@@ -690,6 +690,14 @@
                 </div>
 
                 <div class="form-group">
+                    <label>Associar pessoas a esta entrada (opcional)</label>
+                    <select id="me-people" multiple style="width:100%; padding:10px 12px; border-radius:12px; border:2px solid var(--accent-light); font-weight:700; min-height:56px;">
+                        <!-- options preenchidos dinamicamente -->
+                    </select>
+                    <div style="margin-top:8px; color:var(--text-light); font-size:0.95rem;">Selecione uma ou mais pessoas para relacionar com esta reflexão.</div>
+                </div>
+
+                <div class="form-group">
                     <label>Adicionar imagem (opcional)</label>
                     <input type="file" id="me-image" accept="image/*">
                     <div id="me-image-preview" style="margin-top:12px; display:none;">
@@ -964,9 +972,19 @@ const App = {
         document.getElementById('confirm-msg').innerText = msg;
         const overlay = document.getElementById('confirm-modal');
         const btn = document.getElementById('confirm-btn');
+        // ensure handler uses lexical this and always closes the confirm overlay and refreshes UI after action
         btn.onclick = () => {
-            onConfirm();
+            try {
+                onConfirm && onConfirm();
+            } catch (e) {
+                console.error('Erro na ação de confirmação', e);
+            }
             this.closeConfirm();
+            // small deferred refresh to ensure UI reflects changes
+            setTimeout(() => {
+                this.renderPeople();
+                this.renderMe();
+            }, 60);
         };
         overlay.classList.add('active');
     },
@@ -990,10 +1008,53 @@ const App = {
         if (!this.data.people) this.data.people = [];
         if (!this.data.me) this.data.me = [];
         if (!this.data.settings) this.data.settings = { theme: 'terra', font: 'nunito' };
+
+        // remove duplicatas que possam existir
+        this.dedupePeople();
+        this.dedupeMe();
+        // persist cleaned data
+        this.saveData();
     },
 
     saveData() {
         localStorage.setItem('vinculos_data_v2', JSON.stringify(this.data));
+    },
+
+    // --- Dedupe Helpers ---
+    dedupePeople() {
+        const seen = new Map();
+        this.data.people = this.data.people.filter(p => {
+            // create a key representing the meaningful content
+            const key = [
+                (p.name||'').trim().toLowerCase(),
+                (p.type||'').trim().toLowerCase(),
+                (p.pos||'').trim().toLowerCase(),
+                (p.neg||'').trim().toLowerCase(),
+                String(p.metrics?.closeness||''),
+                String(p.metrics?.trust||''),
+                String(p.metrics?.freq||'')
+            ].join('|');
+            if (seen.has(key)) return false;
+            seen.set(key, true);
+            return true;
+        });
+    },
+
+    dedupeMe() {
+        const seen = new Map();
+        this.data.me = this.data.me.filter(m => {
+            const key = [
+                (m.emotion||'').trim().toLowerCase(),
+                (m.reflection||'').trim().toLowerCase(),
+                (m.improving||'').trim().toLowerCase(),
+                (m.bothering||'').trim().toLowerCase(),
+                String(new Date(m.timestamp).getTime()),
+                (m.image||'')
+            ].join('|');
+            if (seen.has(key)) return false;
+            seen.set(key, true);
+            return true;
+        });
     },
 
     // --- Configurações & Temas ---
@@ -1260,7 +1321,7 @@ const App = {
             id: id || this.generateId(),
             name, type, pos, neg,
             metrics: { closeness, trust, freq },
-            timestamp: id ? this.data.people.find(p=>p.id===id).timestamp : Date.now()
+            timestamp: id ? (this.data.people.find(p=>p.id===id)?.timestamp || Date.now()) : Date.now()
         };
 
         if (id) {
@@ -1270,8 +1331,12 @@ const App = {
             this.data.people.push(personData);
         }
 
+        // remove exact duplicates before persisting
+        this.dedupePeople();
         this.saveData();
         this.showToast("Pessoa salva.");
+        // ensure UI refresh and navigate to people list
+        this.renderPeople();
         this.nav('view-people');
     },
 
@@ -1762,10 +1827,181 @@ const App = {
                     this.data.me.push(entryData);
                 }
 
+                // remove exact duplicates before persist
+                this.dedupeMe();
                 this.saveData();
                 this.showToast("Entrada salva.");
+                // refresh and navigate to diary list
+                this.renderMe();
                 this.nav('view-me');
             }
+
+            // helper: populate people multi-select used in diário form
+            function populatePeopleSelect() {
+                const sel = document.getElementById('me-people');
+                if (!sel) return;
+                sel.innerHTML = '';
+                // Keep insertion order stable (recent first might be nicer)
+                (App.data.people || []).forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.id;
+                    opt.text = p.name + (p.type ? ' — ' + p.type : '');
+                    sel.appendChild(opt);
+                });
+            }
+
+            // Patch existing form helpers to integrate people selection
+            (function patchMeFormHelpers() {
+                // Wrap clearMeForm to also refresh people list & clear selection
+                const origClear = App.clearMeForm.bind(App);
+                App.clearMeForm = function() {
+                    origClear();
+                    populatePeopleSelect();
+                    const sel = document.getElementById('me-people');
+                    if (sel) sel.selectedIndex = -1;
+                };
+
+                // Wrap loadMeForm to restore selected people when editing an entry
+                const origLoad = App.loadMeForm.bind(App);
+                App.loadMeForm = function(id) {
+                    origLoad(id);
+                    // after original load has set up preview, map people selection
+                    const entry = this.data.me.find(m => m.id === id);
+                    populatePeopleSelect();
+                    const sel = document.getElementById('me-people');
+                    if (sel && entry && entry.people && Array.isArray(entry.people)) {
+                        for (let i = 0; i < sel.options.length; i++) {
+                            sel.options[i].selected = entry.people.includes(sel.options[i].value);
+                        }
+                    }
+                };
+
+                // Modify innerSaveMe (already defined later) by wrapping App.saveMe to include people selection
+                // We'll preserve existing behavior but ensure people array is captured when saving.
+                const origSaveMe = App.saveMe.bind(App);
+                App.saveMe = function() {
+                    // original logic already reads fields; to avoid duplicating, we call original and then patch last saved entry
+                    // But original was overridden below to innerSaveMe; ensure we call that and then attach people.
+                    origSaveMe();
+                    // find the last saved/edited entry and update its people from the select
+                    try {
+                        const sel = document.getElementById('me-people');
+                        if (!sel) return;
+                        const selected = Array.from(sel.selectedOptions).map(o => o.value);
+                        // Determine which entry was just saved: either me-id in form or newest by timestamp
+                        const formId = document.getElementById('me-id').value;
+                        if (formId) {
+                            const idx = this.data.me.findIndex(m => m.id === formId);
+                            if (idx > -1) {
+                                this.data.me[idx].people = selected;
+                            }
+                        } else {
+                            // find the newest entry (just saved)
+                            if (this.data.me.length > 0) {
+                                const newest = this.data.me.reduce((a,b)=> a.timestamp>b.timestamp? a: b);
+                                if (newest) newest.people = selected;
+                            }
+                        }
+                        this.saveData();
+                        // refresh UI
+                        this.renderMe();
+                    } catch (e) {
+                        console.error('Erro ao associar pessoas à entrada', e);
+                    }
+                };
+            })();
+
+            // enhance renderMe to show associated people badges
+            const origRenderMe = App.renderMe.bind(App);
+            App.renderMe = function() {
+                origRenderMe();
+                // After cards are rendered, inject people badges into each card header
+                const container = document.getElementById('me-list');
+                if (!container) return;
+                const cards = container.querySelectorAll('.card');
+                cards.forEach(card => {
+                    try {
+                        const dateEl = card.querySelector('div[style*="color:var(--text-light)"]');
+                        const header = card.querySelector('div > div > div');
+                        // find entry by matching date + emotion text (best-effort)
+                        const emotionEl = card.querySelector('div[style*="color:var(--accent)"]');
+                        if (!emotionEl || !dateEl) return;
+                        const emotionText = emotionEl.innerText;
+                        const dateText = dateEl.innerText;
+                        // find matching entry
+                        const entry = (App.data.me || []).find(m => m.emotion === emotionText && App.formatDate(m.timestamp) === dateText);
+                        if (!entry || !entry.people || entry.people.length === 0) return;
+                        // create badges
+                        let badges = card.querySelector('.me-people-badges');
+                        if (!badges) {
+                            badges = document.createElement('div');
+                            badges.className = 'me-people-badges';
+                            badges.style.display = 'flex';
+                            badges.style.gap = '8px';
+                            badges.style.flexWrap = 'wrap';
+                            badges.style.marginTop = '8px';
+                            card.querySelector('div[style*="margin-top:8px;"]').appendChild(badges);
+                        }
+                        badges.innerHTML = '';
+                        entry.people.forEach(pid => {
+                            const p = App.data.people.find(x => x.id === pid);
+                            if (p) {
+                                const span = document.createElement('div');
+                                span.style.background = 'var(--accent-light)';
+                                span.style.color = 'var(--accent)';
+                                span.style.padding = '6px 10px';
+                                span.style.borderRadius = '12px';
+                                span.style.fontWeight = '800';
+                                span.style.fontSize = '0.9rem';
+                                span.innerText = p.name;
+                                badges.appendChild(span);
+                            }
+                        });
+                    } catch (e) { /* ignore per-card errors */ }
+                });
+            };
+
+            // enhance viewMe to display full list of associated people in the modal
+            const origViewMe = App.viewMe.bind(App);
+            App.viewMe = function(id, event) {
+                origViewMe(id, event);
+                try {
+                    const entry = this.data.me.find(m => m.id === id);
+                    const viewContent = document.getElementById('me-view-content');
+                    const peopleContainerId = 'me-view-people';
+                    // remove old people area if present
+                    let existing = document.getElementById(peopleContainerId);
+                    if (existing) existing.remove();
+                    if (entry && entry.people && entry.people.length > 0) {
+                        const wrap = document.createElement('div');
+                        wrap.id = peopleContainerId;
+                        wrap.style.marginTop = '12px';
+                        wrap.innerHTML = '<strong>Pessoas relacionadas</strong>';
+                        const list = document.createElement('div');
+                        list.style.display = 'flex';
+                        list.style.gap = '8px';
+                        list.style.flexWrap = 'wrap';
+                        list.style.marginTop = '6px';
+                        entry.people.forEach(pid => {
+                            const p = App.data.people.find(x => x.id === pid);
+                            const span = document.createElement('div');
+                            span.style.background = 'var(--accent-light)';
+                            span.style.color = 'var(--accent)';
+                            span.style.padding = '6px 10px';
+                            span.style.borderRadius = '12px';
+                            span.style.fontWeight = '800';
+                            span.style.fontSize = '0.95rem';
+                            span.innerText = p ? p.name + (p.type ? ' — ' + p.type : '') : '(removida)';
+                            list.appendChild(span);
+                        });
+                        wrap.appendChild(list);
+                        // append after existing content
+                        document.getElementById('me-view-modal').querySelector('.modal-content').appendChild(wrap);
+                    }
+                } catch (e) {
+                    console.error('Erro ao mostrar pessoas associadas', e);
+                }
+            };
 
             // Initialize app first, then require PIN if configured (so settings are loaded)
             App.init();
