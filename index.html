@@ -697,14 +697,6 @@
                     <div style="margin-top:8px; color:var(--text-light); font-size:0.95rem;">Selecione uma ou mais pessoas para relacionar com esta reflexão.</div>
                 </div>
 
-                <div class="form-group">
-                    <label>Adicionar imagem (opcional)</label>
-                    <input type="file" id="me-image" accept="image/*">
-                    <div id="me-image-preview" style="margin-top:12px; display:none;">
-                        <img id="me-image-preview-img" src="" alt="Prévia" style="width:100%; border-radius:12px; box-shadow: var(--shadow-sm);">
-                        <button class="btn btn-outline mt-2" style="width:100%; margin-top:10px;" onclick="App.removeMeImage(event)">Remover imagem</button>
-                    </div>
-                </div>
             </div>
 
             <div class="flex-row mt-2">
@@ -809,9 +801,7 @@
                     <button class="btn" id="me-view-edit-btn">Editar</button>
                 </div>
             </div>
-            <div id="me-view-image" style="margin-bottom:12px; display:none;">
-                <img id="me-view-image-img" src="" alt="Imagem" style="width:100%; border-radius:12px; box-shadow: var(--shadow-sm);">
-            </div>
+
             <div id="me-view-content" style="font-size:1.05rem; color:var(--text-main); line-height:1.6;"></div>
             <div id="me-view-advice" style="margin-top:14px; display:none;">
                 <div class="advice-box">
@@ -1477,15 +1467,7 @@ const App = {
     },
 
     // --- LÓGICA: SOBRE MIM (Diário) ---
-    removeMeImage(event) {
-        event && event.preventDefault();
-        const input = document.getElementById('me-image');
-        const preview = document.getElementById('me-image-preview');
-        const img = document.getElementById('me-image-preview-img');
-        input.value = '';
-        img.src = '';
-        preview.style.display = 'none';
-    },
+
 
     // --- RENDERIZAÇÕES ---
     renderHome() {
@@ -1616,15 +1598,7 @@ const App = {
                 `;
             }
 
-            // Image block if exists (small inline preview)
             let thumbHtml = '';
-            if (m.image) {
-                thumbHtml = `
-                    <div style="width:84px; height:64px; overflow:hidden; border-radius:10px; flex-shrink:0; box-shadow: var(--shadow-sm); margin-left:12px;">
-                        <img src="${m.image}" alt="img" style="width:100%; height:100%; object-fit:cover; display:block;">
-                    </div>
-                `;
-            }
 
             el.innerHTML = `
                 <div style="display:flex; justify-content:space-between; gap:12px; align-items:flex-start;">
@@ -1662,14 +1636,7 @@ const App = {
             entry.bothering ? `<strong style="margin-top:8px; display:block;">Incomoda</strong><div style="margin-top:6px;">${entry.bothering}</div>` : ''
         ].join('');
         document.getElementById('me-view-content').innerHTML = content || '<em>Sem texto.</em>';
-        if (entry.image) {
-            const viewImg = document.getElementById('me-view-image');
-            const viewImgTag = document.getElementById('me-view-image-img');
-            viewImgTag.src = entry.image;
-            viewImg.style.display = 'block';
-        } else {
-            document.getElementById('me-view-image').style.display = 'none';
-        }
+        // no image handling (feature removed)
         if (entry.counselorAdvice) {
             document.getElementById('me-view-advice-text').innerText = entry.counselorAdvice;
             document.getElementById('me-view-advice').style.display = 'block';
@@ -1741,41 +1708,14 @@ const App = {
  // Iniciar a aplicação quando o documento carregar
         // Hook up image input handling for diary form
         document.addEventListener('DOMContentLoaded', () => {
-            const imgInput = document.getElementById('me-image');
-            if (imgInput) {
-                imgInput.addEventListener('change', (e) => {
-                    const file = e.target.files && e.target.files[0];
-                    const preview = document.getElementById('me-image-preview');
-                    const img = document.getElementById('me-image-preview-img');
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = function(evt) {
-                            img.src = evt.target.result;
-                            preview.style.display = 'block';
-                        };
-                        reader.readAsDataURL(file);
-                    } else {
-                        img.src = '';
-                        preview.style.display = 'none';
-                    }
-                });
-            }
 
-            // Helper: read a File as DataURL (Base64) via Promise
-            function readFileAsDataURL(file) {
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onerror = () => reject(new Error('Falha ao ler arquivo de imagem'));
-                    reader.onload = () => resolve(reader.result);
-                    reader.readAsDataURL(file);
-                });
-            }
 
-            // populate people select used in diário form
+            // helper: populate people multi-select used in diário form
             function populatePeopleSelect() {
                 const sel = document.getElementById('me-people');
                 if (!sel) return;
                 sel.innerHTML = '';
+                // Keep insertion order stable (recent first might be nicer)
                 (App.data.people || []).forEach(p => {
                     const opt = document.createElement('option');
                     opt.value = p.id;
@@ -1784,8 +1724,9 @@ const App = {
                 });
             }
 
-            // Integrate people select with clear/load form helpers
+            // Patch existing form helpers to integrate people selection
             (function patchMeFormHelpers() {
+                // Wrap clearMeForm to also refresh people list & clear selection
                 const origClear = App.clearMeForm.bind(App);
                 App.clearMeForm = function() {
                     origClear();
@@ -1794,9 +1735,11 @@ const App = {
                     if (sel) sel.selectedIndex = -1;
                 };
 
+                // Wrap loadMeForm to restore selected people when editing an entry
                 const origLoad = App.loadMeForm.bind(App);
                 App.loadMeForm = function(id) {
                     origLoad(id);
+                    // after original load has set up preview, map people selection
                     const entry = this.data.me.find(m => m.id === id);
                     populatePeopleSelect();
                     const sel = document.getElementById('me-people');
@@ -1806,98 +1749,63 @@ const App = {
                         }
                     }
                 };
-            })();
 
-            // Single robust async saveMe implementation (reads file as Base64, keeps existing image when editing)
-            App.saveMe = async function() {
-                if (!this.ensureUnlocked()) return;
-                try {
-                    const id = document.getElementById('me-id').value;
-                    const emotion = document.getElementById('me-emotion').value;
-                    const reflection = document.getElementById('me-reflection').value;
-                    const improving = document.getElementById('me-improving').value;
-                    const bothering = document.getElementById('me-bothering').value;
-                    const dateStr = document.getElementById('me-date').value;
-                    const sel = document.getElementById('me-people');
-
-                    // validation: require some content (text or image)
-                    const fileInput = document.getElementById('me-image');
-                    const hasFile = fileInput && fileInput.files && fileInput.files[0];
-                    if (!reflection.trim() && !improving.trim() && !bothering.trim() && !hasFile) {
-                        this.showToast("Escreva algo para salvar.");
-                        return;
-                    }
-
-                    let dateObj = dateStr ? new Date(dateStr + 'T12:00:00') : new Date();
-
-                    const entryData = {
-                        id: id || this.generateId(),
-                        emotion,
-                        reflection,
-                        improving,
-                        bothering,
-                        timestamp: dateObj.getTime(),
-                        counselorAdvice: Counselor.analyze((reflection || '') + " " + (bothering || '')),
-                        image: null,
-                        people: []
-                    };
-
-                    // If a new file is selected, read it as Base64 (safe for localStorage)
-                    if (hasFile) {
-                        try {
-                            entryData.image = await readFileAsDataURL(fileInput.files[0]);
-                        } catch (e) {
-                            console.error('Erro ao ler imagem:', e);
-                            this.showToast('Não foi possível processar a imagem.');
-                            return;
+                // Modify innerSaveMe (already defined later) by wrapping App.saveMe to include people selection
+                // We'll preserve existing behavior but ensure people array is captured when saving.
+                const origSaveMe = App.saveMe.bind(App);
+                App.saveMe = function() {
+                    // original logic already reads fields; to avoid duplicating, we call original and then patch last saved entry
+                    // But original was overridden below to innerSaveMe; ensure we call that and then attach people.
+                    origSaveMe();
+                    // find the last saved/edited entry and update its people from the select
+                    try {
+                        const sel = document.getElementById('me-people');
+                        if (!sel) return;
+                        const selected = Array.from(sel.selectedOptions).map(o => o.value);
+                        // Determine which entry was just saved: either me-id in form or newest by timestamp
+                        const formId = document.getElementById('me-id').value;
+                        if (formId) {
+                            const idx = this.data.me.findIndex(m => m.id === formId);
+                            if (idx > -1) {
+                                this.data.me[idx].people = selected;
+                            }
+                        } else {
+                            // find the newest entry (just saved)
+                            if (this.data.me.length > 0) {
+                                const newest = this.data.me.reduce((a,b)=> a.timestamp>b.timestamp? a: b);
+                                if (newest) newest.people = selected;
+                            }
                         }
-                    } else if (id) {
-                        // keep existing image when editing
-                        const existing = this.data.me.find(m => m.id === id);
-                        if (existing && existing.image) entryData.image = existing.image;
+                        this.saveData();
+                        // refresh UI
+                        this.renderMe();
+                    } catch (e) {
+                        console.error('Erro ao associar pessoas à entrada', e);
                     }
-
-                    // capture selected people (if any)
-                    if (sel) {
-                        entryData.people = Array.from(sel.selectedOptions || []).map(o => o.value);
-                    }
-
-                    // Save or update
-                    if (id) {
-                        const idx = this.data.me.findIndex(m => m.id === id);
-                        if (idx > -1) this.data.me[idx] = entryData;
-                    } else {
-                        this.data.me.push(entryData);
-                    }
-
-                    // dedupe, persist, refresh UI
-                    this.dedupeMe();
-                    this.saveData();
-                    this.showToast("Entrada salva.");
-                    this.renderMe();
-                    this.nav('view-me');
-                } catch (err) {
-                    console.error('saveMe erro:', err);
-                    this.showToast('Erro ao salvar entrada.');
-                }
-            };
+                };
+            })();
 
             // enhance renderMe to show associated people badges
             const origRenderMe = App.renderMe.bind(App);
             App.renderMe = function() {
                 origRenderMe();
+                // After cards are rendered, inject people badges into each card header
                 const container = document.getElementById('me-list');
                 if (!container) return;
                 const cards = container.querySelectorAll('.card');
                 cards.forEach(card => {
                     try {
                         const dateEl = card.querySelector('div[style*="color:var(--text-light)"]');
+                        const header = card.querySelector('div > div > div');
+                        // find entry by matching date + emotion text (best-effort)
                         const emotionEl = card.querySelector('div[style*="color:var(--accent)"]');
                         if (!emotionEl || !dateEl) return;
                         const emotionText = emotionEl.innerText;
                         const dateText = dateEl.innerText;
+                        // find matching entry
                         const entry = (App.data.me || []).find(m => m.emotion === emotionText && App.formatDate(m.timestamp) === dateText);
                         if (!entry || !entry.people || entry.people.length === 0) return;
+                        // create badges
                         let badges = card.querySelector('.me-people-badges');
                         if (!badges) {
                             badges = document.createElement('div');
@@ -1906,8 +1814,7 @@ const App = {
                             badges.style.gap = '8px';
                             badges.style.flexWrap = 'wrap';
                             badges.style.marginTop = '8px';
-                            const contentArea = card.querySelector('div[style*="margin-top:8px;"]') || card;
-                            contentArea.appendChild(badges);
+                            card.querySelector('div[style*="margin-top:8px;"]').appendChild(badges);
                         }
                         badges.innerHTML = '';
                         entry.people.forEach(pid => {
@@ -1934,7 +1841,9 @@ const App = {
                 origViewMe(id, event);
                 try {
                     const entry = this.data.me.find(m => m.id === id);
+                    const viewContent = document.getElementById('me-view-content');
                     const peopleContainerId = 'me-view-people';
+                    // remove old people area if present
                     let existing = document.getElementById(peopleContainerId);
                     if (existing) existing.remove();
                     if (entry && entry.people && entry.people.length > 0) {
@@ -1960,6 +1869,7 @@ const App = {
                             list.appendChild(span);
                         });
                         wrap.appendChild(list);
+                        // append after existing content
                         document.getElementById('me-view-modal').querySelector('.modal-content').appendChild(wrap);
                     }
                 } catch (e) {
