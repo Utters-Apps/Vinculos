@@ -1761,44 +1761,86 @@ const App = {
                 });
             }
 
-            // We'll set a temporary holder for pending image data when saving
-            App._pendingImageData = null;
-
-            // Override saveMe to ensure image data is captured and persisted
-            const originalSaveMe = App.saveMe.bind(App);
-            App.saveMe = function() {
-                const input = document.getElementById('me-image');
-                if (input && input.files && input.files[0]) {
-                    const file = input.files[0];
+            // Robust image & people handling and a single saveMe implementation to avoid conflicts and state bloat
+            function readFileAsDataURL(file) {
+                return new Promise((resolve, reject) => {
+                    if (!file) return resolve(null);
                     const reader = new FileReader();
-                    reader.onload = (evt) => {
-                        this._pendingImageData = evt.target.result;
-                        // call the inner save logic which we'll replace below
-                        innerSaveMe.call(this);
-                        this._pendingImageData = null;
-                    };
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = () => reject(new Error('Falha ao ler arquivo.'));
                     reader.readAsDataURL(file);
-                } else {
-                    // No new image selected; call inner save directly
-                    innerSaveMe.call(this);
-                }
-            };
+                });
+            }
 
-            // innerSaveMe mirrors the original save logic but includes image handling
-            function innerSaveMe() {
+            // populate people select helper
+            function populatePeopleSelect() {
+                const sel = document.getElementById('me-people');
+                if (!sel) return;
+                sel.innerHTML = '';
+                (App.data.people || []).forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.id;
+                    opt.text = p.name + (p.type ? ' — ' + p.type : '');
+                    sel.appendChild(opt);
+                });
+            }
+
+            // Replace App.clearMeForm and App.loadMeForm slightly to ensure people list updated
+            (function patchMeFormHelpers() {
+                const origClear = App.clearMeForm.bind(App);
+                App.clearMeForm = function() {
+                    origClear();
+                    populatePeopleSelect();
+                    const sel = document.getElementById('me-people');
+                    if (sel) sel.selectedIndex = -1;
+                };
+
+                const origLoad = App.loadMeForm.bind(App);
+                App.loadMeForm = function(id) {
+                    origLoad(id);
+                    populatePeopleSelect();
+                    const entry = this.data.me.find(m => m.id === id);
+                    const sel = document.getElementById('me-people');
+                    if (sel && entry && Array.isArray(entry.people)) {
+                        for (let i = 0; i < sel.options.length; i++) {
+                            sel.options[i].selected = entry.people.includes(sel.options[i].value);
+                        }
+                    }
+                };
+            })();
+
+            // Single, reliable async saveMe that handles file reading, people, dedupe and persistence
+            App.saveMe = async function() {
+                if (!this.ensureUnlocked()) return;
                 const id = document.getElementById('me-id').value;
                 const emotion = document.getElementById('me-emotion').value;
-                const reflection = document.getElementById('me-reflection').value;
-                const improving = document.getElementById('me-improving').value;
-                const bothering = document.getElementById('me-bothering').value;
+                const reflection = document.getElementById('me-reflection').value || '';
+                const improving = document.getElementById('me-improving').value || '';
+                const bothering = document.getElementById('me-bothering').value || '';
                 const dateStr = document.getElementById('me-date').value;
+                const sel = document.getElementById('me-people');
 
-                if (!reflection.trim() && !improving.trim() && !bothering.trim() && !this._pendingImageData) {
+                if (!reflection.trim() && !improving.trim() && !bothering.trim() && !(document.getElementById('me-image') && document.getElementById('me-image').files && document.getElementById('me-image').files.length)) {
                     this.showToast("Escreva algo para salvar.");
                     return;
                 }
 
                 let dateObj = dateStr ? new Date(dateStr + 'T12:00:00') : new Date();
+
+                // read image if present
+                let imageData = null;
+                try {
+                    const input = document.getElementById('me-image');
+                    if (input && input.files && input.files[0]) {
+                        imageData = await readFileAsDataURL(input.files[0]);
+                    } else if (id) {
+                        const existing = this.data.me.find(m => m.id === id);
+                        if (existing && existing.image) imageData = existing.image;
+                    }
+                } catch (e) {
+                    console.error('Erro lendo imagem', e);
+                    this.showToast('Não foi possível ler a imagem.');
+                }
 
                 const entryData = {
                     id: id || this.generateId(),
@@ -1808,130 +1850,53 @@ const App = {
                     bothering,
                     timestamp: dateObj.getTime(),
                     counselorAdvice: Counselor.analyze(reflection + " " + bothering),
-                    image: null
+                    image: imageData || null,
+                    people: []
                 };
 
-                // Prefer newly uploaded image
-                if (this._pendingImageData) {
-                    entryData.image = this._pendingImageData;
-                } else if (id) {
-                    // keep existing image when editing
-                    const existing = this.data.me.find(m => m.id === id);
-                    if (existing && existing.image) entryData.image = existing.image;
+                // attach selected people
+                try {
+                    if (sel) {
+                        entryData.people = Array.from(sel.selectedOptions).map(o => o.value);
+                    }
+                } catch (e) {
+                    entryData.people = entryData.people || [];
                 }
 
-                if (id) {
-                    const idx = this.data.me.findIndex(m => m.id === id);
-                    if (idx > -1) this.data.me[idx] = entryData;
-                } else {
-                    this.data.me.push(entryData);
+                // insert or update deterministically
+                const idx = this.data.me.findIndex(m => m.id === entryData.id);
+                if (idx > -1) this.data.me[idx] = entryData;
+                else this.data.me.push(entryData);
+
+                // dedupe, persist and refresh UI
+                try {
+                    this.dedupeMe();
+                    this.saveData();
+                    this.showToast("Entrada salva.");
+                    this.renderMe();
+                    this.nav('view-me');
+                } catch (e) {
+                    console.error('Erro ao salvar entrada', e);
+                    this.showToast('Erro ao salvar. Tente novamente.');
                 }
+            };
 
-                // remove exact duplicates before persist
-                this.dedupeMe();
-                this.saveData();
-                this.showToast("Entrada salva.");
-                // refresh and navigate to diary list
-                this.renderMe();
-                this.nav('view-me');
-            }
-
-            // helper: populate people multi-select used in diário form
-            function populatePeopleSelect() {
-                const sel = document.getElementById('me-people');
-                if (!sel) return;
-                sel.innerHTML = '';
-                // Keep insertion order stable (recent first might be nicer)
-                (App.data.people || []).forEach(p => {
-                    const opt = document.createElement('option');
-                    opt.value = p.id;
-                    opt.text = p.name + (p.type ? ' — ' + p.type : '');
-                    sel.appendChild(opt);
-                });
-            }
-
-            // Patch existing form helpers to integrate people selection
-            (function patchMeFormHelpers() {
-                // Wrap clearMeForm to also refresh people list & clear selection
-                const origClear = App.clearMeForm.bind(App);
-                App.clearMeForm = function() {
-                    origClear();
-                    populatePeopleSelect();
-                    const sel = document.getElementById('me-people');
-                    if (sel) sel.selectedIndex = -1;
-                };
-
-                // Wrap loadMeForm to restore selected people when editing an entry
-                const origLoad = App.loadMeForm.bind(App);
-                App.loadMeForm = function(id) {
-                    origLoad(id);
-                    // after original load has set up preview, map people selection
-                    const entry = this.data.me.find(m => m.id === id);
-                    populatePeopleSelect();
-                    const sel = document.getElementById('me-people');
-                    if (sel && entry && entry.people && Array.isArray(entry.people)) {
-                        for (let i = 0; i < sel.options.length; i++) {
-                            sel.options[i].selected = entry.people.includes(sel.options[i].value);
-                        }
-                    }
-                };
-
-                // Modify innerSaveMe (already defined later) by wrapping App.saveMe to include people selection
-                // We'll preserve existing behavior but ensure people array is captured when saving.
-                const origSaveMe = App.saveMe.bind(App);
-                App.saveMe = function() {
-                    // original logic already reads fields; to avoid duplicating, we call original and then patch last saved entry
-                    // But original was overridden below to innerSaveMe; ensure we call that and then attach people.
-                    origSaveMe();
-                    // find the last saved/edited entry and update its people from the select
-                    try {
-                        const sel = document.getElementById('me-people');
-                        if (!sel) return;
-                        const selected = Array.from(sel.selectedOptions).map(o => o.value);
-                        // Determine which entry was just saved: either me-id in form or newest by timestamp
-                        const formId = document.getElementById('me-id').value;
-                        if (formId) {
-                            const idx = this.data.me.findIndex(m => m.id === formId);
-                            if (idx > -1) {
-                                this.data.me[idx].people = selected;
-                            }
-                        } else {
-                            // find the newest entry (just saved)
-                            if (this.data.me.length > 0) {
-                                const newest = this.data.me.reduce((a,b)=> a.timestamp>b.timestamp? a: b);
-                                if (newest) newest.people = selected;
-                            }
-                        }
-                        this.saveData();
-                        // refresh UI
-                        this.renderMe();
-                    } catch (e) {
-                        console.error('Erro ao associar pessoas à entrada', e);
-                    }
-                };
-            })();
-
-            // enhance renderMe to show associated people badges
+            // enhance renderMe to show associated people badges (non-destructive, idempotent)
             const origRenderMe = App.renderMe.bind(App);
             App.renderMe = function() {
                 origRenderMe();
-                // After cards are rendered, inject people badges into each card header
                 const container = document.getElementById('me-list');
                 if (!container) return;
                 const cards = container.querySelectorAll('.card');
                 cards.forEach(card => {
                     try {
                         const dateEl = card.querySelector('div[style*="color:var(--text-light)"]');
-                        const header = card.querySelector('div > div > div');
-                        // find entry by matching date + emotion text (best-effort)
                         const emotionEl = card.querySelector('div[style*="color:var(--accent)"]');
                         if (!emotionEl || !dateEl) return;
                         const emotionText = emotionEl.innerText;
                         const dateText = dateEl.innerText;
-                        // find matching entry
                         const entry = (App.data.me || []).find(m => m.emotion === emotionText && App.formatDate(m.timestamp) === dateText);
                         if (!entry || !entry.people || entry.people.length === 0) return;
-                        // create badges
                         let badges = card.querySelector('.me-people-badges');
                         if (!badges) {
                             badges = document.createElement('div');
@@ -1940,24 +1905,23 @@ const App = {
                             badges.style.gap = '8px';
                             badges.style.flexWrap = 'wrap';
                             badges.style.marginTop = '8px';
-                            card.querySelector('div[style*="margin-top:8px;"]').appendChild(badges);
+                            const target = card.querySelector('div[style*="margin-top:8px;"]') || card;
+                            target.appendChild(badges);
                         }
                         badges.innerHTML = '';
                         entry.people.forEach(pid => {
                             const p = App.data.people.find(x => x.id === pid);
-                            if (p) {
-                                const span = document.createElement('div');
-                                span.style.background = 'var(--accent-light)';
-                                span.style.color = 'var(--accent)';
-                                span.style.padding = '6px 10px';
-                                span.style.borderRadius = '12px';
-                                span.style.fontWeight = '800';
-                                span.style.fontSize = '0.9rem';
-                                span.innerText = p.name;
-                                badges.appendChild(span);
-                            }
+                            const span = document.createElement('div');
+                            span.style.background = 'var(--accent-light)';
+                            span.style.color = 'var(--accent)';
+                            span.style.padding = '6px 10px';
+                            span.style.borderRadius = '12px';
+                            span.style.fontWeight = '800';
+                            span.style.fontSize = '0.9rem';
+                            span.innerText = p ? p.name : '(removida)';
+                            badges.appendChild(span);
                         });
-                    } catch (e) { /* ignore per-card errors */ }
+                    } catch (e) { console.error(e); }
                 });
             };
 
@@ -1967,9 +1931,7 @@ const App = {
                 origViewMe(id, event);
                 try {
                     const entry = this.data.me.find(m => m.id === id);
-                    const viewContent = document.getElementById('me-view-content');
                     const peopleContainerId = 'me-view-people';
-                    // remove old people area if present
                     let existing = document.getElementById(peopleContainerId);
                     if (existing) existing.remove();
                     if (entry && entry.people && entry.people.length > 0) {
@@ -1995,13 +1957,12 @@ const App = {
                             list.appendChild(span);
                         });
                         wrap.appendChild(list);
-                        // append after existing content
                         document.getElementById('me-view-modal').querySelector('.modal-content').appendChild(wrap);
                     }
-                } catch (e) {
-                    console.error('Erro ao mostrar pessoas associadas', e);
-                }
+                } catch (e) { console.error('Erro ao mostrar pessoas associadas', e); }
             };
+
+            // (duplicate file-input wiring removed — initial listener above handles previews)
 
             // Initialize app first, then require PIN if configured (so settings are loaded)
             App.init();
