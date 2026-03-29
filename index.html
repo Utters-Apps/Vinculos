@@ -1761,18 +1761,17 @@ const App = {
                 });
             }
 
-            // Robust image & people handling and a single saveMe implementation to avoid conflicts and state bloat
+            // Helper: read a File as DataURL (Base64) via Promise
             function readFileAsDataURL(file) {
                 return new Promise((resolve, reject) => {
-                    if (!file) return resolve(null);
                     const reader = new FileReader();
+                    reader.onerror = () => reject(new Error('Falha ao ler arquivo de imagem'));
                     reader.onload = () => resolve(reader.result);
-                    reader.onerror = () => reject(new Error('Falha ao ler arquivo.'));
                     reader.readAsDataURL(file);
                 });
             }
 
-            // populate people select helper
+            // populate people select used in diário form
             function populatePeopleSelect() {
                 const sel = document.getElementById('me-people');
                 if (!sel) return;
@@ -1785,7 +1784,7 @@ const App = {
                 });
             }
 
-            // Replace App.clearMeForm and App.loadMeForm slightly to ensure people list updated
+            // Integrate people select with clear/load form helpers
             (function patchMeFormHelpers() {
                 const origClear = App.clearMeForm.bind(App);
                 App.clearMeForm = function() {
@@ -1798,10 +1797,10 @@ const App = {
                 const origLoad = App.loadMeForm.bind(App);
                 App.loadMeForm = function(id) {
                     origLoad(id);
-                    populatePeopleSelect();
                     const entry = this.data.me.find(m => m.id === id);
+                    populatePeopleSelect();
                     const sel = document.getElementById('me-people');
-                    if (sel && entry && Array.isArray(entry.people)) {
+                    if (sel && entry && entry.people && Array.isArray(entry.people)) {
                         for (let i = 0; i < sel.options.length; i++) {
                             sel.options[i].selected = entry.people.includes(sel.options[i].value);
                         }
@@ -1809,79 +1808,81 @@ const App = {
                 };
             })();
 
-            // Single, reliable async saveMe that handles file reading, people, dedupe and persistence
+            // Single robust async saveMe implementation (reads file as Base64, keeps existing image when editing)
             App.saveMe = async function() {
                 if (!this.ensureUnlocked()) return;
-                const id = document.getElementById('me-id').value;
-                const emotion = document.getElementById('me-emotion').value;
-                const reflection = document.getElementById('me-reflection').value || '';
-                const improving = document.getElementById('me-improving').value || '';
-                const bothering = document.getElementById('me-bothering').value || '';
-                const dateStr = document.getElementById('me-date').value;
-                const sel = document.getElementById('me-people');
-
-                if (!reflection.trim() && !improving.trim() && !bothering.trim() && !(document.getElementById('me-image') && document.getElementById('me-image').files && document.getElementById('me-image').files.length)) {
-                    this.showToast("Escreva algo para salvar.");
-                    return;
-                }
-
-                let dateObj = dateStr ? new Date(dateStr + 'T12:00:00') : new Date();
-
-                // read image if present
-                let imageData = null;
                 try {
-                    const input = document.getElementById('me-image');
-                    if (input && input.files && input.files[0]) {
-                        imageData = await readFileAsDataURL(input.files[0]);
+                    const id = document.getElementById('me-id').value;
+                    const emotion = document.getElementById('me-emotion').value;
+                    const reflection = document.getElementById('me-reflection').value;
+                    const improving = document.getElementById('me-improving').value;
+                    const bothering = document.getElementById('me-bothering').value;
+                    const dateStr = document.getElementById('me-date').value;
+                    const sel = document.getElementById('me-people');
+
+                    // validation: require some content (text or image)
+                    const fileInput = document.getElementById('me-image');
+                    const hasFile = fileInput && fileInput.files && fileInput.files[0];
+                    if (!reflection.trim() && !improving.trim() && !bothering.trim() && !hasFile) {
+                        this.showToast("Escreva algo para salvar.");
+                        return;
+                    }
+
+                    let dateObj = dateStr ? new Date(dateStr + 'T12:00:00') : new Date();
+
+                    const entryData = {
+                        id: id || this.generateId(),
+                        emotion,
+                        reflection,
+                        improving,
+                        bothering,
+                        timestamp: dateObj.getTime(),
+                        counselorAdvice: Counselor.analyze((reflection || '') + " " + (bothering || '')),
+                        image: null,
+                        people: []
+                    };
+
+                    // If a new file is selected, read it as Base64 (safe for localStorage)
+                    if (hasFile) {
+                        try {
+                            entryData.image = await readFileAsDataURL(fileInput.files[0]);
+                        } catch (e) {
+                            console.error('Erro ao ler imagem:', e);
+                            this.showToast('Não foi possível processar a imagem.');
+                            return;
+                        }
                     } else if (id) {
+                        // keep existing image when editing
                         const existing = this.data.me.find(m => m.id === id);
-                        if (existing && existing.image) imageData = existing.image;
+                        if (existing && existing.image) entryData.image = existing.image;
                     }
-                } catch (e) {
-                    console.error('Erro lendo imagem', e);
-                    this.showToast('Não foi possível ler a imagem.');
-                }
 
-                const entryData = {
-                    id: id || this.generateId(),
-                    emotion,
-                    reflection,
-                    improving,
-                    bothering,
-                    timestamp: dateObj.getTime(),
-                    counselorAdvice: Counselor.analyze(reflection + " " + bothering),
-                    image: imageData || null,
-                    people: []
-                };
-
-                // attach selected people
-                try {
+                    // capture selected people (if any)
                     if (sel) {
-                        entryData.people = Array.from(sel.selectedOptions).map(o => o.value);
+                        entryData.people = Array.from(sel.selectedOptions || []).map(o => o.value);
                     }
-                } catch (e) {
-                    entryData.people = entryData.people || [];
-                }
 
-                // insert or update deterministically
-                const idx = this.data.me.findIndex(m => m.id === entryData.id);
-                if (idx > -1) this.data.me[idx] = entryData;
-                else this.data.me.push(entryData);
+                    // Save or update
+                    if (id) {
+                        const idx = this.data.me.findIndex(m => m.id === id);
+                        if (idx > -1) this.data.me[idx] = entryData;
+                    } else {
+                        this.data.me.push(entryData);
+                    }
 
-                // dedupe, persist and refresh UI
-                try {
+                    // dedupe, persist, refresh UI
                     this.dedupeMe();
                     this.saveData();
                     this.showToast("Entrada salva.");
                     this.renderMe();
                     this.nav('view-me');
-                } catch (e) {
-                    console.error('Erro ao salvar entrada', e);
-                    this.showToast('Erro ao salvar. Tente novamente.');
+                } catch (err) {
+                    console.error('saveMe erro:', err);
+                    this.showToast('Erro ao salvar entrada.');
                 }
             };
 
-            // enhance renderMe to show associated people badges (non-destructive, idempotent)
+            // enhance renderMe to show associated people badges
             const origRenderMe = App.renderMe.bind(App);
             App.renderMe = function() {
                 origRenderMe();
@@ -1905,23 +1906,25 @@ const App = {
                             badges.style.gap = '8px';
                             badges.style.flexWrap = 'wrap';
                             badges.style.marginTop = '8px';
-                            const target = card.querySelector('div[style*="margin-top:8px;"]') || card;
-                            target.appendChild(badges);
+                            const contentArea = card.querySelector('div[style*="margin-top:8px;"]') || card;
+                            contentArea.appendChild(badges);
                         }
                         badges.innerHTML = '';
                         entry.people.forEach(pid => {
                             const p = App.data.people.find(x => x.id === pid);
-                            const span = document.createElement('div');
-                            span.style.background = 'var(--accent-light)';
-                            span.style.color = 'var(--accent)';
-                            span.style.padding = '6px 10px';
-                            span.style.borderRadius = '12px';
-                            span.style.fontWeight = '800';
-                            span.style.fontSize = '0.9rem';
-                            span.innerText = p ? p.name : '(removida)';
-                            badges.appendChild(span);
+                            if (p) {
+                                const span = document.createElement('div');
+                                span.style.background = 'var(--accent-light)';
+                                span.style.color = 'var(--accent)';
+                                span.style.padding = '6px 10px';
+                                span.style.borderRadius = '12px';
+                                span.style.fontWeight = '800';
+                                span.style.fontSize = '0.9rem';
+                                span.innerText = p.name;
+                                badges.appendChild(span);
+                            }
                         });
-                    } catch (e) { console.error(e); }
+                    } catch (e) { /* ignore per-card errors */ }
                 });
             };
 
@@ -1959,10 +1962,10 @@ const App = {
                         wrap.appendChild(list);
                         document.getElementById('me-view-modal').querySelector('.modal-content').appendChild(wrap);
                     }
-                } catch (e) { console.error('Erro ao mostrar pessoas associadas', e); }
+                } catch (e) {
+                    console.error('Erro ao mostrar pessoas associadas', e);
+                }
             };
-
-            // (duplicate file-input wiring removed — initial listener above handles previews)
 
             // Initialize app first, then require PIN if configured (so settings are loaded)
             App.init();
