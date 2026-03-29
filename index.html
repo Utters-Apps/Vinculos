@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Vínculos - Diário Pessoal</title>
     
-    <!-- Importando fontes fofas e elegantes do Google Fonts -->
+    <!-- Importando mais opções de fontes do Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Nunito:wght@400;600;700;800&family=Poppins:wght@400;500;600&family=Quicksand:wght@400;500;600;700&family=Playfair+Display:wght@400;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
 
     <style>
-        /* --- Variáveis Base --- */
+        /* --- Variáveis Base & Cores (Temas) --- */
         :root {
             --radius-lg: 24px;
             --radius-md: 16px;
@@ -20,964 +20,783 @@
             --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
             --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.03);
             
-            --danger: #FF8BA7;
-            --success: #88D4AB;
-        }
-
-        /* --- TEMA: TERRA (Padrão) --- */
-        [data-theme="terra"] {
-            --bg-color: #FDFBF7;
+            --danger: #FF6B6B;
+            --danger-light: #FFE5E5;
+            
+            /* Tema Padrão: Terra */
+            --bg: #FAF6F0;
             --surface: #FFFFFF;
-            --text-main: #5C544B;
-            --text-light: #9B9288;
-            --accent: #D4A373;
-            --accent-hover: #C28D5A;
-            --accent-light: #FAEDDF;
+            --primary: #8C7A6B;
+            --primary-light: #E8E0D5;
+            --text-main: #4A4036;
+            --text-muted: #8C7A6B;
+            --border: #E8E0D5;
         }
 
-        /* --- TEMA: MATCHA (Verde Suave) --- */
-        [data-theme="matcha"] {
-            --bg-color: #F7F9F6;
-            --surface: #FFFFFF;
-            --text-main: #4A5C4A;
-            --text-light: #8BA08B;
-            --accent: #8EAE7D;
-            --accent-hover: #759664;
-            --accent-light: #EAF2E6;
+        /* Tema: Oceano */
+        [data-theme="oceano"] {
+            --bg: #F0F6FA; --surface: #FFFFFF; --primary: #5A8296;
+            --primary-light: #D5E2E8; --text-main: #2A3F4A;
+            --text-muted: #6B8C9E; --border: #D5E0E8;
         }
 
-        /* --- TEMA: LAVANDA (Roxo Suave) --- */
+        /* Tema: Lavanda */
         [data-theme="lavanda"] {
-            --bg-color: #F8F7FA;
-            --surface: #FFFFFF;
-            --text-main: #564E65;
-            --text-light: #948CA3;
-            --accent: #A99BCE;
-            --accent-hover: #9182BA;
-            --accent-light: #F0EDF7;
+            --bg: #F8F0FA; --surface: #FFFFFF; --primary: #835A96;
+            --primary-light: #E2D5E8; --text-main: #3F2A4A;
+            --text-muted: #8C6B9E; --border: #E0D5E8;
         }
 
-        /* --- TEMA: PÊSSEGO (Rosa/Laranja Suave) --- */
-        [data-theme="pessego"] {
-            --bg-color: #FFF8F6;
-            --surface: #FFFFFF;
-            --text-main: #634C48;
-            --text-light: #A8908C;
-            --accent: #FFA69E;
-            --accent-hover: #F28C84;
-            --accent-light: #FFEAE8;
+        /* Tema: Floresta */
+        [data-theme="floresta"] {
+            --bg: #F0FAF2; --surface: #FFFFFF; --primary: #5A966E;
+            --primary-light: #D5E8DD; --text-main: #2A4A34;
+            --text-muted: #6B9E82; --border: #D5E8D9;
         }
 
-        /* --- FONTES --- */
-        [data-font="nunito"] { --font-main: 'Nunito', sans-serif; }
-        [data-font="system"] { --font-main: system-ui, -apple-system, sans-serif; }
-        [data-font="lora"]   { --font-main: 'Lora', serif; }
+        /* Tema: Noite (Dark Mode) */
+        [data-theme="noite"] {
+            --bg: #1A1A24; --surface: #2A2A36; --primary: #8C9EBB;
+            --primary-light: #3A4A6B; --text-main: #F0F0F0;
+            --text-muted: #8C9EBB; --border: #3A3A4A;
+        }
 
-        /* --- Resets e Estrutura Básica --- */
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        /* --- Tipografia (Fontes) --- */
+        [data-font="nunito"] { font-family: 'Nunito', sans-serif; }
+        [data-font="lora"] { font-family: 'Lora', serif; }
+        [data-font="poppins"] { font-family: 'Poppins', sans-serif; }
+        [data-font="quicksand"] { font-family: 'Quicksand', sans-serif; }
+        [data-font="playfair"] { font-family: 'Playfair Display', serif; }
+        [data-font="mono"] { font-family: 'Roboto Mono', monospace; }
+
+        /* --- Reset & Base --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
 
         body {
-            font-family: var(--font-main);
-            background-color: var(--bg-color);
+            background-color: var(--bg);
             color: var(--text-main);
-            line-height: 1.6;
-            display: flex;
-            justify-content: center;
-            transition: background-color 0.4s ease, color 0.4s ease;
-        }
-
-        #app {
-            width: 100%;
-            max-width: 600px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            padding-bottom: 110px; /* Espaço para a navbar mais alta */
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            background-color: var(--bg-color);
-            position: relative;
-            box-shadow: 0 0 40px rgba(0,0,0,0.02);
-            transition: background-color 0.4s ease;
         }
 
-        /* --- Top Bar (Cabeçalho Fofo) --- */
-        .top-bar {
+        h1, h2, h3 { font-weight: 700; margin-bottom: 15px; }
+        p { line-height: 1.6; }
+
+        /* --- Layout --- */
+        .container {
+            padding: 24px 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 24px 10px 24px;
-        }
-        
-        .top-bar .logo {
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: var(--accent);
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            margin-bottom: 24px;
         }
 
-        .btn-icon {
-            background: var(--surface);
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-main);
-            box-shadow: var(--shadow-sm);
-            cursor: pointer;
-            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .btn-icon:active { transform: scale(0.85); }
-
-        /* --- Navegação Inferior --- */
-        .bottom-nav {
-            position: sticky;
-            bottom: 0;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            display: flex;
-            justify-content: space-around;
-            padding: 12px 16px;
-            padding-bottom: env(safe-area-inset-bottom, 16px);
-            border-top: 1px solid rgba(0,0,0,0.03);
-            z-index: 100;
-        }
-
-        .nav-btn {
-            background: none;
-            border: none;
-            color: var(--text-light);
-            font-size: 0.8rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 700;
-            font-family: inherit;
-        }
-
-        .nav-btn svg {
-            width: 24px;
-            height: 24px;
-            stroke: currentColor;
-            fill: none;
-            stroke-width: 2.5;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .nav-btn.active { color: var(--accent); }
-        .nav-btn.active svg { transform: translateY(-4px) scale(1.1); }
-
-        /* --- Telas (Views) --- */
-        main {
-            flex: 1;
-            padding: 10px 24px 24px 24px;
-            overflow-y: auto;
-            padding-bottom: 90px;
-        }
-
-        .view { display: none; animation: fadeIn 0.4s ease forwards; }
-        .view.active { display: block; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* --- Tipografia --- */
-        h1, h2, h3 { font-weight: 800; color: var(--text-main); line-height: 1.3; }
-        h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
-        h2 { font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 1rem; }
-        
-        .subtitle { color: var(--text-light); font-size: 1rem; margin-bottom: 1.5rem; font-weight: 600;}
+        .header h1 { margin: 0; font-size: 24px; }
 
         /* --- Componentes --- */
         .card {
             background: var(--surface);
-            border-radius: var(--radius-lg);
-            padding: 24px;
+            border-radius: var(--radius-md);
+            padding: 20px;
             margin-bottom: 16px;
-            box-shadow: var(--shadow);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            border: 2px solid transparent;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .insight-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            background: var(--primary-light);
+            border: none;
+            color: var(--text-main);
+        }
+
+        .insight-icon {
+            font-size: 28px;
+            line-height: 1;
         }
 
         .btn {
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 14px 24px;
-            border-radius: 100px; /* Estilo pílula fofo */
-            font-size: 1rem;
-            font-weight: 700;
-            font-family: inherit;
-            cursor: pointer;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease;
-            width: 100%;
+            padding: 12px 20px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
         }
 
-        .btn:active { transform: scale(0.95); }
-        .btn-outline { background: transparent; color: var(--text-main); border: 2px solid var(--accent-light); }
-        .btn-danger { background: var(--accent-light); color: var(--danger); border: none; }
-
-        .fab {
-            position: fixed;
-            bottom: 90px;
-            right: 24px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: var(--accent);
-            color: white;
+        .btn-primary { background: var(--primary); color: #FFF; width: 100%; }
+        .btn-primary:active { transform: scale(0.98); opacity: 0.9; }
+        
+        .btn-icon {
+            background: none;
             border: none;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-muted);
+            padding: 8px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
-            cursor: pointer;
-            z-index: 90;
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        .fab:active { transform: scale(0.85); }
+
+        .btn-icon:hover, .btn-icon:active {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .btn-danger { color: var(--danger); }
+        .btn-danger:hover { background: var(--danger-light); }
 
         /* --- Formulários --- */
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.95rem; color: var(--text-main); }
+        .input-group { margin-bottom: 16px; }
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
 
-        input[type="text"], textarea, select {
+        .input-field {
             width: 100%;
-            padding: 14px 16px;
-            border: 2px solid var(--accent-light);
-            border-radius: var(--radius-md);
-            background: var(--bg-color);
+            padding: 14px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--bg);
             color: var(--text-main);
             font-family: inherit;
-            font-size: 1rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        input:focus, textarea:focus, select:focus {
+            font-size: 16px; /* Previne zoom no iOS */
             outline: none;
-            border-color: var(--accent);
-            background: var(--surface);
-            box-shadow: 0 0 0 4px var(--accent-light);
+            transition: border-color 0.2s;
         }
 
-        textarea { resize: vertical; min-height: 100px; }
+        .input-field:focus { border-color: var(--primary); }
 
-        /* Sliders fofos */
-        .slider-container { display: flex; align-items: center; gap: 16px; }
-        .slider-value {
-            font-weight: 800; color: var(--accent); min-width: 30px; text-align: center;
-            background: var(--accent-light); padding: 4px 10px; border-radius: 12px;
+        /* Sliders */
+        .slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--border);
+            outline: none;
+            margin: 10px 0 20px 0;
         }
-        input[type="range"] {
-            flex: 1; -webkit-appearance: none; height: 8px; background: var(--accent-light); border-radius: 10px; outline: none;
-        }
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none; width: 24px; height: 24px; border-radius: 50%;
-            background: var(--accent); cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-            border: 3px solid var(--surface);
-            transition: transform 0.1s;
-        }
-        input[type="range"]::-webkit-slider-thumb:active { transform: scale(1.2); }
-
-        /* --- Listas e Itens --- */
-        .person-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 18px;
-            background: var(--surface);
-            border-radius: var(--radius-md);
-            margin-bottom: 14px;
-            box-shadow: var(--shadow-sm);
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary);
             cursor: pointer;
-            border: 2px solid transparent;
-            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
         }
-        .person-item:active { transform: scale(0.98); }
-        .person-item:hover { border-color: var(--accent-light); transform: translateY(-2px); box-shadow: var(--shadow); }
-        
-        .person-info h3 { margin: 0; font-size: 1.15rem; }
-        .person-info p { margin: 0; color: var(--text-light); font-size: 0.9rem; font-weight: 600; }
-        .person-score { background: var(--accent-light); color: var(--accent); padding: 6px 12px; border-radius: 20px; font-size: 0.9rem; font-weight: 800; display: flex; gap:4px; align-items: center;}
 
-        /* --- Insights & Conselheiro --- */
-        .insight-card {
-            background: var(--accent-light);
-            padding: 18px;
-            border-radius: var(--radius-lg);
-            margin-bottom: 16px;
-            color: var(--text-main);
-            font-weight: 600;
+        /* --- Views (Abas) --- */
+        .view { display: none; animation: fadeIn 0.3s ease; }
+        .view.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- Navegação Inferior (Mais Alta e Adaptada) --- */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 90px; /* Mais alta */
+            background: var(--surface);
             display: flex;
-            gap: 12px;
-            align-items: flex-start;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.05);
+            padding-bottom: env(safe-area-inset-bottom); /* Área segura do iPhone */
+            border-top-left-radius: var(--radius-lg);
+            border-top-right-radius: var(--radius-lg);
+            z-index: 1000;
         }
-        .insight-icon { font-size: 1.5rem; line-height: 1; }
 
-        .advice-box {
-            margin-top: 16px;
-            padding: 16px;
-            background: var(--bg-color);
-            border: 2px dashed var(--accent);
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 700;
+            padding: 10px 20px;
+            border: none;
+            background: none;
+            cursor: pointer;
             border-radius: var(--radius-md);
-            font-size: 0.95rem;
-            color: var(--text-main);
+            transition: all 0.2s;
+            font-family: inherit;
         }
-        .advice-title { font-weight: 800; color: var(--accent); display: flex; align-items: center; gap: 6px; margin-bottom: 8px;}
 
-        /* --- Modal de Configurações --- */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.2); backdrop-filter: blur(4px);
-            display: flex; justify-content: center; align-items: flex-end;
-            z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        .nav-item.active {
+            color: var(--primary);
+            background: var(--primary-light);
+            transform: translateY(-5px);
         }
-        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+
+        .nav-icon { font-size: 26px; }
+
+        /* --- Modais --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: flex-end; /* Abre por baixo no mobile */
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+
         .modal-content {
-            background: var(--surface); width: 100%; max-width: 600px;
-            border-radius: 30px 30px 0 0; padding: 30px 24px;
-            transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
+            background: var(--surface);
+            width: 100%;
+            max-width: 600px;
+            border-top-left-radius: var(--radius-lg);
+            border-top-right-radius: var(--radius-lg);
+            padding: 30px 24px;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-height: 90vh;
+            overflow-y: auto;
         }
         .modal-overlay.active .modal-content { transform: translateY(0); }
-        
-        .theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px;}
-        .theme-btn {
-            padding: 16px; border-radius: var(--radius-md); border: 2px solid var(--accent-light);
-            background: var(--bg-color); font-weight: 700; cursor: pointer; color: var(--text-main);
-            display: flex; align-items: center; gap: 8px; font-family: inherit;
+
+        /* Modal Centralizado para Confirmação */
+        .modal-center { align-items: center; padding: 20px; }
+        .modal-center .modal-content {
+            border-radius: var(--radius-lg);
+            transform: scale(0.9);
         }
-        .theme-btn.active { border-color: var(--accent); background: var(--accent-light); }
+        .modal-overlay.active .modal-center .modal-content { transform: scale(1); }
 
-        /* Helper Classes */
-        .d-none { display: none !important; }
-        .flex-row { display: flex; gap: 12px; }
-        .mt-2 { margin-top: 20px; }
-        .mb-2 { margin-bottom: 20px; }
-        .text-center { text-align: center; }
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        .modal-actions .btn { flex: 1; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
+
+        /* --- Específicos do Diário e Pessoas --- */
+        .item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .item-date { font-size: 14px; color: var(--text-muted); font-weight: 600; }
+        .item-text { white-space: pre-wrap; font-size: 16px; }
         
-        .empty-state { text-align: center; padding: 50px 20px; color: var(--text-light); font-weight: 600;}
-        .empty-state span { font-size: 3rem; display: block; margin-bottom: 16px; }
+        .person-metrics { display: flex; gap: 15px; margin-top: 10px; font-size: 14px;}
+        .metric-badge {
+            background: var(--bg);
+            padding: 4px 10px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
 
+        /* --- Estilização (Configurações) --- */
+        .grid-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .option-btn {
+            padding: 15px 10px;
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--border);
+            background: var(--bg);
+            cursor: pointer;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.2s;
+            color: var(--text-main);
+        }
+        .option-btn.selected { border-color: var(--primary); background: var(--primary-light); }
+        
     </style>
 </head>
 <body>
 
-<div id="app">
-    <!-- Cabeçalho Global -->
-    <header class="top-bar">
-        <div class="logo">🪴 Vínculos</div>
-        <button class="btn-icon" onclick="App.toggleSettings()" aria-label="Configurações">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-        </button>
-    </header>
+    <div class="container">
+        <!-- HEADER PRINCIPAL -->
+        <header class="header">
+            <h1 id="view-title">Início</h1>
+            <button class="btn-icon" onclick="app.openModal('settings')" aria-label="Personalizar Estilo">🎨</button>
+        </header>
 
-    <main>
-        <!-- TELA: INÍCIO -->
-        <section id="view-home" class="view active">
-            <h1>Olá! Como você está?</h1>
-            <p class="subtitle">Aqui está um resumo do seu universo.</p>
-
-            <div id="home-insights">
-                <!-- Preenchido via JS com dicas inteligentes -->
+        <!-- VIEW: INÍCIO (Insights) -->
+        <div id="view-home" class="view active">
+            <p style="color: var(--text-muted); margin-bottom: 20px;">Seus insights diários baseados nas suas conexões e pensamentos.</p>
+            <div id="insights-container">
+                <!-- Insights injetados via JS -->
             </div>
+        </div>
 
-            <div class="flex-row mt-2">
-                <button class="card flex-row" style="flex: 1; flex-direction: column; align-items: center; padding: 20px; gap:12px;" onclick="App.nav('view-person-form'); App.clearPersonForm();">
-                    <div style="font-size: 2rem;">🫂</div>
-                    <span style="font-weight: 700;">Nova Pessoa</span>
-                </button>
-                <button class="card flex-row" style="flex: 1; flex-direction: column; align-items: center; padding: 20px; gap:12px;" onclick="App.nav('view-me-form'); App.clearMeForm();">
-                    <div style="font-size: 2rem;">✍️</div>
-                    <span style="font-weight: 700;">Refletir Hoje</span>
-                </button>
-            </div>
-        </section>
-
-        <!-- TELA: LISTA DE PESSOAS -->
-        <section id="view-people" class="view">
-            <h1>Sua Constelação</h1>
-            <p class="subtitle">As pessoas importantes da sua vida.</p>
-            
-            <div id="people-list">
-                <!-- Preenchido via JS -->
-            </div>
-
-            <button class="fab" onclick="App.nav('view-person-form'); App.clearPersonForm();" aria-label="Adicionar pessoa">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        <!-- VIEW: PESSOAS -->
+        <div id="view-people" class="view">
+            <button class="btn btn-primary" style="margin-bottom: 24px;" onclick="app.openModal('person')">
+                <span>➕</span> Adicionar Pessoa
             </button>
-        </section>
-
-        <!-- TELA: FORMULÁRIO DE PESSOA -->
-        <section id="view-person-form" class="view">
-            <h1 id="person-form-title">Nova Pessoa</h1>
-            <input type="hidden" id="person-id">
-            
-            <div class="card">
-                <div class="form-group">
-                    <label>Como ela se chama?</label>
-                    <input type="text" id="person-name" placeholder="Ex: Maria">
-                </div>
-                <div class="form-group">
-                    <label>Qual a relação de vocês?</label>
-                    <input type="text" id="person-type" placeholder="Ex: Amiga, Mãe, Amor...">
-                </div>
+            <div id="people-container">
+                <!-- Pessoas injetadas via JS -->
             </div>
+        </div>
 
-            <h2>Percepções Sinceras 💭</h2>
-            <div class="card">
-                <div class="form-group">
-                    <label>O que você mais admira nela?</label>
-                    <textarea id="person-pos" placeholder="Descreva os pontos de luz dessa pessoa."></textarea>
-                </div>
-                <div class="form-group">
-                    <label>O que costuma ser difícil?</label>
-                    <textarea id="person-neg" placeholder="Atritos, desafios ou coisas que chateiam. O diário pode ajudar a refletir sobre isso."></textarea>
-                </div>
+        <!-- VIEW: MIM (Diário) -->
+        <div id="view-me" class="view">
+            <button class="btn btn-primary" style="margin-bottom: 24px;" onclick="app.openModal('diary')">
+                <span>✍️</span> Escrever no Diário
+            </button>
+            <div id="diary-container">
+                <!-- Registros injetados via JS -->
             </div>
+        </div>
+    </div>
 
-            <h2>Termômetro da Relação 🌡️</h2>
-            <div class="card">
-                <div class="form-group">
-                    <label>Proximidade Emocional</label>
-                    <div class="slider-container">
-                        <input type="range" id="person-closeness" min="1" max="10" value="5" oninput="document.getElementById('val-closeness').innerText = this.value">
-                        <span class="slider-value" id="val-closeness">5</span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Confiança</label>
-                    <div class="slider-container">
-                        <input type="range" id="person-trust" min="1" max="10" value="5" oninput="document.getElementById('val-trust').innerText = this.value">
-                        <span class="slider-value" id="val-trust">5</span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Frequência de Contato</label>
-                    <div class="slider-container">
-                        <input type="range" id="person-freq" min="1" max="10" value="5" oninput="document.getElementById('val-freq').innerText = this.value">
-                        <span class="slider-value" id="val-freq">5</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex-row mt-2">
-                <button class="btn btn-outline" style="flex: 1;" onclick="App.nav('view-people')">Voltar</button>
-                <button class="btn" style="flex: 2;" onclick="App.savePerson()">Salvar Pessoa</button>
-            </div>
-            <button id="btn-delete-person" class="btn btn-danger mt-2 d-none" onclick="App.deletePerson()">Apagar Registro</button>
-        </section>
-
-        <!-- TELA: SOBRE MIM (DIÁRIO PESSOAL) -->
-        <section id="view-me" class="view">
-            <h1>Seu Refúgio</h1>
-            <p class="subtitle">Um espaço seguro só para você.</p>
-            
-            <button class="btn mb-2" onclick="App.nav('view-me-form'); App.clearMeForm();">✨ Escrever no Diário</button>
-
-            <div id="me-list">
-                <!-- Preenchido via JS -->
-            </div>
-        </section>
-
-        <!-- TELA: FORMULÁRIO SOBRE MIM -->
-        <section id="view-me-form" class="view">
-            <h1>Como foi o dia?</h1>
-            
-            <div class="card">
-                <div class="form-group">
-                    <label>Me sinto principalmente...</label>
-                    <select id="me-emotion">
-                        <option value="Calmo(a) 🍃">Calmo(a) 🍃</option>
-                        <option value="Feliz ✨">Feliz ✨</option>
-                        <option value="Motivado(a) 🔥">Motivado(a) 🔥</option>
-                        <option value="Ansioso(a) 🌪️">Ansioso(a) 🌪️</option>
-                        <option value="Triste 🌧️">Triste 🌧️</option>
-                        <option value="Cansado(a) 🔋">Cansado(a) 🔋</option>
-                        <option value="Confuso(a) 🧩">Confuso(a) 🧩</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Desabafe livremente</label>
-                    <textarea id="me-reflection" placeholder="O que está pesando (ou flutuando) na sua mente hoje?"></textarea>
-                </div>
-                <div class="form-group">
-                    <label>O que você sente que está melhorando?</label>
-                    <textarea id="me-improving" placeholder="Comemore uma pequena vitória."></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Algo está incomodando?</label>
-                    <textarea id="me-bothering" placeholder="Tirar da cabeça e pôr no papel ajuda."></textarea>
-                </div>
-            </div>
-
-            <div class="flex-row mt-2">
-                <button class="btn btn-outline" style="flex: 1;" onclick="App.nav('view-me')">Cancelar</button>
-                <button class="btn" style="flex: 2;" onclick="App.saveMe()">Guardar no Diário</button>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Barra de Navegação -->
+    <!-- NAVEGAÇÃO INFERIOR -->
     <nav class="bottom-nav">
-        <button class="nav-btn active" data-target="view-home" onclick="App.nav('view-home')">
-            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-            Início
+        <button class="nav-item active" onclick="app.switchView('home')" id="nav-home">
+            <span class="nav-icon">🪴</span>
+            <span>Início</span>
         </button>
-        <button class="nav-btn" data-target="view-people" onclick="App.nav('view-people')">
-            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-            Pessoas
+        <button class="nav-item" onclick="app.switchView('people')" id="nav-people">
+            <span class="nav-icon">👥</span>
+            <span>Pessoas</span>
         </button>
-        <button class="nav-btn" data-target="view-me" onclick="App.nav('view-me')">
-            <svg viewBox="0 0 24 24"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path><line x1="16" y1="8" x2="2" y2="22"></line><line x1="17.5" y1="15" x2="9" y2="6.5"></line></svg>
-            Mim
+        <button class="nav-item" onclick="app.switchView('me')" id="nav-me">
+            <span class="nav-icon">📖</span>
+            <span>Mim</span>
         </button>
     </nav>
 
-    <!-- Modal de Configurações -->
-    <div class="modal-overlay" id="settings-modal" onclick="if(event.target === this) App.toggleSettings()">
+    <!-- MODAL: NOVA PESSOA -->
+    <div id="modal-person" class="modal-overlay">
         <div class="modal-content">
-            <h2>Personalizar Diário 🎨</h2>
+            <h3>Nova Conexão</h3>
             
-            <div class="form-group mt-2">
-                <label>Escolha as Cores</label>
-                <div class="theme-grid">
-                    <button class="theme-btn" onclick="App.setTheme('terra')">🧸 Terra</button>
-                    <button class="theme-btn" onclick="App.setTheme('matcha')">🍵 Matchá</button>
-                    <button class="theme-btn" onclick="App.setTheme('lavanda')">☂️ Lavanda</button>
-                    <button class="theme-btn" onclick="App.setTheme('pessego')">🍑 Pêssego</button>
-                </div>
+            <div class="input-group">
+                <label>Nome ou Apelido</label>
+                <input type="text" id="person-name" class="input-field" placeholder="Ex: Maria, Mãe, João...">
+            </div>
+            
+            <div class="input-group">
+                <label>Nível de Proximidade: <span id="val-closeness">5</span>/10</label>
+                <input type="range" id="person-closeness" min="1" max="10" value="5" class="slider" oninput="document.getElementById('val-closeness').innerText=this.value">
+            </div>
+            
+            <div class="input-group">
+                <label>Nível de Confiança: <span id="val-trust">5</span>/10</label>
+                <input type="range" id="person-trust" min="1" max="10" value="5" class="slider" oninput="document.getElementById('val-trust').innerText=this.value">
             </div>
 
-            <div class="form-group">
-                <label>Estilo da Letra</label>
-                <div class="theme-grid">
-                    <button class="theme-btn" style="font-family: 'Nunito', sans-serif;" onclick="App.setFont('nunito')">Redondinha</button>
-                    <button class="theme-btn" style="font-family: 'Lora', serif;" onclick="App.setFont('lora')">Clássica</button>
-                    <button class="theme-btn" style="font-family: system-ui, sans-serif;" onclick="App.setFont('system')">Limpa</button>
-                </div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="app.closeModal('person')">Cancelar</button>
+                <button class="btn btn-primary" onclick="app.savePerson()">Salvar</button>
             </div>
-
-            <button class="btn mt-2" onclick="App.toggleSettings()">Pronto!</button>
         </div>
     </div>
-</div>
 
-<script>
-/**
- * Lógica Inteligente e Funcional do Aplicativo "Vínculos"
- */
-
-// --- Inteligência do Diário (NLP Simples) ---
-const Counselor = {
-    // Dicionário de palavras-chave para detectar sentimentos e dar conselhos
-    analyze(text) {
-        if (!text) return null;
-        text = text.toLowerCase();
-
-        const categories = {
-            burnout: {
-                words: ['cansada', 'cansado', 'exausto', 'exaustão', 'dormir', 'sobrecarga', 'pesado', 'sem energia'],
-                advice: "O diário notou que você está usando palavras de cansaço. Tire um momento hoje apenas para respirar, beber uma água ou descansar a vista. Você não precisa dar conta de tudo o tempo todo. 🍵"
-            },
-            anxiety: {
-                words: ['ansioso', 'ansiosa', 'medo', 'preocupado', 'futuro', 'nervoso', 'pressão', 'pânico', 'sufocado'],
-                advice: "Notei um pouco de ansiedade nas suas palavras. Que tal focar apenas no próximo pequeno passo em vez da escada inteira? Feche os olhos por 1 minuto e respire fundo. Vai ficar tudo bem. 🌻"
-            },
-            conflict: {
-                words: ['briga', 'raiva', 'chateado', 'irritado', 'discuti', 'tóxico', 'grito', 'injusto', 'decepção'],
-                advice: "Relações podem gerar atritos dolorosos. Lembre-se de proteger a sua paz mental e comunicar seus limites com firmeza e carinho quando estiver pronto(a). 🕊️"
-            },
-            growth: {
-                words: ['aprendi', 'consegui', 'melhorei', 'orgulho', 'superei', 'feliz', 'grato', 'paz'],
-                advice: "Que incrível notar essa energia positiva e de crescimento nas suas palavras! Continue regando suas pequenas vitórias, elas importan muito. 🌱"
-            }
-        };
-
-        for (let cat in categories) {
-            if (categories[cat].words.some(word => text.includes(word))) {
-                return categories[cat].advice;
-            }
-        }
-        return null;
-    }
-};
-
-const App = {
-    data: {
-        people: [],
-        me: [],
-        settings: {
-            theme: 'terra',
-            font: 'nunito'
-        }
-    },
-
-    // --- Inicialização ---
-    init() {
-        this.loadData();
-        this.applySettings();
-        this.renderHome();
-        this.renderPeople();
-        this.renderMe();
-    },
-
-    // --- Persistência de Dados (Local Storage) ---
-    loadData() {
-        try {
-            const stored = localStorage.getItem('vinculos_data_v2');
-            if (stored) {
-                this.data = JSON.parse(stored);
-            }
-        } catch (e) {
-            console.error("Erro ao carregar dados", e);
-        }
-        
-        // Assegurar estrutura
-        if (!this.data.people) this.data.people = [];
-        if (!this.data.me) this.data.me = [];
-        if (!this.data.settings) this.data.settings = { theme: 'terra', font: 'nunito' };
-    },
-
-    saveData() {
-        localStorage.setItem('vinculos_data_v2', JSON.stringify(this.data));
-    },
-
-    // --- Configurações & Temas ---
-    toggleSettings() {
-        const modal = document.getElementById('settings-modal');
-        modal.classList.toggle('active');
-        this.updateSettingsUI();
-    },
-
-    setTheme(themeName) {
-        this.data.settings.theme = themeName;
-        this.applySettings();
-        this.saveData();
-    },
-
-    setFont(fontName) {
-        this.data.settings.font = fontName;
-        this.applySettings();
-        this.saveData();
-    },
-
-    applySettings() {
-        document.documentElement.setAttribute('data-theme', this.data.settings.theme);
-        document.documentElement.setAttribute('data-font', this.data.settings.font);
-        this.updateSettingsUI();
-    },
-
-    updateSettingsUI() {
-        document.querySelectorAll('.theme-grid .theme-btn').forEach(btn => {
-            btn.classList.remove('active');
-            if(btn.innerText.toLowerCase().includes(this.data.settings.theme)) btn.classList.add('active');
+    <!-- MODAL: NOVO REGISTRO NO DIÁRIO -->
+    <div id="modal-diary" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Meu Diário</h3>
             
-            // Lógica preguiçosa para botões de fonte
-            if(this.data.settings.font === 'nunito' && btn.innerText.includes('Redondinha')) btn.classList.add('active');
-            if(this.data.settings.font === 'lora' && btn.innerText.includes('Clássica')) btn.classList.add('active');
-            if(this.data.settings.font === 'system' && btn.innerText.includes('Limpa')) btn.classList.add('active');
-        });
-    },
+            <div class="input-group">
+                <label>Data do Registro</label>
+                <!-- Escolha de data para permitir registros retroativos -->
+                <input type="date" id="diary-date" class="input-field">
+            </div>
 
-    // --- Navegação ---
-    nav(viewId) {
-        document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
-        document.getElementById(viewId).classList.add('active');
+            <div class="input-group">
+                <label>O que está na sua mente?</label>
+                <textarea id="diary-text" class="input-field" rows="6" placeholder="Escreva sobre seus sentimentos, pensamentos ou acontecimentos..."></textarea>
+            </div>
 
-        if (['view-home', 'view-people', 'view-me'].includes(viewId)) {
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                if(btn.dataset.target === viewId) btn.classList.add('active');
-                else btn.classList.remove('active');
-            });
-        }
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="app.closeModal('diary')">Cancelar</button>
+                <button class="btn btn-primary" onclick="app.saveDiary()">Salvar</button>
+            </div>
+        </div>
+    </div>
 
-        if (viewId === 'view-home') this.renderHome();
-        if (viewId === 'view-people') this.renderPeople();
-        if (viewId === 'view-me') this.renderMe();
-        
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    },
-
-    generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2); },
-    
-    formatDate(timestamp) {
-        const d = new Date(timestamp);
-        return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
-    },
-
-    // --- LÓGICA: PESSOAS ---
-    clearPersonForm() {
-        document.getElementById('person-id').value = '';
-        ['name', 'type', 'pos', 'neg'].forEach(id => document.getElementById(`person-${id}`).value = '');
-        
-        ['closeness', 'trust', 'freq'].forEach(s => {
-            document.getElementById(`person-${s}`).value = 5;
-            document.getElementById(`val-${s}`).innerText = 5;
-        });
-
-        document.getElementById('person-form-title').innerText = 'Nova Pessoa';
-        document.getElementById('btn-delete-person').classList.add('d-none');
-    },
-
-    loadPersonForm(id) {
-        const person = this.data.people.find(p => p.id === id);
-        if (!person) return;
-
-        document.getElementById('person-id').value = person.id;
-        document.getElementById('person-name').value = person.name;
-        document.getElementById('person-type').value = person.type;
-        document.getElementById('person-pos').value = person.pos;
-        document.getElementById('person-neg').value = person.neg;
-        
-        ['closeness', 'trust', 'freq'].forEach(s => {
-            document.getElementById(`person-${s}`).value = person.metrics[s] || 5;
-            document.getElementById(`val-${s}`).innerText = person.metrics[s] || 5;
-        });
-
-        document.getElementById('person-form-title').innerText = 'Ficha de ' + person.name;
-        document.getElementById('btn-delete-person').classList.remove('d-none');
-        
-        this.nav('view-person-form');
-    },
-
-    savePerson() {
-        const id = document.getElementById('person-id').value;
-        const name = document.getElementById('person-name').value.trim();
-        
-        if (!name) { alert("Ops! Esqueceu de preencher o nome."); return; }
-
-        const newData = {
-            name: name,
-            type: document.getElementById('person-type').value,
-            pos: document.getElementById('person-pos').value,
-            neg: document.getElementById('person-neg').value,
-            metrics: {
-                closeness: parseInt(document.getElementById('person-closeness').value),
-                trust: parseInt(document.getElementById('person-trust').value),
-                freq: parseInt(document.getElementById('person-freq').value)
-            }
-        };
-
-        if (id) {
-            const index = this.data.people.findIndex(p => p.id === id);
-            if (index !== -1) {
-                const oldData = this.data.people[index];
-                this.data.people[index] = { ...oldData, ...newData };
-            }
-        } else {
-            newData.id = this.generateId();
-            newData.created_at = Date.now();
-            this.data.people.push(newData);
-        }
-
-        this.saveData();
-        this.nav('view-people');
-    },
-
-    deletePerson() {
-        if(confirm("Deseja mesmo apagar essa pessoa do seu diário?")) {
-            const id = document.getElementById('person-id').value;
-            this.data.people = this.data.people.filter(p => p.id !== id);
-            this.saveData();
-            this.nav('view-people');
-        }
-    },
-
-    renderPeople() {
-        const list = document.getElementById('people-list');
-        list.innerHTML = '';
-
-        if (this.data.people.length === 0) {
-            list.innerHTML = `
-                <div class="empty-state">
-                    <span>🛸</span>
-                    <p>Seu universo ainda está vazio. Adicione as estrelas (pessoas) da sua vida aqui.</p>
-                </div>`;
-            return;
-        }
-
-        const sortedPeople = [...this.data.people].sort((a,b) => b.metrics.closeness - a.metrics.closeness);
-
-        sortedPeople.forEach(p => {
-            const item = document.createElement('div');
-            item.className = 'person-item';
-            item.onclick = () => this.loadPersonForm(p.id);
+    <!-- MODAL: ESTILO E PERSONALIZAÇÃO -->
+    <div id="modal-settings" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Personalizar Vínculos</h3>
             
-            // Lógica de ícone baseada na proximidade
-            let icon = '🤍';
-            if (p.metrics.closeness >= 8) icon = '💖';
-            else if (p.metrics.closeness >= 5) icon = '💛';
-            else icon = '💙';
-
-            item.innerHTML = `
-                <div class="person-info">
-                    <h3>${p.name}</h3>
-                    <p>${p.type || 'Vínculo'}</p>
+            <div class="input-group">
+                <label>Temas de Cores</label>
+                <div class="grid-options" id="theme-options">
+                    <button class="option-btn" onclick="app.setTheme('terra')">Terra</button>
+                    <button class="option-btn" onclick="app.setTheme('oceano')">Oceano</button>
+                    <button class="option-btn" onclick="app.setTheme('lavanda')">Lavanda</button>
+                    <button class="option-btn" onclick="app.setTheme('floresta')">Floresta</button>
+                    <button class="option-btn" onclick="app.setTheme('noite')">Noite</button>
                 </div>
-                <div class="person-score">
-                    ${icon} ${p.metrics.closeness}
+            </div>
+
+            <div class="input-group">
+                <label>Estilo de Fonte</label>
+                <div class="grid-options" id="font-options">
+                    <button class="option-btn" style="font-family: 'Nunito'" onclick="app.setFont('nunito')">Nunito</button>
+                    <button class="option-btn" style="font-family: 'Lora'" onclick="app.setFont('lora')">Lora</button>
+                    <button class="option-btn" style="font-family: 'Poppins'" onclick="app.setFont('poppins')">Poppins</button>
+                    <button class="option-btn" style="font-family: 'Quicksand'" onclick="app.setFont('quicksand')">Quicksand</button>
+                    <button class="option-btn" style="font-family: 'Playfair Display'" onclick="app.setFont('playfair')">Playfair</button>
+                    <button class="option-btn" style="font-family: 'Roboto Mono'" onclick="app.setFont('mono')">Mono</button>
                 </div>
-            `;
-            list.appendChild(item);
-        });
-    },
+            </div>
 
-    // --- LÓGICA: SOBRE MIM (DIÁRIO) ---
-    clearMeForm() {
-        document.getElementById('me-emotion').selectedIndex = 0;
-        document.getElementById('me-reflection').value = '';
-        document.getElementById('me-improving').value = '';
-        document.getElementById('me-bothering').value = '';
-    },
+            <button class="btn btn-primary" style="margin-top: 10px;" onclick="app.closeModal('settings')">Pronto</button>
+        </div>
+    </div>
 
-    saveMe() {
-        const reflection = document.getElementById('me-reflection').value.trim();
-        const improving = document.getElementById('me-improving').value.trim();
-        const bothering = document.getElementById('me-bothering').value.trim();
-        const emotion = document.getElementById('me-emotion').value;
+    <!-- MODAL: CONFIRMAÇÃO DE EXCLUSÃO (Mensagem Box customizada ao invés de alert) -->
+    <div id="modal-confirm" class="modal-overlay modal-center">
+        <div class="modal-content" style="padding-bottom: 24px;">
+            <h3>Atenção</h3>
+            <p id="confirm-message" style="margin-top: 10px;">Tem certeza que deseja apagar?</p>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="app.closeModal('confirm')">Cancelar</button>
+                <button class="btn btn-primary btn-danger" id="confirm-btn">Sim, apagar</button>
+            </div>
+        </div>
+    </div>
 
-        if (!reflection && !improving && !bothering) {
-            alert("Escreva um pouquinho antes de salvar! ✨");
-            return;
-        }
+    <script>
+        class VinculosApp {
+            constructor() {
+                // Carrega dados ou inicializa estrutura base
+                const savedData = localStorage.getItem('vinculos_data');
+                this.data = savedData ? JSON.parse(savedData) : {
+                    people: [],
+                    diary: [],
+                    settings: { theme: 'terra', font: 'nunito' }
+                };
 
-        // --- O CONSELHEIRO ENTRA EM AÇÃO ---
-        // Junta todo o texto escrito para análise
-        const fullText = `${reflection} ${improving} ${bothering}`;
-        const advice = Counselor.analyze(fullText);
+                // Helper para formatador de datas local
+                this.dateFormatter = new Intl.DateTimeFormat('pt-BR', { 
+                    day: '2-digit', month: 'long', year: 'numeric' 
+                });
 
-        const entry = {
-            id: this.generateId(),
-            date: Date.now(),
-            emotion: emotion,
-            reflection: reflection,
-            improving: improving,
-            bothering: bothering,
-            diary_advice: advice // Salva o conselho gerado
-        };
-
-        this.data.me.unshift(entry);
-        this.saveData();
-        this.nav('view-me');
-    },
-
-    renderMe() {
-        const list = document.getElementById('me-list');
-        list.innerHTML = '';
-
-        if (this.data.me.length === 0) {
-            list.innerHTML = `
-                <div class="empty-state">
-                    <span>📖</span>
-                    <p>O diário está em branco. Qual foi a melhor (ou pior) parte do seu dia?</p>
-                </div>`;
-            return;
-        }
-
-        this.data.me.forEach(entry => {
-            const el = document.createElement('div');
-            el.className = 'card';
-            
-            let htmlContent = `
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                    <span style="font-weight: 800; color: var(--text-light); font-size: 0.9rem;">${this.formatDate(entry.date)}</span>
-                    <span style="background: var(--accent-light); padding: 4px 10px; border-radius: 12px; font-weight: 700; font-size: 0.85rem; color: var(--accent);">${entry.emotion}</span>
-                </div>
-            `;
-
-            if(entry.reflection) htmlContent += `<p style="margin-bottom: 12px;">${entry.reflection}</p>`;
-            if(entry.improving) htmlContent += `<p style="margin-bottom: 8px; font-size: 0.95rem;"><strong>🌱 Progresso:</strong> ${entry.improving}</p>`;
-            if(entry.bothering) htmlContent += `<p style="font-size: 0.95rem;"><strong>🌧️ Nuvem:</strong> ${entry.bothering}</p>`;
-
-            // Renderiza o conselho do diário se existir
-            if(entry.diary_advice) {
-                htmlContent += `
-                    <div class="advice-box">
-                        <div class="advice-title">🪴 Nota do Diário</div>
-                        ${entry.diary_advice}
-                    </div>
-                `;
+                this.init();
             }
 
-            el.innerHTML = htmlContent;
-            list.appendChild(el);
-        });
-    },
+            init() {
+                this.applySettings();
+                this.setDefaultDate();
+                this.renderAll();
+            }
 
-    // --- LÓGICA: RECAP/INSIGHTS NA HOME ---
-    renderHome() {
-        const container = document.getElementById('home-insights');
-        container.innerHTML = '';
-        let insights = [];
+            save() {
+                localStorage.setItem('vinculos_data', JSON.stringify(this.data));
+            }
 
-        // Verifica a vibe da última entrada no diário
-        if (this.data.me.length > 0) {
-            const lastMe = this.data.me[0];
-            const diasAtras = Math.floor((Date.now() - lastMe.date) / (1000 * 60 * 60 * 24));
+            // --- NAVEGAÇÃO E UI ---
             
-            if (diasAtras === 0) {
-                if(lastMe.emotion.includes("Ansioso") || lastMe.emotion.includes("Triste") || lastMe.emotion.includes("Cansado")) {
-                    insights.push({ icon: '🫂', text: `Hoje parece ser um dia cinza (${lastMe.emotion}). Pegue leve com você. Uma xícara de chá e deitar mais cedo podem ajudar.` });
-                } else {
-                    insights.push({ icon: '✨', text: `Sua última nota mostra que você está ${lastMe.emotion}. Que a sensação boa se prolongue!` });
+            switchView(viewName) {
+                // Oculta todas
+                document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+                // Mostra a selecionada
+                document.getElementById(`view-${viewName}`).classList.add('active');
+                document.getElementById(`nav-${viewName}`).classList.add('active');
+
+                // Atualiza Título
+                const titles = { 'home': 'Início', 'people': 'Suas Conexões', 'me': 'Seu Diário' };
+                document.getElementById('view-title').innerText = titles[viewName];
+            }
+
+            openModal(modalId) {
+                if (modalId === 'diary') this.setDefaultDate();
+                document.getElementById(`modal-${modalId}`).classList.add('active');
+            }
+
+            closeModal(modalId) {
+                document.getElementById(`modal-${modalId}`).classList.remove('active');
+            }
+
+            confirmAction(message, onConfirm) {
+                document.getElementById('confirm-message').innerText = message;
+                const btn = document.getElementById('confirm-btn');
+                
+                // Remove listeners anteriores criando um clone do botão
+                const newBtn = btn.cloneNode(true);
+                btn.parentNode.replaceChild(newBtn, btn);
+                
+                newBtn.addEventListener('click', () => {
+                    onConfirm();
+                    this.closeModal('confirm');
+                });
+
+                this.openModal('confirm');
+            }
+
+            // --- ESTILO E CONFIGURAÇÕES ---
+
+            applySettings() {
+                document.documentElement.setAttribute('data-theme', this.data.settings.theme);
+                document.documentElement.setAttribute('data-font', this.data.settings.font);
+                this.updateSettingsUI();
+            }
+
+            setTheme(themeName) {
+                this.data.settings.theme = themeName;
+                this.save();
+                this.applySettings();
+            }
+
+            setFont(fontName) {
+                this.data.settings.font = fontName;
+                this.save();
+                this.applySettings();
+            }
+
+            updateSettingsUI() {
+                // Atualiza visual dos botões de tema
+                document.querySelectorAll('#theme-options .option-btn').forEach(btn => {
+                    const theme = btn.getAttribute('onclick').match(/'([^']+)'/)[1];
+                    btn.classList.toggle('selected', theme === this.data.settings.theme);
+                });
+                
+                // Atualiza visual dos botões de fonte
+                document.querySelectorAll('#font-options .option-btn').forEach(btn => {
+                    const font = btn.getAttribute('onclick').match(/'([^']+)'/)[1];
+                    btn.classList.toggle('selected', font === this.data.settings.font);
+                });
+            }
+
+            // --- DIÁRIO ---
+
+            setDefaultDate() {
+                const dateInput = document.getElementById('diary-date');
+                if (dateInput) {
+                    // Define a data de hoje como padrão para o input date
+                    const today = new Date();
+                    const localISOTime = (new Date(today.getTime() - today.getTimezoneOffset() * 60000)).toISOString().slice(0, 10);
+                    dateInput.value = localISOTime;
                 }
-            } else if (diasAtras > 5) {
-                insights.push({ icon: '📝', text: `Faz um tempinho que você não escreve sobre si. Seus pensamentos sentem falta de serem ouvidos.` });
+            }
+
+            saveDiary() {
+                const text = document.getElementById('diary-text').value;
+                const dateVal = document.getElementById('diary-date').value;
+
+                if (!text.trim()) {
+                    // Feedback visual se vazio (evitando alert)
+                    document.getElementById('diary-text').style.borderColor = 'var(--danger)';
+                    setTimeout(() => document.getElementById('diary-text').style.borderColor = '', 2000);
+                    return;
+                }
+
+                // Corrige timezone na hora de salvar
+                const [year, month, day] = dateVal.split('-');
+                const entryDate = new Date(year, month - 1, day).toISOString();
+
+                this.data.diary.push({
+                    id: crypto.randomUUID(),
+                    text: text,
+                    date: entryDate,
+                    timestamp: new Date().getTime()
+                });
+
+                // Ordena do mais recente para o mais antigo
+                this.data.diary.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                this.save();
+                this.closeModal('diary');
+                document.getElementById('diary-text').value = '';
+                
+                this.renderAll();
+            }
+
+            deleteDiary(id) {
+                this.confirmAction("Tem certeza que deseja apagar esta página do diário? Essa ação não pode ser desfeita.", () => {
+                    this.data.diary = this.data.diary.filter(d => d.id !== id);
+                    this.save();
+                    this.renderAll();
+                });
+            }
+
+            renderDiary() {
+                const container = document.getElementById('diary-container');
+                container.innerHTML = '';
+
+                if (this.data.diary.length === 0) {
+                    container.innerHTML = '<p style="text-align:center; color: var(--text-muted); margin-top: 40px;">Seu diário está em branco. Comece a escrever!</p>';
+                    return;
+                }
+
+                this.data.diary.forEach(entry => {
+                    const el = document.createElement('div');
+                    el.className = 'card';
+                    
+                    const dateObj = new Date(entry.date);
+                    const formattedDate = this.dateFormatter.format(dateObj);
+
+                    el.innerHTML = `
+                        <div class="item-header">
+                            <span class="item-date">${formattedDate}</span>
+                            <button class="btn-icon btn-danger" onclick="app.deleteDiary('${entry.id}')" aria-label="Apagar">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
+                        </div>
+                        <div class="item-text">${entry.text}</div>
+                    `;
+                    container.appendChild(el);
+                });
+            }
+
+            // --- PESSOAS ---
+
+            savePerson() {
+                const name = document.getElementById('person-name').value;
+                const closeness = parseInt(document.getElementById('person-closeness').value);
+                const trust = parseInt(document.getElementById('person-trust').value);
+
+                if (!name.trim()) {
+                    document.getElementById('person-name').style.borderColor = 'var(--danger)';
+                    setTimeout(() => document.getElementById('person-name').style.borderColor = '', 2000);
+                    return;
+                }
+
+                this.data.people.push({
+                    id: crypto.randomUUID(),
+                    name: name,
+                    metrics: { closeness, trust }
+                });
+
+                this.save();
+                this.closeModal('person');
+                document.getElementById('person-name').value = '';
+                document.getElementById('person-closeness').value = 5;
+                document.getElementById('person-trust').value = 5;
+                document.getElementById('val-closeness').innerText = 5;
+                document.getElementById('val-trust').innerText = 5;
+                
+                this.renderAll();
+            }
+
+            deletePerson(id) {
+                this.confirmAction("Tem certeza que deseja remover esta pessoa dos seus vínculos?", () => {
+                    this.data.people = this.data.people.filter(p => p.id !== id);
+                    this.save();
+                    this.renderAll();
+                });
+            }
+
+            renderPeople() {
+                const container = document.getElementById('people-container');
+                container.innerHTML = '';
+
+                if (this.data.people.length === 0) {
+                    container.innerHTML = '<p style="text-align:center; color: var(--text-muted); margin-top: 40px;">Você ainda não adicionou conexões. Registre as pessoas importantes para você.</p>';
+                    return;
+                }
+
+                this.data.people.forEach(person => {
+                    const el = document.createElement('div');
+                    el.className = 'card';
+                    el.innerHTML = `
+                        <div class="item-header">
+                            <h3 style="margin:0;">${person.name}</h3>
+                            <button class="btn-icon btn-danger" onclick="app.deletePerson('${person.id}')" aria-label="Apagar">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
+                        </div>
+                        <div class="person-metrics">
+                            <div class="metric-badge">
+                                <span>🫂</span> Prox: ${person.metrics.closeness}/10
+                            </div>
+                            <div class="metric-badge">
+                                <span>🤝</span> Conf: ${person.metrics.trust}/10
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(el);
+                });
+            }
+
+            // --- INSIGHTS (A BASE ORIGINAL INTACTA, MAS ADAPTADA AO DESIGN) ---
+
+            renderInsights() {
+                const container = document.getElementById('insights-container');
+                container.innerHTML = '';
+                let insights = [];
+
+                // Lógica da Base Original
+                if (this.data.diary.length === 0) {
+                    insights.push({ icon: '📝', text: `Você ainda não escreveu sobre si. Seus pensamentos sentem falta de serem ouvidos.` });
+                }
+
+                let hasTension = false;
+                this.data.people.forEach(p => {
+                    if(p.metrics.closeness <= 3 && p.metrics.trust <= 4) {
+                        hasTension = true;
+                    }
+                });
+
+                if (hasTension) {
+                    insights.push({ icon: '🌧️', text: `Notei que algumas das suas relações estão com pontuações baixas. Avalie se essas conexões ainda te fazem bem ou se é hora de impor limites.` });
+                } else if (this.data.people.length > 0) {
+                    insights.push({ icon: '💖', text: `O termômetro das suas relações parece estável. Que bom ter pessoas em quem confiar.` });
+                }
+
+                if (insights.length === 0) {
+                    insights.push({ icon: '🪴', text: `Bem-vindo(a) ao Vínculos. Este é seu espaço seguro para cultivar relações saudáveis consigo e com os outros.` });
+                }
+
+                // Renderiza na tela
+                insights.slice(0, 3).forEach(item => {
+                    const el = document.createElement('div');
+                    el.className = 'card insight-card';
+                    el.innerHTML = `
+                        <div class="insight-icon">${item.icon}</div>
+                        <div>${item.text}</div>
+                    `;
+                    container.appendChild(el);
+                });
+            }
+
+            renderAll() {
+                this.renderDiary();
+                this.renderPeople();
+                this.renderInsights();
             }
         }
 
-        // Verifica pontos de atenção nas pessoas
-        let hasTension = false;
-        this.data.people.forEach(p => {
-            if(p.metrics.closeness <= 3 && p.metrics.trust <= 4) {
-                hasTension = true;
-            }
-        });
-
-        if (hasTension) {
-            insights.push({ icon: '🌧️', text: `Notei que algumas das suas relações estão com pontuações baixas. Avalie se essas conexões ainda te fazem bem ou se é hora de impor limites.` });
-        } else if (this.data.people.length > 0) {
-            insights.push({ icon: '💖', text: `O termômetro das suas relações parece estável. Que bom ter pessoas em quem confiar.` });
-        }
-
-        // Default se vazio
-        if (insights.length === 0) {
-            insights.push({ icon: '🪴', text: `Bem-vindo(a) ao Vínculos. Este é seu espaço seguro para cultivar relações saudáveis consigo e com os outros.` });
-        }
-
-        insights.slice(0, 2).forEach(item => {
-            const el = document.createElement('div');
-            el.className = 'insight-card';
-            el.innerHTML = `
-                <div class="insight-icon">${item.icon}</div>
-                <div>${item.text}</div>
-            `;
-            container.appendChild(el);
-        });
-    }
-};
-
-// Inicializar aplicativo
-document.addEventListener('DOMContentLoaded', () => App.init());
-
-</script>
+        // Inicia a Aplicação
+        const app = new VinculosApp();
+    </script>
 </body>
 </html>
