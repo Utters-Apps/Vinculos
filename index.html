@@ -115,6 +115,8 @@
         /* --- Resets e Estrutura Básica --- */
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
+        html, body { height: 100%; }
+
         body {
             font-family: var(--font-main);
             background-color: var(--bg-color);
@@ -123,6 +125,8 @@
             display: flex;
             justify-content: center;
             transition: background-color 0.4s ease, color 0.4s ease;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         #app {
@@ -135,6 +139,7 @@
             position: relative;
             box-shadow: 0 0 40px rgba(0,0,0,0.02);
             transition: background-color 0.4s ease;
+            -webkit-tap-highlight-color: transparent;
         }
 
         /* --- Top Bar (Cabeçalho Fofo) --- */
@@ -142,11 +147,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 24px 24px 12px 24px;
+            padding: 18px 18px 10px 18px;
         }
         
         .top-bar .logo {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: 800;
             color: var(--accent);
             display: flex;
@@ -157,8 +162,10 @@
         .btn-icon {
             background: var(--surface);
             border: none;
-            width: 44px;
-            height: 44px;
+            width: 48px;
+            height: 48px;
+            min-width: 44px;
+            min-height: 44px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -166,45 +173,51 @@
             color: var(--text-main);
             box-shadow: var(--shadow-sm);
             cursor: pointer;
-            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+            transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s;
+            touch-action: manipulation;
         }
-        .btn-icon:active { transform: scale(0.85); }
+        .btn-icon:active { transform: scale(0.92); }
 
         /* --- Navegação Inferior (Taller & Mobile Optimized) --- */
         .bottom-nav {
             position: sticky;
             bottom: 0;
             width: 100%;
-            background: rgba(var(--surface-rgb, 255, 255, 255), 0.85);
-            backdrop-filter: blur(12px);
+            background: rgba(var(--surface-rgb, 255, 255, 255), 0.95);
+            backdrop-filter: blur(8px);
             display: flex;
             justify-content: space-around;
-            padding: 18px 20px;
-            padding-bottom: calc(env(safe-area-inset-bottom, 16px) + 12px);
+            padding: 12px 12px;
+            padding-bottom: calc(env(safe-area-inset-bottom, 12px) + 8px);
             border-top: 1px solid rgba(0,0,0,0.03);
             z-index: 100;
+            gap: 6px;
         }
         
-        [data-theme="noturno"] .bottom-nav { background: rgba(42, 42, 53, 0.85); border-top: 1px solid rgba(255,255,255,0.05); }
+        [data-theme="noturno"] .bottom-nav { background: rgba(42, 42, 53, 0.95); border-top: 1px solid rgba(255,255,255,0.05); }
 
         .nav-btn {
             background: none;
             border: none;
             color: var(--text-light);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 700;
+            transition: all 0.22s ease;
+            font-weight: 800;
             font-family: inherit;
+            padding: 8px 6px;
+            min-width: 56px;
+            min-height: 44px;
+            border-radius: 12px;
         }
 
         .nav-btn svg {
-            width: 28px;
-            height: 28px;
+            width: 26px;
+            height: 26px;
             stroke: currentColor;
             fill: none;
             stroke-width: 2.5;
@@ -213,40 +226,40 @@
             transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        .nav-btn.active { color: var(--accent); }
-        .nav-btn.active svg { transform: translateY(-4px) scale(1.1); }
+        .nav-btn.active { color: var(--accent); background: transparent; }
 
         /* --- Telas (Views) --- */
         main {
             flex: 1;
-            padding: 10px 24px 24px 24px;
+            padding: 8px 16px 18px 16px;
             overflow-y: auto;
             padding-bottom: 110px;
+            -webkit-overflow-scrolling: touch;
         }
 
-        .view { display: none; animation: fadeIn 0.4s ease forwards; }
+        .view { display: none; animation: fadeIn 0.28s ease forwards; }
         .view.active { display: block; }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         /* --- Tipografia --- */
-        h1, h2, h3 { font-weight: 800; color: var(--text-main); line-height: 1.3; }
-        h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
-        h2 { font-size: 1.3rem; margin-top: 1.5rem; margin-bottom: 1rem; }
+        h1, h2, h3 { font-weight: 800; color: var(--text-main); line-height: 1.25; }
+        h1 { font-size: 1.4rem; margin-bottom: 0.45rem; }
+        h2 { font-size: 1.05rem; margin-top: 1.1rem; margin-bottom: 0.9rem; }
         
-        .subtitle { color: var(--text-light); font-size: 1.05rem; margin-bottom: 1.5rem; font-weight: 600;}
+        .subtitle { color: var(--text-light); font-size: 0.98rem; margin-bottom: 1rem; font-weight: 700;}
 
         /* --- Componentes --- */
         .card {
             background: var(--surface);
             border-radius: var(--radius-lg);
-            padding: 24px;
-            margin-bottom: 16px;
+            padding: 18px;
+            margin-bottom: 12px;
             box-shadow: var(--shadow);
-            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s;
+            transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s;
             border: 2px solid transparent;
         }
 
@@ -254,21 +267,22 @@
             background: var(--accent);
             color: white;
             border: none;
-            padding: 16px 24px;
-            border-radius: 100px; /* Estilo pílula fofo */
-            font-size: 1.05rem;
-            font-weight: 700;
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 800;
             font-family: inherit;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease;
+            transition: transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.14s ease;
             width: 100%;
+            min-height: 44px;
         }
 
-        .btn:active { transform: scale(0.95); }
+        .btn:active { transform: scale(0.97); }
         .btn-outline { background: transparent; color: var(--text-main); border: 2px solid var(--accent-light); }
         .btn-danger { background: var(--accent-light); color: var(--danger); border: none; }
         
@@ -276,43 +290,47 @@
         [data-theme="noturno"] .btn-outline { color: var(--text-main); }
         [data-theme="noturno"] .btn-danger { color: var(--danger); }
 
-        .fab {
-            position: fixed;
-            bottom: 110px;
-            right: 24px;
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
+        /* Header action for people view (inline + button) */
+        .people-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-bottom: 8px; }
+        .people-header h1 { margin: 0; font-size: 1.15rem; }
+        .add-person {
             background: var(--accent);
             color: white;
             border: none;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-            display: flex;
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.12);
             cursor: pointer;
-            z-index: 90;
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: transform 0.16s ease;
+            min-width: 44px;
+            min-height: 44px;
         }
-        [data-theme="noturno"] .fab { color: #1A1A24; }
-        .fab svg { width: 28px; height: 28px; }
-        .fab:active { transform: scale(0.85); }
+        .add-person:active { transform: scale(0.95); }
+        [data-theme="noturno"] .add-person { color: #1A1A24; }
+        .add-person svg { width: 18px; height: 18px; stroke-width: 3; }
+
+        /* Legacy floating fab left in place but hidden (kept for compatibility) */
+        .fab { display: none; }
 
         /* --- Formulários --- */
-        .form-group { margin-bottom: 22px; }
-        .form-group label { display: block; margin-bottom: 10px; font-weight: 700; font-size: 1rem; color: var(--text-main); }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 800; font-size: 0.97rem; color: var(--text-main); }
 
         input[type="text"], input[type="date"], textarea, select {
             width: 100%;
-            padding: 16px 18px;
+            padding: 12px 14px;
             border: 2px solid var(--accent-light);
             border-radius: var(--radius-md);
             background: var(--bg-color);
             color: var(--text-main);
             font-family: inherit;
-            font-size: 1.05rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
+            font-size: 1rem;
+            font-weight: 700;
+            transition: all 0.22s ease;
             -webkit-appearance: none;
         }
         
@@ -322,8 +340,8 @@
         input[type="date"]::-webkit-calendar-picker-indicator {
             filter: var(--calendar-filter);
             cursor: pointer;
-            opacity: 0.6;
-            transition: 0.2s;
+            opacity: 0.7;
+            transition: 0.18s;
         }
         input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
         
@@ -334,119 +352,184 @@
             box-shadow: 0 0 0 4px var(--accent-light);
         }
 
-        textarea { resize: vertical; min-height: 120px; }
+        textarea { resize: vertical; min-height: 100px; font-size:0.98rem; }
 
         /* Sliders fofos */
-        .slider-container { display: flex; align-items: center; gap: 16px; }
+        .slider-container { display: flex; align-items: center; gap: 12px; }
         .slider-value {
             font-weight: 800; color: var(--accent); min-width: 36px; text-align: center;
-            background: var(--accent-light); padding: 6px 12px; border-radius: 12px;
+            background: var(--accent-light); padding: 6px 10px; border-radius: 12px;
         }
         input[type="range"] {
             flex: 1; -webkit-appearance: none; height: 8px; background: var(--accent-light); border-radius: 10px; outline: none; padding: 0; border: none;
         }
         input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none; width: 28px; height: 28px; border-radius: 50%;
-            background: var(--accent); cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            -webkit-appearance: none; width: 24px; height: 24px; border-radius: 50%;
+            background: var(--accent); cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.18);
             border: 4px solid var(--surface);
-            transition: transform 0.1s;
+            transition: transform 0.08s;
         }
-        input[type="range"]::-webkit-slider-thumb:active { transform: scale(1.2); }
+        input[type="range"]::-webkit-slider-thumb:active { transform: scale(1.12); }
 
         /* --- Listas e Itens --- */
         .person-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px;
+            padding: 16px;
             background: var(--surface);
             border-radius: var(--radius-md);
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             box-shadow: var(--shadow-sm);
             cursor: pointer;
             border: 2px solid transparent;
-            transition: all 0.2s ease;
+            transition: all 0.16s ease;
         }
-        .person-item:active { transform: scale(0.98); }
-        .person-item:hover { border-color: var(--accent-light); transform: translateY(-2px); box-shadow: var(--shadow); }
+        .person-item:active { transform: scale(0.995); }
+        .person-item:hover { border-color: var(--accent-light); transform: translateY(-1px); box-shadow: var(--shadow); }
         
-        .person-info h3 { margin: 0; font-size: 1.2rem; }
-        .person-info p { margin: 0; color: var(--text-light); font-size: 0.95rem; font-weight: 600; }
-        .person-score { background: var(--accent-light); color: var(--accent); padding: 8px 14px; border-radius: 20px; font-size: 0.95rem; font-weight: 800; display: flex; gap:6px; align-items: center;}
+        .person-info h3 { margin: 0; font-size: 1.05rem; }
+        .person-info p { margin: 0; color: var(--text-light); font-size: 0.9rem; font-weight: 700; }
+        .person-score { background: var(--accent-light); color: var(--accent); padding: 6px 10px; border-radius: 16px; font-size: 0.95rem; font-weight: 800; display: flex; gap:6px; align-items: center;}
 
         /* --- Insights & Conselheiro --- */
         .insight-card {
             background: var(--accent-light);
-            padding: 20px;
+            padding: 14px;
             border-radius: var(--radius-lg);
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             color: var(--text-main);
-            font-weight: 600;
+            font-weight: 700;
             display: flex;
-            gap: 14px;
+            gap: 12px;
             align-items: flex-start;
-            font-size: 1.05rem;
+            font-size: 1rem;
         }
-        .insight-icon { font-size: 1.8rem; line-height: 1; }
+        .insight-icon { font-size: 1.4rem; line-height: 1; }
 
         .advice-box {
-            margin-top: 16px;
-            padding: 18px;
+            margin-top: 12px;
+            padding: 14px;
             background: var(--bg-color);
             border: 2px dashed var(--accent);
             border-radius: var(--radius-md);
-            font-size: 1rem;
+            font-size: 0.98rem;
             color: var(--text-main);
         }
-        .advice-title { font-weight: 800; color: var(--accent); display: flex; align-items: center; gap: 8px; margin-bottom: 10px;}
+        .advice-title { font-weight: 800; color: var(--accent); display: flex; align-items: center; gap: 8px; margin-bottom: 8px;}
 
         /* --- Modal Genérico --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.3); backdrop-filter: blur(5px);
+            background: rgba(0,0,0,0.28); backdrop-filter: blur(4px);
             display: flex; justify-content: center; align-items: flex-end;
-            z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+            z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.22s ease;
         }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
         .modal-content {
             background: var(--surface); width: 100%; max-width: 600px;
-            border-radius: 30px 30px 0 0; padding: 34px 24px;
-            padding-bottom: calc(env(safe-area-inset-bottom, 24px) + 24px);
-            transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
+            border-radius: 20px 20px 0 0; padding: 20px 16px;
+            padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 16px);
+            transform: translateY(100%); transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.08);
+            max-height: 92vh;
+            overflow: auto;
         }
         .modal-overlay.active .modal-content { transform: translateY(0); }
         
-        .theme-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px;}
+        .theme-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 18px;}
         .theme-btn {
-            padding: 16px; border-radius: var(--radius-md); border: 2px solid var(--accent-light);
-            background: var(--bg-color); font-weight: 700; cursor: pointer; color: var(--text-main);
-            display: flex; align-items: center; justify-content: center; gap: 8px; font-family: inherit; font-size: 1rem;
-            transition: all 0.2s;
+            padding: 12px; border-radius: var(--radius-md); border: 2px solid var(--accent-light);
+            background: var(--bg-color); font-weight: 800; cursor: pointer; color: var(--text-main);
+            display: flex; align-items: center; justify-content: center; gap: 8px; font-family: inherit; font-size: 0.95rem;
+            transition: all 0.16s;
         }
-        .theme-btn.active { border-color: var(--accent); background: var(--accent-light); transform: scale(1.02); }
+        .theme-btn.active { border-color: var(--accent); background: var(--accent-light); transform: scale(1.01); }
 
         /* --- Toasts Notificações --- */
         .toast {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
-            background: var(--text-main); color: var(--surface); padding: 14px 28px;
-            border-radius: 100px; font-weight: 700; z-index: 2000; opacity: 0;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: var(--shadow);
-            text-align: center; font-size: 1.05rem; white-space: nowrap;
+            position: fixed; top: 14px; left: 50%; transform: translateX(-50%) translateY(-120px);
+            background: var(--text-main); color: var(--surface); padding: 12px 20px;
+            border-radius: 100px; font-weight: 800; z-index: 2000; opacity: 0;
+            transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1); box-shadow: var(--shadow);
+            text-align: center; font-size: 0.98rem; white-space: nowrap;
         }
         [data-theme="noturno"] .toast { background: var(--accent); color: #1A1A24; }
         .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
         /* Helper Classes */
         .d-none { display: none !important; }
-        .flex-row { display: flex; gap: 14px; }
-        .mt-2 { margin-top: 24px; }
-        .mb-2 { margin-bottom: 24px; }
+        .flex-row { display: flex; gap: 12px; }
+        .mt-2 { margin-top: 18px; }
+        .mb-2 { margin-bottom: 18px; }
         .text-center { text-align: center; }
         
-        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-light); font-weight: 600; font-size: 1.1rem;}
-        .empty-state span { font-size: 3.5rem; display: block; margin-bottom: 20px; }
+        .empty-state { text-align: center; padding: 36px 14px; color: var(--text-light); font-weight: 700; font-size: 1rem;}
+        .empty-state span { font-size: 3rem; display: block; margin-bottom: 14px; }
 
+        /* Locked state when PIN is required */
+        #app.locked > *:not(.modal-overlay) {
+            filter: blur(6px) saturate(0.85);
+            pointer-events: none;
+            user-select: none;
+            opacity: 0.45;
+        }
+        /* Ensure pin modal appears above locked UI */
+        #pin-modal { z-index: 3000; }
+
+        /* --- Mobile specific tweaks (phones) --- */
+        @media (max-width: 480px) {
+
+            /* Make app use full width and compress spacing */
+            #app { max-width: 100%; min-height: 100vh; }
+
+            .top-bar { padding: 12px 12px 8px 12px; }
+            .top-bar .logo { font-size: 1.05rem; gap:8px; }
+            .btn-icon { width:44px; height:44px; }
+
+            main { padding: 8px 12px 96px 12px; }
+
+            h1 { font-size: 1.25rem; }
+            h2 { font-size: 1rem; }
+
+            .card { padding: 14px; border-radius: 18px; margin-bottom: 12px; }
+            .form-group { margin-bottom: 12px; }
+            .form-group label { font-size: 0.95rem; }
+
+            .btn { padding: 12px 14px; font-size: 0.98rem; min-height:44px; border-radius:12px; }
+            .btn-outline { padding: 10px 12px; }
+
+            .nav-btn { font-size: 0.82rem; min-width: 56px; padding: 8px; }
+            .nav-btn svg { width: 22px; height: 22px; }
+
+            .person-item { padding: 12px; }
+            .person-info h3 { font-size: 1rem; }
+            .person-score { padding: 6px 10px; font-size: 0.9rem; }
+
+            input[type="text"], input[type="date"], textarea, select { padding: 10px 12px; font-size: 0.98rem; }
+
+            .theme-grid { grid-template-columns: repeat(3, 1fr); gap:8px; }
+            .theme-btn { padding: 10px; font-size: 0.9rem; }
+
+            /* Make modals feel native mobile: slide-up, full width with safe-area and comfortable spacing */
+            .modal-overlay { align-items: flex-end; padding: 8px; }
+            .modal-content { border-radius: 14px 14px 0 0; padding: 16px; max-height: 92vh; width: 100%; box-shadow: 0 -8px 30px rgba(0,0,0,0.12); }
+
+            /* Pin modal center small box but comfortable */
+            #pin-modal .modal-content { max-width: 420px; margin: 0 auto 8px; border-radius: 12px; }
+
+            /* Increase hit targets for small icons & controls */
+            .add-person, .btn-icon, .nav-btn, .btn { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+
+            /* Ensure image previews scale nicely */
+            #me-image-preview-img, #me-view-image-img { max-height: 220px; object-fit: cover; display: block; width: 100%; border-radius: 12px; }
+
+            /* Make toasts slightly smaller on phones */
+            .toast { font-size: 0.95rem; padding: 10px 18px; top: 12px; }
+
+            /* Avoid long scrollbars and encourage one-screen flow */
+            body, html { overscroll-behavior-y: contain; }
+        }
     </style>
 </head>
 <body>
@@ -463,8 +546,8 @@
     <main>
         <!-- TELA: INÍCIO -->
         <section id="view-home" class="view active">
-            <h1>Olá! Como você está?</h1>
-            <p class="subtitle">Aqui está um resumo do seu universo.</p>
+            <h1>Oi, como você está?</h1>
+            <p class="subtitle">Um resumo simples do que está acontecendo com você.</p>
 
             <div id="home-insights">
                 <!-- Preenchido via JS com dicas inteligentes -->
@@ -473,7 +556,7 @@
             <div class="flex-row mt-2">
                 <button class="card flex-row" style="flex: 1; flex-direction: column; align-items: center; padding: 24px 20px; gap:14px; cursor: pointer;" onclick="App.nav('view-person-form'); App.clearPersonForm();">
                     <div style="font-size: 2.2rem;">🫂</div>
-                    <span style="font-weight: 700; font-size: 1.05rem;">Nova Pessoa</span>
+                    <span style="font-weight: 700; font-size: 1.05rem;">Adicionar pessoa</span>
                 </button>
                 <button class="card flex-row" style="flex: 1; flex-direction: column; align-items: center; padding: 24px 20px; gap:14px; cursor: pointer;" onclick="App.nav('view-me-form'); App.clearMeForm();">
                     <div style="font-size: 2.2rem;">✍️</div>
@@ -484,35 +567,38 @@
 
         <!-- TELA: LISTA DE PESSOAS -->
         <section id="view-people" class="view">
-            <h1>Sua Constelação</h1>
-            <p class="subtitle">As pessoas importantes da sua vida.</p>
-            
+            <div class="people-header">
+                <div style="display:flex; flex-direction:column;">
+                    <h1>Sua rede</h1>
+                    <p class="subtitle" style="margin-top:6px;">Pessoas que têm lugar no seu dia a dia.</p>
+                </div>
+                <button class="add-person" onclick="App.nav('view-person-form'); App.clearPersonForm();" aria-label="Adicionar pessoa">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                </button>
+            </div>
+
             <div id="people-list">
                 <!-- Preenchido via JS -->
             </div>
-
-            <button class="fab" onclick="App.nav('view-person-form'); App.clearPersonForm();" aria-label="Adicionar pessoa">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            </button>
         </section>
 
         <!-- TELA: FORMULÁRIO DE PESSOA -->
         <section id="view-person-form" class="view">
-            <h1 id="person-form-title">Nova Pessoa</h1>
+            <h1 id="person-form-title">Adicionar pessoa</h1>
             <input type="hidden" id="person-id">
             
             <div class="card">
                 <div class="form-group">
-                    <label>Como ela se chama?</label>
+                    <label>Nome</label>
                     <input type="text" id="person-name" placeholder="Ex: Maria">
                 </div>
                 <div class="form-group">
-                    <label>Qual a relação de vocês?</label>
-                    <input type="text" id="person-type" placeholder="Ex: Amiga, Mãe, Amor...">
+                    <label>Relação</label>
+                    <input type="text" id="person-type" placeholder="Ex: amiga, mãe, parceira...">
                 </div>
             </div>
 
-            <h2>Percepções Sinceras 💭</h2>
+            <h2>Percepções</h2>
             <div class="card">
                 <div class="form-group">
                     <label>O que você mais admira nela?</label>
@@ -524,7 +610,7 @@
                 </div>
             </div>
 
-            <h2>Termômetro da Relação 🌡️</h2>
+            <h2>Termômetro</h2>
             <div class="card">
                 <div class="form-group">
                     <label>Proximidade Emocional</label>
@@ -558,10 +644,10 @@
 
         <!-- TELA: SOBRE MIM (DIÁRIO PESSOAL) -->
         <section id="view-me" class="view">
-            <h1>Seu Refúgio</h1>
-            <p class="subtitle">Um espaço seguro só para você.</p>
+            <h1>Seu espaço</h1>
+            <p class="subtitle">Um cantinho só para suas ideias e sentimentos.</p>
             
-            <button class="btn mb-2" onclick="App.nav('view-me-form'); App.clearMeForm();">✨ Escrever no Diário</button>
+            <button class="btn mb-2" onclick="App.nav('view-me-form'); App.clearMeForm();">✨ Escrever</button>
 
             <div id="me-list">
                 <!-- Preenchido via JS -->
@@ -570,7 +656,7 @@
 
         <!-- TELA: FORMULÁRIO SOBRE MIM -->
         <section id="view-me-form" class="view">
-            <h1>Página do Diário</h1>
+            <h1>Entrada do dia</h1>
             <input type="hidden" id="me-id">
             
             <div class="card">
@@ -602,6 +688,15 @@
                     <label>Algo está incomodando?</label>
                     <textarea id="me-bothering" placeholder="Tirar da cabeça e pôr no papel ajuda."></textarea>
                 </div>
+
+                <div class="form-group">
+                    <label>Adicionar imagem (opcional)</label>
+                    <input type="file" id="me-image" accept="image/*">
+                    <div id="me-image-preview" style="margin-top:12px; display:none;">
+                        <img id="me-image-preview-img" src="" alt="Prévia" style="width:100%; border-radius:12px; box-shadow: var(--shadow-sm);">
+                        <button class="btn btn-outline mt-2" style="width:100%; margin-top:10px;" onclick="App.removeMeImage(event)">Remover imagem</button>
+                    </div>
+                </div>
             </div>
 
             <div class="flex-row mt-2">
@@ -632,25 +727,25 @@
 
     <!-- Modal de Configurações -->
     <div class="modal-overlay" id="settings-modal" onclick="if(event.target === this) App.toggleSettings()">
-        <div class="modal-content">
-            <h2>Personalizar Diário 🎨</h2>
+        <div class="modal-content" role="dialog" aria-modal="true" aria-label="Configurações do diário">
+            <h2 style="margin-bottom:8px;">Personalizar Diário 🎨</h2>
             
             <div class="form-group mt-2">
                 <label>Escolha as Cores</label>
-                <div class="theme-grid">
+                <div class="theme-grid" style="grid-template-columns: repeat(3, 1fr); gap:8px;">
                     <button class="theme-btn" onclick="App.setTheme('terra')">🧸 Terra</button>
                     <button class="theme-btn" onclick="App.setTheme('matcha')">🍵 Matchá</button>
                     <button class="theme-btn" onclick="App.setTheme('lavanda')">☂️ Lavanda</button>
                     <button class="theme-btn" onclick="App.setTheme('pessego')">🍑 Pêssego</button>
                     <button class="theme-btn" onclick="App.setTheme('oceano')">🌊 Oceano</button>
                     <button class="theme-btn" onclick="App.setTheme('girassol')">🌻 Girassol</button>
-                    <button class="theme-btn" onclick="App.setTheme('noturno')">🌙 Noturno</button>
+                    <button class="theme-btn" style="grid-column: span 3;" onclick="App.setTheme('noturno')">🌙 Noturno</button>
                 </div>
             </div>
 
             <div class="form-group">
                 <label>Estilo da Letra</label>
-                <div class="theme-grid">
+                <div class="theme-grid" style="grid-template-columns: repeat(3, 1fr); gap:8px;">
                     <button class="theme-btn" style="font-family: 'Nunito', sans-serif;" onclick="App.setFont('nunito')">Redondinha</button>
                     <button class="theme-btn" style="font-family: 'Quicksand', sans-serif;" onclick="App.setFont('quicksand')">Suave</button>
                     <button class="theme-btn" style="font-family: 'Lora', serif;" onclick="App.setFont('lora')">Clássica</button>
@@ -659,7 +754,100 @@
                 </div>
             </div>
 
-            <button class="btn mt-2" onclick="App.toggleSettings()">Pronto!</button>
+            <div class="form-group mt-2">
+                <label>Bloqueio com PIN (opcional)</label>
+                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                    <input id="settings-pin-input" type="password" inputmode="numeric" pattern="[0-9]*" placeholder="PIN 4-8 dígitos" style="flex:1; min-width:160px; padding:12px 14px; border-radius:12px; border:2px solid var(--accent-light); font-weight:700;">
+                    <button class="btn" style="padding:10px 14px; flex:0 0 auto;" onclick="App.savePinFromSettings(event)">Salvar PIN</button>
+                </div>
+                <div style="margin-top:8px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                    <button class="btn btn-outline" onclick="App.clearPin()">Remover PIN</button>
+                    <div id="settings-pin-hint" style="color:var(--text-light); font-weight:700; padding-top:6px;">PIN atual: <span id="settings-pin-status">nenhum</span></div>
+                </div>
+                <div style="margin-top:8px; color:var(--text-light); font-size:0.95rem;">O PIN é armazenado localmente no seu dispositivo.</div>
+            </div>
+
+            <div style="display:flex; gap:8px; margin-top:18px;">
+                <button class="btn btn-outline" style="flex:1;" onclick="App.toggleSettings()">Fechar</button>
+                <button class="btn" style="flex:1;" onclick="App.toggleSettings()">Pronto</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de bloqueio por PIN -->
+    <div class="modal-overlay" id="pin-modal">
+        <div class="modal-content text-center" style="max-width:420px;">
+            <h2>Digite seu PIN</h2>
+            <div style="margin-top:12px;">
+                <input id="pin-input" type="password" placeholder="PIN" inputmode="numeric" pattern="[0-9]*" style="padding:14px 16px; border-radius:12px; border:2px solid var(--accent-light); width:100%; font-weight:800; text-align:center; font-size:1.1rem;">
+            </div>
+            <div style="margin-top:18px; display:flex; gap:10px;">
+                <button class="btn btn-outline" style="flex:1;" onclick="App.closePinModal()">Cancelar</button>
+                <button class="btn" style="flex:1;" onclick="App.verifyPin()">Entrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de visualização rápida da entrada -->
+    <div class="modal-overlay" id="me-view-modal" onclick="if(event.target === this) App.closeMeView()">
+        <div class="modal-content">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <div>
+                    <div id="me-view-emotion" style="font-weight:800; color:var(--accent); font-size:1.1rem;"></div>
+                    <div id="me-view-date" style="color:var(--text-light); font-weight:700; font-size:0.95rem;"></div>
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn btn-outline" onclick="App.closeMeView()">Fechar</button>
+                    <button class="btn" id="me-view-edit-btn">Editar</button>
+                </div>
+            </div>
+            <div id="me-view-image" style="margin-bottom:12px; display:none;">
+                <img id="me-view-image-img" src="" alt="Imagem" style="width:100%; border-radius:12px; box-shadow: var(--shadow-sm);">
+            </div>
+            <div id="me-view-content" style="font-size:1.05rem; color:var(--text-main); line-height:1.6;"></div>
+            <div id="me-view-advice" style="margin-top:14px; display:none;">
+                <div class="advice-box">
+                    <div class="advice-title">💡 Insight do Diário</div>
+                    <div id="me-view-advice-text"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de visualização rápida da pessoa -->
+    <div class="modal-overlay" id="person-view-modal" onclick="if(event.target === this) App.closePersonView()">
+        <div class="modal-content">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+                <div>
+                    <div id="person-view-name" style="font-weight:800; color:var(--accent); font-size:1.1rem;"></div>
+                    <div id="person-view-type" style="color:var(--text-light); font-weight:700; font-size:0.95rem;"></div>
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn btn-outline" onclick="App.closePersonView()">Fechar</button>
+                    <button class="btn" id="person-view-edit-btn">Editar</button>
+                </div>
+            </div>
+
+            <div id="person-view-content" style="font-size:1rem; color:var(--text-main); line-height:1.6;">
+                <div style="margin-top:6px;">
+                    <strong>O que você admira</strong>
+                    <div id="person-view-pos" style="margin-top:6px;"></div>
+                </div>
+                <div style="margin-top:12px;">
+                    <strong>O que é difícil</strong>
+                    <div id="person-view-neg" style="margin-top:6px;"></div>
+                </div>
+                <div style="margin-top:12px; display:flex; gap:10px;">
+                    <div style="background:var(--accent-light); padding:8px 10px; border-radius:10px; font-weight:800;">Proximidade: <span id="person-view-closeness"></span></div>
+                    <div style="background:var(--accent-light); padding:8px 10px; border-radius:10px; font-weight:800;">Confiança: <span id="person-view-trust"></span></div>
+                    <div style="background:var(--accent-light); padding:8px 10px; border-radius:10px; font-weight:800;">Frequência: <span id="person-view-freq"></span></div>
+                </div>
+
+                <div style="margin-top:16px; display:flex; gap:8px;">
+                    <button class="btn" id="person-view-edit-btn-2">Editar</button>
+                    <button class="btn btn-danger" id="person-view-delete-btn">Apagar</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -693,20 +881,44 @@ const Counselor = {
 
         const categories = {
             burnout: {
-                words: ['cansada', 'cansado', 'exausto', 'exaustão', 'dormir', 'sobrecarga', 'pesado', 'sem energia'],
-                advice: "O diário notou que você está usando palavras de cansaço. Tire um momento hoje apenas para respirar, beber uma água ou descansar a vista. Você não precisa dar conta de tudo o tempo todo. 🍵"
+                words: ['cansada', 'cansado', 'exausto', 'exaustão', 'dormir', 'sobrecarga', 'pesado', 'sem energia', 'esgotado'],
+                advice: "Parece cansativo. Tente parar por cinco minutos: respire fundo e faça algo pequeno que te acalme. Você pode voltar ao resto depois."
             },
             anxiety: {
-                words: ['ansioso', 'ansiosa', 'medo', 'preocupado', 'futuro', 'nervoso', 'pressão', 'pânico', 'sufocado'],
-                advice: "Notei um pouco de ansiedade nas suas palavras. Que tal focar apenas no próximo pequeno passo em vez da escada inteira? Feche os olhos por 1 minuto e respire fundo. Vai ficar tudo bem. 🌻"
+                words: ['ansioso', 'ansiosa', 'medo', 'preocupado', 'futuro', 'nervoso', 'pressão', 'pânico', 'sufocado', 'tensão'],
+                advice: "Há sinais de ansiedade. Escolha uma pequena ação agora (um copo d'água, 60s de respiração) e veja como se sente."
             },
             conflict: {
-                words: ['briga', 'raiva', 'chateado', 'irritado', 'discuti', 'tóxico', 'grito', 'injusto', 'decepção'],
-                advice: "Relações podem gerar atritos dolorosos. Lembre-se de proteger a sua paz mental e comunicar seus limites com firmeza e carinho quando estiver pronto(a). 🕊️"
+                words: ['briga', 'raiva', 'chateado', 'irritado', 'discuti', 'tóxico', 'grito', 'injusto', 'decepção', 'ofendido'],
+                advice: "Tem tensão com alguém. Antes de agir, escreva o que você quer dizer — isso ajuda a falar de forma mais clara e calma."
             },
             growth: {
-                words: ['aprendi', 'consegui', 'melhorei', 'orgulho', 'superei', 'feliz', 'grato', 'paz'],
-                advice: "Que incrível notar essa energia positiva e de crescimento nas suas palavras! Continue regando suas pequenas vitórias, elas importam muito. 🌱"
+                words: ['aprendi', 'consegui', 'melhorei', 'orgulho', 'superei', 'feliz', 'grato', 'paz', 'celebrei'],
+                advice: "Você cresceu em algo — ótimo. Anote um pequeno passo para continuar esse movimento."
+            },
+            loneliness: {
+                words: ['sozinho', 'sozinha', 'sozinho(a)', 'solitário', 'solitária', 'isolado'],
+                advice: "Se sente sozinho(a). Mandar uma mensagem curta ou marcar um encontro pequeno pode aliviar esse peso."
+            },
+            gratitude: {
+                words: ['grato', 'grata', 'agradecido', 'agradecida', 'obrigado', 'obrigada'],
+                advice: "Gratidão aqui — escreva três detalhes específicos do que te fez sentir assim."
+            },
+            overwhelm: {
+                words: ['sobrecarregado', 'sobrecarregada', 'muito', 'demais', 'invadido', 'afogado'],
+                advice: "Muita coisa ao mesmo tempo. Liste três prioridades e deixe o resto para depois."
+            },
+            nostalgia: {
+                words: ['saudade', 'saudoso', 'nostalgia', 'lembrar', 'lembrança'],
+                advice: "Memórias estão vindo. Deixe-se sentir e, se ajudar, escreva uma carta sem enviar."
+            },
+            joy: {
+                words: ['alegre', 'animado', 'feliz', 'radiante', 'eufórico', 'contente'],
+                advice: "Alegria! Compartilhe esse momento ou repita o que te fez bem."
+            },
+            boundaries: {
+                words: ['limite', 'limites', 'respeito', 'dizer não', 'não consigo'],
+                advice: "Pensando em limites — experimente ensaiar uma frase curta e respeitosa para usar quando precisar."
             }
         };
 
@@ -830,10 +1042,145 @@ const App = {
             if(this.data.settings.font === 'caveat' && txt.includes('manuscrita')) btn.classList.add('active');
             if(this.data.settings.font === 'system' && txt.includes('limpa')) btn.classList.add('active');
         });
+
+        // update PIN status hint
+        const status = this.data.settings.pin ? 'ativado' : 'nenhum';
+        const hintEl = document.getElementById('settings-pin-status');
+        if (hintEl) hintEl.innerText = status;
+    },
+
+    // --- PIN / Bloqueio ---
+    setPin() {
+        const input = document.getElementById('settings-pin-input');
+        if (!input) return;
+        const val = (input.value || '').trim();
+        if (!val) {
+            this.showToast('Digite um PIN válido.');
+            return;
+        }
+        if (!/^\d{4,8}$/.test(val)) {
+            this.showToast('PIN deve ter entre 4 e 8 dígitos numéricos.');
+            return;
+        }
+        // armazenar PIN simples (não é seguro criptograficamente, mas serve para bloqueio local)
+        this.data.settings.pin = val;
+        this.saveData();
+        this.updateSettingsUI();
+        input.value = '';
+        this.showToast('PIN salvo.');
+    },
+
+    // Called from the settings UI so the button reliably saves without closing or misfiring
+    savePinFromSettings(event) {
+        if (event && event.stopPropagation) event.stopPropagation();
+        const input = document.getElementById('settings-pin-input');
+        if (!input) return;
+        const val = (input.value || '').trim();
+        if (!val) {
+            this.showToast('Digite um PIN válido.');
+            return;
+        }
+        // reuse validation/storage logic
+        this.setPin();
+        // keep the settings modal open and update UI state
+        this.updateSettingsUI();
+        // focus back to input for clarity
+        setTimeout(() => input.focus(), 120);
+    },
+
+    clearPin() {
+        delete this.data.settings.pin;
+        this.saveData();
+        this.updateSettingsUI();
+        this.showToast('PIN removido.');
+    },
+
+    togglePinModal() {
+        const modal = document.getElementById('pin-modal');
+        modal.classList.toggle('active');
+        const input = document.getElementById('pin-input');
+        if (modal.classList.contains('active') && input) {
+            setTimeout(() => input.focus(), 200);
+        }
+    },
+
+    closePinModal() {
+        document.getElementById('pin-modal').classList.remove('active');
+    },
+
+    verifyPin() {
+        const input = document.getElementById('pin-input');
+        if (!input) return;
+        const val = (input.value || '').trim();
+        if (!this.data.settings.pin) {
+            // no PIN configured: ensure modal hidden and app unlocked
+            this.closePinModal();
+            this._locked = false;
+            document.getElementById('app')?.classList.remove('locked');
+            return;
+        }
+        if (val === this.data.settings.pin) {
+            // Successful unlock: remove lock state, hide modal, restore UI & settings
+            this.closePinModal();
+            localStorage.setItem('vinculos_unlocked_at', Date.now().toString());
+            this.showToast('Bem-vindo(a).');
+            this._locked = false;
+            input.value = '';
+            // remove visual lock/blur
+            document.getElementById('app')?.classList.remove('locked');
+            // restore settings modal availability
+            document.getElementById('settings-modal')?.classList.remove('d-none');
+            // refresh views
+            this.renderHome();
+            this.renderPeople();
+            this.renderMe();
+        } else {
+            this.showToast('PIN incorreto.');
+            input.value = '';
+            // keep modal open and focused for retry
+            setTimeout(() => input.focus(), 120);
+        }
+    },
+
+    // check and require PIN at start
+    requirePinIfSet() {
+        // Always require PIN on fresh load when a PIN is configured.
+        try {
+            if (this.data.settings.pin) {
+                // hide settings while locked and lock the app UI
+                document.getElementById('settings-modal')?.classList.add('d-none');
+                this._locked = true;
+                document.getElementById('app').classList.add('locked');
+                // open PIN modal and focus
+                const pinModal = document.getElementById('pin-modal');
+                if (!pinModal.classList.contains('active')) this.togglePinModal();
+            } else {
+                this._locked = false;
+                document.getElementById('app').classList.remove('locked');
+            }
+        } catch (e) {
+            this._locked = false;
+            document.getElementById('app').classList.remove('locked');
+        }
+    },
+
+    // --- Utility: ensure user unlocked before actions ---
+    ensureUnlocked(promptIfLocked = true) {
+        if (this._locked) {
+            if (promptIfLocked) {
+                // ensure settings modal hidden and show PIN modal
+                document.getElementById('settings-modal')?.classList.add('d-none');
+                if (!document.getElementById('pin-modal').classList.contains('active')) this.togglePinModal();
+            }
+            this.showToast('Digite seu PIN para continuar.');
+            return false;
+        }
+        return true;
     },
 
     // --- Navegação ---
     nav(viewId) {
+        if (!this.ensureUnlocked()) return;
         document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
         document.getElementById(viewId).classList.add('active');
 
@@ -873,6 +1220,7 @@ const App = {
     },
 
     loadPersonForm(id) {
+        if (!this.ensureUnlocked()) return;
         const person = this.data.people.find(p => p.id === id);
         if (!person) return;
 
@@ -893,6 +1241,7 @@ const App = {
     },
 
     savePerson() {
+        if (!this.ensureUnlocked()) return;
         const id = document.getElementById('person-id').value;
         const name = document.getElementById('person-name').value;
         const type = document.getElementById('person-type').value;
@@ -903,7 +1252,7 @@ const App = {
         const freq = parseInt(document.getElementById('person-freq').value);
 
         if (!name.trim()) {
-            this.showToast("Dê um nome a essa pessoa especial. 🌱");
+            this.showToast("Por favor, coloque um nome.");
             return;
         }
 
@@ -922,17 +1271,18 @@ const App = {
         }
 
         this.saveData();
-        this.showToast("Pessoa salva com sucesso. 🫂");
+        this.showToast("Pessoa salva.");
         this.nav('view-people');
     },
 
     deletePerson() {
+        if (!this.ensureUnlocked()) return;
         const id = document.getElementById('person-id').value;
         if (id) {
             this.confirmAction("Apagar Pessoa", "Isso removerá esta pessoa do seu universo. Continuar?", () => {
                 this.data.people = this.data.people.filter(p => p.id !== id);
                 this.saveData();
-                this.showToast("Pessoa removida. 🍃");
+                this.showToast("Pessoa removida.");
                 this.nav('view-people');
             });
         }
@@ -949,10 +1299,19 @@ const App = {
         // Data atual por padrão (compatível com input date)
         document.getElementById('me-date').value = new Date().toISOString().split('T')[0];
         
+        // limpar imagem do formulário também
+        const preview = document.getElementById('me-image-preview');
+        const img = document.getElementById('me-image-preview-img');
+        const input = document.getElementById('me-image');
+        if (input) input.value = '';
+        if (img) img.src = '';
+        if (preview) preview.style.display = 'none';
+
         document.getElementById('btn-delete-me').classList.add('d-none');
     },
     
     loadMeForm(id) {
+        if (!this.ensureUnlocked()) return;
         const entry = this.data.me.find(m => m.id === id);
         if (!entry) return;
         
@@ -967,11 +1326,26 @@ const App = {
         d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
         document.getElementById('me-date').value = d.toISOString().split('T')[0];
         
+        // Mostrar preview da imagem, se houver
+        const preview = document.getElementById('me-image-preview');
+        const img = document.getElementById('me-image-preview-img');
+        const input = document.getElementById('me-image');
+        if (entry.image) {
+            if (img) img.src = entry.image;
+            if (preview) preview.style.display = 'block';
+            if (input) input.value = ''; // evitar substituir pelo arquivo atual até o usuário escolher novo
+        } else {
+            if (img) img.src = '';
+            if (preview) preview.style.display = 'none';
+            if (input) input.value = '';
+        }
+
         document.getElementById('btn-delete-me').classList.remove('d-none');
         this.nav('view-me-form');
     },
 
     saveMe() {
+        if (!this.ensureUnlocked()) return;
         const id = document.getElementById('me-id').value;
         const emotion = document.getElementById('me-emotion').value;
         const reflection = document.getElementById('me-reflection').value;
@@ -980,7 +1354,8 @@ const App = {
         const dateStr = document.getElementById('me-date').value;
 
         if (!reflection.trim() && !improving.trim() && !bothering.trim()) {
-            this.showToast("Escreva algo no seu diário para salvar. 🪴");
+            // allow saving only image entries handled by overridden save below
+            this.showToast("Escreva algo para salvar.");
             return;
         }
 
@@ -999,13 +1374,17 @@ const App = {
 
         if (id) {
             const idx = this.data.me.findIndex(m => m.id === id);
-            if (idx > -1) this.data.me[idx] = entryData;
+            if (idx > -1) {
+                // preserve existing image unless replaced by the patched save below
+                entryData.image = this.data.me[idx].image || null;
+                this.data.me[idx] = entryData;
+            }
         } else {
             this.data.me.push(entryData);
         }
 
         this.saveData();
-        this.showToast("Página guardada com carinho. 📖");
+        this.showToast("Entrada salva.");
         this.nav('view-me');
     },
     
@@ -1015,10 +1394,32 @@ const App = {
             this.confirmAction("Apagar Página", "Tem certeza que deseja apagar esta página do diário?", () => {
                 this.data.me = this.data.me.filter(m => m.id !== id);
                 this.saveData();
-                this.showToast("Página apagada. 🍃");
+                this.showToast("Entrada apagada.");
                 this.nav('view-me');
             });
         }
+    },
+
+    // New helper to safely confirm deletion of a specific diary entry (avoids inline arrow fn in HTML)
+    confirmDeleteEntry(id) {
+        if (!id) return;
+        this.confirmAction("Apagar Entrada", "Apagar esta entrada do diário?", () => {
+            this.data.me = this.data.me.filter(m => m.id !== id);
+            this.saveData();
+            this.renderMe();
+            this.showToast("Entrada apagada.");
+        });
+    },
+
+    // --- LÓGICA: SOBRE MIM (Diário) ---
+    removeMeImage(event) {
+        event && event.preventDefault();
+        const input = document.getElementById('me-image');
+        const preview = document.getElementById('me-image-preview');
+        const img = document.getElementById('me-image-preview-img');
+        input.value = '';
+        img.src = '';
+        preview.style.display = 'none';
     },
 
     // --- RENDERIZAÇÕES ---
@@ -1027,7 +1428,7 @@ const App = {
         container.innerHTML = '';
         let insights = [];
 
-        // Diário recente
+        // Diário recente — mais personalizado com análise do conselheiro
         if (this.data.me.length > 0) {
             const sortedMe = [...this.data.me].sort((a, b) => b.timestamp - a.timestamp);
             const lastEntry = sortedMe[0];
@@ -1035,8 +1436,17 @@ const App = {
             
             if (daysAgo === 0) {
                 insights.push({ icon: '✨', text: `Que ótimo que você tirou um tempo para si hoje.` });
+            } else if (daysAgo === 1) {
+                insights.push({ icon: '🕒', text: `Você escreveu ontem — ótima prática! Que tal manter esse ritmo, mesmo que curto?` });
             } else if (daysAgo >= 3) {
                 insights.push({ icon: '📖', text: `Faz ${daysAgo} dias que você não escreve sobre si. Seus pensamentos sentem falta de serem ouvidos.` });
+            }
+
+            // Aproveitar a análise automática do diário para oferecer um insight direto
+            if (lastEntry.counselorAdvice) {
+                insights.push({ icon: '💡', text: lastEntry.counselorAdvice });
+            } else if (lastEntry.emotion) {
+                insights.push({ icon: '🧾', text: `Última emoção registrada: ${lastEntry.emotion}. Refletir sobre o porquê pode trazer clareza.` });
             }
         }
 
@@ -1056,7 +1466,7 @@ const App = {
 
         // Default se vazio
         if (insights.length === 0) {
-            insights.push({ icon: '🪴', text: `Bem-vindo(a) ao Vínculos. Este é seu espaço seguro para cultivar relações saudáveis consigo e com os outros.` });
+            insights.push({ icon: '🪴', text: `Bem-vindo(a) ao Vínculos. Um espaço simples para cuidar de você e das suas relações.` });
         }
 
         insights.slice(0, 2).forEach(item => {
@@ -1082,7 +1492,7 @@ const App = {
         this.data.people.forEach(p => {
             const el = document.createElement('div');
             el.className = 'person-item';
-            el.onclick = () => this.loadPersonForm(p.id);
+            // build a non-clickable card and provide explicit actions (Ver / Editar / Apagar)
             
             const score = Math.round((p.metrics.closeness + p.metrics.trust + p.metrics.freq) / 3);
             let icon = '🌧️';
@@ -1090,12 +1500,21 @@ const App = {
             else if (score >= 4) icon = '⛅';
 
             el.innerHTML = `
-                <div class="person-info">
-                    <h3>${p.name}</h3>
-                    <p>${p.type}</p>
-                </div>
-                <div class="person-score">
-                    ${icon} ${score.toFixed(1)}
+                <div style="display:flex; align-items:center; gap:12px; width:100%;">
+                    <div style="flex:1;">
+                        <div class="person-info">
+                            <h3 style="margin-bottom:4px;">${p.name}</h3>
+                            <p style="margin:0;">${p.type}</p>
+                        </div>
+                    </div>
+                    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
+                        <div class="person-score" style="margin-bottom:6px;">${icon} ${score.toFixed(1)}</div>
+                        <div style="display:flex; gap:8px;">
+                            <button class="btn btn-outline" style="padding:8px 10px; font-size:0.9rem;" onclick="App.viewPerson('${p.id}', event)">Ver</button>
+                            <button class="btn" style="padding:8px 10px; font-size:0.9rem;" onclick="event.stopPropagation(); App.loadPersonForm('${p.id}')">Editar</button>
+                            <button class="btn btn-danger" style="padding:8px 10px; font-size:0.9rem;" onclick="event.stopPropagation(); App.confirmAction('Apagar Pessoa', 'Apagar esta pessoa?', () => { App._deletePersonById('${p.id}'); })">Apagar</button>
+                        </div>
+                    </div>
                 </div>
             `;
             container.appendChild(el);
@@ -1116,39 +1535,243 @@ const App = {
         sortedMe.forEach(m => {
             const el = document.createElement('div');
             el.className = 'card';
-            el.style.cursor = 'pointer';
-            el.onclick = () => this.loadMeForm(m.id);
+            // actions instead of whole-card click
+            el.style.cursor = 'default';
 
             const allText = [m.reflection, m.improving, m.bothering].filter(t => t).join(' ');
-            const preview = allText.length > 90 ? allText.substring(0, 90) + '...' : allText;
+            const preview = allText.length > 140 ? allText.substring(0, 140) + '...' : allText;
 
             let adviceHtml = '';
             if (m.counselorAdvice) {
                 adviceHtml = `
-                    <div class="advice-box">
+                    <div class="advice-box" style="margin-top:12px;">
                         <div class="advice-title">💡 Insight do Diário</div>
                         ${m.counselorAdvice}
                     </div>
                 `;
             }
 
+            // Image block if exists (small inline preview)
+            let thumbHtml = '';
+            if (m.image) {
+                thumbHtml = `
+                    <div style="width:84px; height:64px; overflow:hidden; border-radius:10px; flex-shrink:0; box-shadow: var(--shadow-sm); margin-left:12px;">
+                        <img src="${m.image}" alt="img" style="width:100%; height:100%; object-fit:cover; display:block;">
+                    </div>
+                `;
+            }
+
             el.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                    <div style="font-weight: 800; color: var(--accent); font-size: 1.1rem;">${m.emotion}</div>
-                    <div style="font-size: 0.9rem; color: var(--text-light); font-weight: 700;">${this.formatDate(m.timestamp)}</div>
+                <div style="display:flex; justify-content:space-between; gap:12px; align-items:flex-start;">
+                    <div style="flex:1;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div style="font-weight:800; color:var(--accent); font-size:1.05rem;">${m.emotion}</div>
+                            <div style="font-size:0.9rem; color:var(--text-light); font-weight:700;">${this.formatDate(m.timestamp)}</div>
+                        </div>
+                        <div style="color:var(--text-main); font-size:1rem; line-height:1.5; margin-top:8px;">${preview}</div>
+                        ${adviceHtml}
+                        <div style="display:flex; gap:8px; margin-top:12px;">
+                            <button class="btn btn-outline" style="padding:8px 12px; font-size:0.95rem;" onclick="App.viewMe('${m.id}', event)">Ver</button>
+                            <button class="btn" style="padding:8px 12px; font-size:0.95rem;" onclick="App.loadMeForm('${m.id}')">Editar</button>
+                            <button class="btn btn-danger" style="padding:8px 12px; font-size:0.95rem;" onclick="event.stopPropagation(); App.confirmDeleteEntry('${m.id}')">Apagar</button>
+                        </div>
+                    </div>
+                    ${thumbHtml}
                 </div>
-                <div style="color: var(--text-main); font-size: 1.05rem; line-height: 1.5;">${preview}</div>
-                ${adviceHtml}
             `;
             container.appendChild(el);
         });
-    }
+    },
+
+    // Mostrar entrada em modal de leitura rápida
+    viewMe(id, event) {
+        if (!this.ensureUnlocked()) return;
+        if (event) event.stopPropagation();
+        const entry = this.data.me.find(m => m.id === id);
+        if (!entry) return;
+        document.getElementById('me-view-emotion').innerText = entry.emotion;
+        document.getElementById('me-view-date').innerText = this.formatDate(entry.timestamp);
+        const content = [
+            entry.reflection ? `<strong>Reflexão</strong><div style="margin-top:6px;">${entry.reflection}</div>` : '',
+            entry.improving ? `<strong style="margin-top:8px; display:block;">Melhorando</strong><div style="margin-top:6px;">${entry.improving}</div>` : '',
+            entry.bothering ? `<strong style="margin-top:8px; display:block;">Incomoda</strong><div style="margin-top:6px;">${entry.bothering}</div>` : ''
+        ].join('');
+        document.getElementById('me-view-content').innerHTML = content || '<em>Sem texto.</em>';
+        if (entry.image) {
+            const viewImg = document.getElementById('me-view-image');
+            const viewImgTag = document.getElementById('me-view-image-img');
+            viewImgTag.src = entry.image;
+            viewImg.style.display = 'block';
+        } else {
+            document.getElementById('me-view-image').style.display = 'none';
+        }
+        if (entry.counselorAdvice) {
+            document.getElementById('me-view-advice-text').innerText = entry.counselorAdvice;
+            document.getElementById('me-view-advice').style.display = 'block';
+        } else {
+            document.getElementById('me-view-advice').style.display = 'none';
+        }
+
+        // wire edit button
+        const editBtn = document.getElementById('me-view-edit-btn');
+        editBtn.onclick = () => {
+            this.closeMeView();
+            this.loadMeForm(id);
+        };
+
+        document.getElementById('me-view-modal').classList.add('active');
+    },
+
+    closeMeView() {
+        document.getElementById('me-view-modal').classList.remove('active');
+    },
+
+    // Mostrar pessoa em modal de leitura rápida
+    viewPerson(id, event) {
+        if (!this.ensureUnlocked()) return;
+        if (event) event.stopPropagation();
+        const person = this.data.people.find(p => p.id === id);
+        if (!person) return;
+        document.getElementById('person-view-name').innerText = person.name;
+        document.getElementById('person-view-type').innerText = person.type || '';
+        document.getElementById('person-view-pos').innerText = person.pos || '(Nada registrado)';
+        document.getElementById('person-view-neg').innerText = person.neg || '(Nada registrado)';
+        document.getElementById('person-view-closeness').innerText = person.metrics.closeness;
+        document.getElementById('person-view-trust').innerText = person.metrics.trust;
+        document.getElementById('person-view-freq').innerText = person.metrics.freq;
+
+        // wire edit buttons
+        const editBtn = document.getElementById('person-view-edit-btn');
+        const editBtn2 = document.getElementById('person-view-edit-btn-2');
+        editBtn.onclick = editBtn2.onclick = () => {
+            this.closePersonView();
+            this.loadPersonForm(id);
+        };
+
+        const delBtn = document.getElementById('person-view-delete-btn');
+        delBtn.onclick = (e) => {
+            e.stopPropagation();
+            this.confirmAction("Apagar Pessoa", "Isso removerá esta pessoa do seu universo. Continuar?", () => {
+                this._deletePersonById(id);
+                this.closePersonView();
+            });
+        };
+
+        document.getElementById('person-view-modal').classList.add('active');
+    },
+
+    closePersonView() {
+        document.getElementById('person-view-modal').classList.remove('active');
+    },
+
+    // internal helper to delete by id (used by confirm callbacks)
+    _deletePersonById(id) {
+        this.data.people = this.data.people.filter(p => p.id !== id);
+        this.saveData();
+        this.renderPeople();
+        this.showToast("Pessoa removida.");
+    },
 };
 
-// Iniciar a aplicação quando o documento carregar
-document.addEventListener('DOMContentLoaded', () => {
-    App.init();
-});
+ // Iniciar a aplicação quando o documento carregar
+        // Hook up image input handling for diary form
+        document.addEventListener('DOMContentLoaded', () => {
+            const imgInput = document.getElementById('me-image');
+            if (imgInput) {
+                imgInput.addEventListener('change', (e) => {
+                    const file = e.target.files && e.target.files[0];
+                    const preview = document.getElementById('me-image-preview');
+                    const img = document.getElementById('me-image-preview-img');
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(evt) {
+                            img.src = evt.target.result;
+                            preview.style.display = 'block';
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        img.src = '';
+                        preview.style.display = 'none';
+                    }
+                });
+            }
+
+            // We'll set a temporary holder for pending image data when saving
+            App._pendingImageData = null;
+
+            // Override saveMe to ensure image data is captured and persisted
+            const originalSaveMe = App.saveMe.bind(App);
+            App.saveMe = function() {
+                const input = document.getElementById('me-image');
+                if (input && input.files && input.files[0]) {
+                    const file = input.files[0];
+                    const reader = new FileReader();
+                    reader.onload = (evt) => {
+                        this._pendingImageData = evt.target.result;
+                        // call the inner save logic which we'll replace below
+                        innerSaveMe.call(this);
+                        this._pendingImageData = null;
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    // No new image selected; call inner save directly
+                    innerSaveMe.call(this);
+                }
+            };
+
+            // innerSaveMe mirrors the original save logic but includes image handling
+            function innerSaveMe() {
+                const id = document.getElementById('me-id').value;
+                const emotion = document.getElementById('me-emotion').value;
+                const reflection = document.getElementById('me-reflection').value;
+                const improving = document.getElementById('me-improving').value;
+                const bothering = document.getElementById('me-bothering').value;
+                const dateStr = document.getElementById('me-date').value;
+
+                if (!reflection.trim() && !improving.trim() && !bothering.trim() && !this._pendingImageData) {
+                    this.showToast("Escreva algo para salvar.");
+                    return;
+                }
+
+                let dateObj = dateStr ? new Date(dateStr + 'T12:00:00') : new Date();
+
+                const entryData = {
+                    id: id || this.generateId(),
+                    emotion,
+                    reflection,
+                    improving,
+                    bothering,
+                    timestamp: dateObj.getTime(),
+                    counselorAdvice: Counselor.analyze(reflection + " " + bothering),
+                    image: null
+                };
+
+                // Prefer newly uploaded image
+                if (this._pendingImageData) {
+                    entryData.image = this._pendingImageData;
+                } else if (id) {
+                    // keep existing image when editing
+                    const existing = this.data.me.find(m => m.id === id);
+                    if (existing && existing.image) entryData.image = existing.image;
+                }
+
+                if (id) {
+                    const idx = this.data.me.findIndex(m => m.id === id);
+                    if (idx > -1) this.data.me[idx] = entryData;
+                } else {
+                    this.data.me.push(entryData);
+                }
+
+                this.saveData();
+                this.showToast("Entrada salva.");
+                this.nav('view-me');
+            }
+
+            // Initialize app first, then require PIN if configured (so settings are loaded)
+            App.init();
+            // If PIN is set, require it before full use
+            App.requirePinIfSet();
+        });
 </script>
 </body>
 </html>
