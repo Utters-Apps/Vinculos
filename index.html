@@ -1,1259 +1,1038 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyParty - Gestão de Eventos Premium</title>
-    
+    <title>Festiv - Organizador de Convidados Premium</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: 'var(--primary)',
-                        primaryHover: 'var(--primary-hover)',
-                        surface: {
-                            base: '#000000',     // Preto puro (Fundo da tela)
-                            card: '#121214',     // Cinza escuro sólido (Fundo dos cards para contraste)
-                            panel: '#1e1e24',    // Elementos interativos / Hover
-                            border: '#27272a',   // Bordas visíveis
-                            muted: '#a1a1aa',    // Texto silenciado
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-                    },
-                    animation: {
-                        'fade-in': 'fadeIn 0.3s ease-out forwards',
-                        'slide-up': 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-                        'scale-in': 'scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                    },
-                    keyframes: {
-                        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
-                        slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
-                        scaleIn: { '0%': { transform: 'scale(0.95)', opacity: '0' }, '100%': { transform: 'scale(1)', opacity: '1' } }
-                    }
-                }
-            }
-        }
-    </script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Phosphor Icons -->
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        :root {
-            --primary: #a855f7; 
-            --primary-hover: #9333ea;
-            color-scheme: dark;
-        }
-
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: theme('colors.surface.base');
-            color: #fafafa;
-            -webkit-tap-highlight-color: transparent;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #0f172a 100%);
+            min-height: 100vh;
+            color: #f8fafc;
+            overflow-x: hidden;
         }
 
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: theme('colors.surface.base'); }
-        ::-webkit-scrollbar-thumb { background: theme('colors.surface.border'); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: theme('colors.surface.muted'); }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.03);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
 
-        /* Inputs Premium */
-        .input-field {
-            width: 100%; 
-            background-color: theme('colors.surface.panel'); 
-            border: 1px solid theme('colors.surface.border');
-            color: white; 
-            border-radius: 0.75rem; 
-            padding: 0.75rem 1rem; 
-            transition: all 0.3s ease; 
+        /* Glassmorphism Classes */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.45);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-input {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-input:focus {
+            border-color: rgba(139, 92, 246, 0.6);
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.15);
             outline: none;
         }
-        .input-field:focus { 
-            border-color: var(--primary); 
-            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15); 
-            background-color: #23232a;
-        }
-        
-        select.input-field option { background-color: theme('colors.surface.panel'); color: white; }
 
-        /* Solid Cards - Substituindo o fundo transparente/gradiente por cor sólida para melhor leitura */
-        .solid-card {
-            background-color: theme('colors.surface.card');
-            border: 1px solid theme('colors.surface.border');
-            box-shadow: 0 4px 20px -2px rgba(0,0,0,0.8);
-            transition: transform 0.2s ease, border-color 0.2s ease;
-        }
-        .solid-card:hover {
-            transform: translateY(-2px);
-            border-color: theme('colors.surface.muted');
+        /* Custom Keyframe Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Gradient Button */
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
-            box-shadow: 0 4px 15px -3px rgba(168, 85, 247, 0.4);
-            transition: all 0.2s ease;
-            color: white;
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(12px); }
         }
-        .btn-primary:hover {
-            box-shadow: 0 8px 25px -5px rgba(168, 85, 247, 0.6);
-            transform: scale(1.02);
-        }
-        .btn-primary:active { transform: scale(0.98); }
 
-        /* Custom Checkbox */
-        .custom-checkbox {
-            appearance: none;
-            width: 1.25rem; height: 1.25rem;
-            border: 2px solid theme('colors.surface.border');
-            border-radius: 0.375rem;
-            background-color: theme('colors.surface.panel');
-            cursor: pointer;
-            display: grid; place-content: center;
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
-        .custom-checkbox::before {
-            content: ""; width: 0.65em; height: 0.65em;
-            transform: scale(0);
-            transition: 120ms transform ease-in-out;
-            box-shadow: inset 1em 1em white;
-            background-color: white;
-            transform-origin: center;
-            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+
+        @keyframes slideOutRight {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
         }
-        .custom-checkbox:checked { background-color: var(--primary); border-color: var(--primary); }
-        .custom-checkbox:checked::before { transform: scale(1); }
 
-        /* Modal Glow */
-        .modal-glow { box-shadow: 0 0 50px -10px var(--primary); }
-
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: theme('colors.surface.border'); border-radius: 10px; }
-
-        @media print {
-            body { background: white !important; color: black !important; display: block; overflow: auto; color-scheme: light; }
-            #app-layout, .modal-overlay, #toast-container { display: none !important; }
-            #print-area { display: block !important; padding: 20px; }
-            .print-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; }
-            .print-table th, .print-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-            .print-table th { background-color: #f3f4f6 !important; -webkit-print-color-adjust: exact; font-weight: bold; }
+        @keyframes pulseSoft {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
         }
-        #print-area { display: none; }
+
+        /* Helper Animation Classes */
+        .animate-fade-in {
+            animation: fadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .animate-pulse-soft {
+            animation: pulseSoft 4s infinite ease-in-out;
+        }
+
+        /* Card Hover Effects */
+        .hover-trigger .hover-target {
+            transform: translateY(0) scale(1);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .hover-trigger:hover .hover-target {
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        /* Switch Styling */
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #8b5cf6;
+        }
+        .toggle-checkbox:checked + .toggle-label .toggle-dot {
+            transform: translateX(100%);
+        }
     </style>
 </head>
-<body class="flex h-screen overflow-hidden selection:bg-primary selection:text-white antialiased">
+<body class="p-4 md:p-8 flex flex-col items-center">
 
-    <!-- APP LAYOUT -->
-    <div id="app-layout" class="flex w-full h-full relative">
+    <!-- Ambient Glow Background Blobs -->
+    <div class="fixed top-0 left-1/4 w-96 h-96 bg-purple-900/10 rounded-full blur-3xl -z-10 animate-pulse-soft"></div>
+    <div class="fixed bottom-10 right-1/4 w-[400px] h-[400px] bg-indigo-900/10 rounded-full blur-3xl -z-10 animate-pulse-soft" style="animation-delay: 2s;"></div>
+
+    <main class="w-full max-w-4xl flex flex-col gap-6 animate-fade-in">
         
-        <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary/10 rounded-full blur-[120px] pointer-events-none animate-pulse-slow"></div>
-
-        <!-- Sidebar -->
-        <aside class="w-64 bg-[#09090b] border-r border-surface-border flex flex-col transition-transform duration-300 ease-out absolute md:relative z-30 h-full transform -translate-x-full md:translate-x-0" id="sidebar">
-            <div class="h-20 flex items-center px-6 border-b border-surface-border/50">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primaryHover flex items-center justify-center mr-3 shadow-lg shadow-primary/20">
-                    <i class="ph-fill ph-cake text-white text-xl"></i>
+        <!-- HEADER -->
+        <header class="glass-panel rounded-3xl p-6 md:p-8 flex flex-col md:flex-row justify-between items-center gap-6 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-violet-500/10 to-indigo-500/10 rounded-bl-full pointer-events-none"></div>
+            
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                    <i data-lucide="sparkles" class="w-6 h-6 text-white"></i>
                 </div>
-                <h1 class="text-xl font-bold tracking-tight text-white">MyParty</h1>
-                <button class="ml-auto md:hidden text-surface-muted hover:text-white" onclick="toggleSidebar()">
-                    <i class="ph ph-x text-xl"></i>
+                <div>
+                    <h1 id="party-title-display" class="text-2xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">Minha Festa Exclusiva</h1>
+                    <p class="text-xs text-slate-400 font-medium tracking-wide uppercase mt-0.5" id="party-date-display">Carregando detalhes...</p>
+                </div>
+            </div>
+
+            <!-- Stats Header Quick View -->
+            <div class="flex items-center gap-3">
+                <button onclick="openGroupsModal()" class="glass-input p-3 rounded-2xl hover:bg-white/5 text-slate-300 transition duration-300 flex items-center justify-center gap-2" title="Gerenciar Grupos">
+                    <i data-lucide="folder-git-2" class="w-5 h-5 text-violet-400"></i>
+                    <span class="text-xs font-semibold hidden sm:inline">Grupos</span>
+                </button>
+                <button onclick="openConfigModal()" class="glass-input p-3 rounded-2xl hover:bg-white/5 text-slate-300 transition duration-300 flex items-center justify-center" title="Configurar Festa">
+                    <i data-lucide="settings" class="w-5 h-5"></i>
+                </button>
+                <button onclick="openStatsModal()" class="glass-panel px-4 py-3 rounded-2xl hover:bg-white/5 text-slate-200 transition duration-300 flex items-center gap-2">
+                    <i data-lucide="pie-chart" class="w-4 h-4 text-violet-400"></i>
+                    <span class="text-sm font-medium">Ver Painel</span>
                 </button>
             </div>
-            
-            <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-2">
-                <button onclick="navigate('dashboard')" id="nav-dashboard" class="w-full flex items-center px-4 py-3 rounded-xl font-medium transition-all group nav-btn">
-                    <i class="ph ph-squares-four text-xl mr-3"></i> O Evento
-                </button>
-                <button onclick="navigate('guests')" id="nav-guests" class="w-full flex items-center px-4 py-3 rounded-xl font-medium transition-all group nav-btn">
-                    <i class="ph ph-users text-xl mr-3"></i> Convidados
-                </button>
-                <button onclick="navigate('circles')" id="nav-circles" class="w-full flex items-center px-4 py-3 rounded-xl font-medium transition-all group nav-btn">
-                    <i class="ph ph-circles-three text-xl mr-3"></i> Círculos
-                </button>
-                <div class="pt-4 pb-2">
-                    <p class="px-4 text-xs font-semibold text-surface-muted uppercase tracking-wider">Organização</p>
-                </div>
-                <button onclick="navigate('planner')" id="nav-planner" class="w-full flex items-center px-4 py-3 rounded-xl font-medium transition-all group nav-btn">
-                    <i class="ph ph-clipboard-text text-xl mr-3"></i> Planejamento
-                </button>
-            </nav>
+        </header>
 
-            <div class="p-4 border-t border-surface-border/50">
-                <button onclick="navigate('settings')" id="nav-settings" class="w-full flex items-center px-4 py-3 rounded-xl font-medium transition-all nav-btn">
-                    <i class="ph ph-gear text-xl mr-3"></i> Configurações
+        <!-- DASHBOARD MINI QUICK STATS -->
+        <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="glass-panel p-5 rounded-2xl flex flex-col justify-between hover-trigger">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-xs font-semibold uppercase tracking-wider">Confirmados</span>
+                    <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i>
+                </div>
+                <div class="flex items-baseline gap-2 mt-1">
+                    <span class="text-2xl font-bold text-white hover-target" id="stat-confirmed">0</span>
+                    <span class="text-xs text-slate-500">pessoas</span>
+                </div>
+            </div>
+
+            <div class="glass-panel p-5 rounded-2xl flex flex-col justify-between hover-trigger">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-xs font-semibold uppercase tracking-wider">Pendentes</span>
+                    <i data-lucide="help-circle" class="w-4 h-4 text-amber-400"></i>
+                </div>
+                <div class="flex items-baseline gap-2 mt-1">
+                    <span class="text-2xl font-bold text-white hover-target" id="stat-pending">0</span>
+                    <span class="text-xs text-slate-500">pessoas</span>
+                </div>
+            </div>
+
+            <div class="glass-panel p-5 rounded-2xl flex flex-col justify-between hover-trigger">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-xs font-semibold uppercase tracking-wider">Acompanhantes</span>
+                    <i data-lucide="users" class="w-4 h-4 text-sky-400"></i>
+                </div>
+                <div class="flex items-baseline gap-2 mt-1">
+                    <span class="text-2xl font-bold text-white hover-target" id="stat-companions">0</span>
+                    <span class="text-xs text-slate-500">total</span>
+                </div>
+            </div>
+
+            <div class="glass-panel p-5 rounded-2xl flex flex-col justify-between hover-trigger">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-xs font-semibold uppercase tracking-wider">Total Geral</span>
+                    <i data-lucide="glass-water" class="w-4 h-4 text-violet-400"></i>
+                </div>
+                <div class="flex items-baseline gap-2 mt-1">
+                    <span class="text-2xl font-bold text-white hover-target" id="stat-total">0</span>
+                    <span class="text-xs text-slate-500">presentes</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- FILTERS & ACTIONS BAR -->
+        <section class="glass-panel p-4 rounded-2xl flex flex-col md:flex-row gap-4 items-center justify-between">
+            <!-- Search & Filters -->
+            <div class="relative w-full md:w-72">
+                <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+                <input type="text" id="search-input" oninput="renderGuests()" placeholder="Buscar convidado..." class="w-full pl-11 pr-4 py-2.5 rounded-xl glass-input text-sm text-slate-200 placeholder-slate-500">
+            </div>
+
+            <!-- Categories Tabs -->
+            <div class="flex p-1 bg-slate-950/40 rounded-xl border border-white/5 w-full md:w-auto overflow-x-auto">
+                <button onclick="setFilter('all')" id="filter-all" class="flex-1 md:flex-none px-4 py-1.5 rounded-lg text-xs font-medium transition duration-300 text-white bg-violet-600/90 shadow-md whitespace-nowrap">Todos</button>
+                <button onclick="setFilter('confirmed')" id="filter-confirmed" class="flex-1 md:flex-none px-4 py-1.5 rounded-lg text-xs font-medium transition duration-300 text-slate-400 hover:text-slate-200 whitespace-nowrap">Confirmados</button>
+                <button onclick="setFilter('pending')" id="filter-pending" class="flex-1 md:flex-none px-4 py-1.5 rounded-lg text-xs font-medium transition duration-300 text-slate-400 hover:text-slate-200 whitespace-nowrap">Pendentes</button>
+                <button onclick="setFilter('declined')" id="filter-declined" class="flex-1 md:flex-none px-4 py-1.5 rounded-lg text-xs font-medium transition duration-300 text-slate-400 hover:text-slate-200 whitespace-nowrap">Não Vão</button>
+            </div>
+
+            <!-- Main CTA Add Guest Button -->
+            <button onclick="openAddModal()" class="w-full md:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-medium text-sm flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/15 active:scale-95 transition-all duration-200">
+                <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                <span>Convidar Alguém</span>
+            </button>
+        </section>
+
+        <!-- GUESTS GRID / LIST -->
+        <section id="guests-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Dynamic items rendered by JavaScript -->
+        </section>
+
+        <!-- Empty State Fallback -->
+        <section id="empty-state" class="hidden glass-panel p-12 rounded-3xl flex-col items-center justify-center text-center gap-4 animate-fade-in">
+            <div class="w-16 h-16 rounded-full bg-slate-800/50 flex items-center justify-center border border-white/5">
+                <i data-lucide="users" class="w-8 h-8 text-slate-500"></i>
+            </div>
+            <div>
+                <h3 class="text-lg font-medium text-slate-200">Nenhum convidado encontrado</h3>
+                <p class="text-sm text-slate-400 mt-1 max-w-sm">Adicione novos amigos, parceiros ou familiares para gerenciar sua lista de convidados.</p>
+            </div>
+            <button onclick="openAddModal()" class="mt-2 px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-medium text-sm transition">
+                Adicionar meu Primeiro Convidado
+            </button>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="mt-12 text-center text-slate-500 text-xs flex flex-col items-center gap-2">
+        <p>Festiv Premium Guest App &copy; 2026. Feito com amor e atenção aos detalhes.</p>
+        <button onclick="triggerClearAllData()" class="text-rose-400/80 hover:text-rose-400 transition underline decoration-dotted">Limpar Todos os Dados</button>
+    </footer>
+
+    <!-- MODAL 1: ADD / EDIT GUEST -->
+    <div id="guest-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="glass-panel w-full max-w-md rounded-3xl p-6 md:p-8 transform scale-95 transition-transform duration-300 flex flex-col gap-6 relative max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center">
+                <h3 id="modal-title" class="text-xl font-bold text-white">Adicionar Convidado</h3>
+                <button onclick="closeGuestModal()" class="p-2 rounded-xl hover:bg-white/5 text-slate-400 transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
-        </aside>
 
-        <!-- Overlay mobile -->
-        <div id="mobile-overlay" class="fixed inset-0 bg-black/80 z-20 hidden md:hidden backdrop-blur-sm transition-opacity duration-300" onclick="toggleSidebar()"></div>
-
-        <!-- Conteúdo Principal -->
-        <main class="flex-1 flex flex-col min-w-0 z-10 relative h-full">
-            
-            <header class="h-20 border-b border-surface-border/50 bg-surface-base/90 backdrop-blur-xl flex items-center justify-between px-6 z-10 sticky top-0 transition-all">
-                <div class="flex items-center">
-                    <button class="md:hidden mr-4 text-surface-muted hover:text-white" onclick="toggleSidebar()">
-                        <i class="ph ph-list text-2xl"></i>
-                    </button>
-                    <h2 class="text-2xl font-bold text-white tracking-tight animate-fade-in" id="page-title">O Evento</h2>
-                </div>
-                <div id="header-actions">
-                    <!-- Ações dinâmicas injetadas aqui -->
-                </div>
-            </header>
-
-            <!-- Telas (Views) -->
-            <div class="flex-1 overflow-y-auto p-4 sm:p-8 relative custom-scrollbar">
+            <form id="guest-form" onsubmit="saveGuest(event)" class="flex flex-col gap-4">
+                <input type="hidden" id="guest-id">
                 
-                <!-- DASHBOARD -->
-                <div id="view-dashboard" class="view-section space-y-8 animate-slide-up pb-12">
-                    
-                    <!-- Banner do Evento (Contagem Regressiva) -->
-                    <div class="solid-card rounded-2xl p-8 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6 border-primary/30">
-                        <div class="absolute -right-20 -top-20 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
-                        <div>
-                            <h2 class="text-3xl font-bold text-white mb-2" id="dash-event-name">Minha Festa</h2>
-                            <p class="text-surface-muted flex items-center gap-4 font-medium" id="dash-event-info">
-                                <span><i class="ph-fill ph-calendar-blank mr-1"></i> Defina a data nas configurações</span>
-                            </p>
-                        </div>
-                        <div class="bg-surface-base/50 p-4 rounded-xl border border-surface-border text-center min-w-[160px] shadow-inner">
-                            <p class="text-xs text-surface-muted uppercase tracking-wider font-semibold mb-1">Faltam</p>
-                            <p class="text-3xl font-bold text-primary" id="dash-countdown">-- dias</p>
-                        </div>
-                    </div>
-
-                    <!-- Cards Estatísticas -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div class="solid-card rounded-2xl p-6 relative group">
-                            <h3 class="text-surface-muted text-sm font-semibold mb-2 uppercase tracking-wider">Total Convidados</h3>
-                            <div class="flex items-end justify-between">
-                                <span class="text-4xl font-bold text-white" id="dash-total">0</span>
-                                <div class="w-10 h-10 rounded-full bg-surface-panel flex items-center justify-center border border-surface-border">
-                                    <i class="ph-fill ph-users text-white text-xl"></i>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="solid-card rounded-2xl p-6">
-                            <h3 class="text-surface-muted text-sm font-semibold mb-2 uppercase tracking-wider">Confirmados</h3>
-                            <div class="flex items-end justify-between">
-                                <span class="text-4xl font-bold text-emerald-400" id="dash-confirmed">0</span>
-                                <div class="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
-                                    <i class="ph-fill ph-check-circle text-emerald-500 text-xl"></i>
-                                </div>
-                            </div>
-                            <!-- Barra de progresso de confirmação -->
-                            <div class="w-full bg-surface-base rounded-full h-1.5 mt-4 overflow-hidden">
-                                <div class="bg-emerald-500 h-full rounded-full transition-all duration-1000" id="dash-progress-confirm" style="width: 0%"></div>
-                            </div>
-                        </div>
-
-                        <div class="solid-card rounded-2xl p-6">
-                            <h3 class="text-surface-muted text-sm font-semibold mb-2 uppercase tracking-wider">Pendentes</h3>
-                            <div class="flex items-end justify-between">
-                                <span class="text-4xl font-bold text-amber-400" id="dash-pending">0</span>
-                                <div class="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center border border-amber-500/20">
-                                    <i class="ph-fill ph-clock text-amber-500 text-xl"></i>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="solid-card rounded-2xl p-6">
-                            <h3 class="text-surface-muted text-sm font-semibold mb-2 uppercase tracking-wider">Não irão</h3>
-                            <div class="flex items-end justify-between">
-                                <span class="text-4xl font-bold text-rose-400" id="dash-declined">0</span>
-                                <div class="w-10 h-10 rounded-full bg-rose-500/10 flex items-center justify-center border border-rose-500/20">
-                                    <i class="ph-fill ph-x-circle text-rose-500 text-xl"></i>
-                                </div>
-                            </div>
-                        </div>
+                <!-- Main Name -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Nome Completo</label>
+                    <div class="relative">
+                        <i data-lucide="user" class="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400"></i>
+                        <input type="text" id="guest-name" required placeholder="Ex: Lucas Gabriel" class="w-full pl-11 pr-4 py-3 rounded-xl glass-input text-slate-200 text-sm">
                     </div>
                 </div>
 
-                <!-- GUESTS (Convidados) -->
-                <div id="view-guests" class="view-section hidden flex flex-col h-full animate-slide-up">
-                    <div class="flex flex-col lg:flex-row justify-between gap-4 mb-6">
-                        <div class="flex-1 flex flex-col sm:flex-row gap-3">
-                            <div class="relative flex-1 max-w-md">
-                                <i class="ph ph-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-surface-muted text-lg"></i>
-                                <input type="text" id="search-guest" placeholder="Buscar por nome ou acompanhante..." class="input-field pl-12" oninput="renderGuests()">
+                <!-- Status Select -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Status da Confirmação</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="guest-status" value="confirmed" checked class="sr-only peer">
+                            <div class="py-2.5 rounded-xl border border-white/5 text-center text-xs font-medium text-slate-400 peer-checked:bg-emerald-500/10 peer-checked:border-emerald-500/50 peer-checked:text-emerald-400 transition-all duration-200">
+                                Confirmado
                             </div>
-                            <select id="filter-group" class="input-field w-full sm:w-48 cursor-pointer" onchange="renderGuests()">
-                                <option value="all">Todos Círculos</option>
-                            </select>
-                            <select id="filter-sort" class="input-field w-full sm:w-48 cursor-pointer" onchange="renderGuests()">
-                                <option value="name">Ordenar por Nome</option>
-                                <option value="status">Ordenar por Status</option>
-                            </select>
-                        </div>
-                        <button onclick="openGuestModal()" class="btn-primary px-6 py-3 rounded-xl font-semibold flex items-center justify-center whitespace-nowrap shadow-lg">
-                            <i class="ph-bold ph-plus mr-2 text-lg"></i> Adicionar Convidado
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="guest-status" value="pending" class="sr-only peer">
+                            <div class="py-2.5 rounded-xl border border-white/5 text-center text-xs font-medium text-slate-400 peer-checked:bg-amber-500/10 peer-checked:border-amber-500/50 peer-checked:text-amber-400 transition-all duration-200">
+                                Pendente
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="guest-status" value="declined" class="sr-only peer">
+                            <div class="py-2.5 rounded-xl border border-white/5 text-center text-xs font-medium text-slate-400 peer-checked:bg-rose-500/10 peer-checked:border-rose-500/50 peer-checked:text-rose-400 transition-all duration-200">
+                                Não Vou
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Group / Role -->
+                <div class="flex flex-col gap-1.5">
+                    <div class="flex justify-between items-center">
+                        <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Grupo de Pessoas</label>
+                        <button type="button" onclick="openGroupsModal(); closeGuestModal();" class="text-xs text-violet-400 hover:text-violet-300 transition flex items-center gap-1">
+                            <i data-lucide="plus" class="w-3 h-3"></i> Criar Grupo
                         </button>
                     </div>
-
-                    <div class="flex-1 pb-12">
-                        <div id="guests-list" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5">
-                            <!-- Cards inseridos via JS -->
-                        </div>
-                        <div id="guests-empty" class="hidden text-center py-20 animate-fade-in bg-surface-card rounded-2xl border border-surface-border/50">
-                            <div class="w-20 h-20 rounded-full bg-surface-panel flex items-center justify-center mx-auto mb-4 border border-surface-border">
-                                <i class="ph ph-user-plus text-3xl text-surface-muted"></i>
-                            </div>
-                            <h3 class="text-xl text-white font-semibold mb-2">Nenhum convidado encontrado</h3>
-                            <p class="text-surface-muted">Adicione convidados para começar a organizar sua festa.</p>
-                        </div>
+                    <div class="relative">
+                        <select id="guest-group" class="w-full px-4 py-3 rounded-xl glass-input text-slate-200 text-sm appearance-none cursor-pointer">
+                            <!-- Dynamic Groups populated from state -->
+                        </select>
+                        <i data-lucide="chevron-down" class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
                     </div>
                 </div>
 
-                <!-- CIRCLES (Círculos) -->
-                <div id="view-circles" class="view-section hidden animate-slide-up pb-12">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                        <p class="text-surface-muted">Agrupe convidados para organizar mesas ou envios de convite.</p>
-                        <button onclick="openGroupModal()" class="bg-surface-panel hover:bg-[#2a2a30] text-white px-5 py-3 rounded-xl font-medium flex items-center transition-all border border-surface-border shadow-md">
-                            <i class="ph-bold ph-plus mr-2"></i> Novo Círculo
-                        </button>
+                <!-- Companion Toggle Switch -->
+                <div class="flex items-center justify-between p-3 rounded-xl glass-input">
+                    <div class="flex flex-col">
+                        <span class="text-sm font-medium text-slate-200">Trazer Acompanhante?</span>
+                        <span class="text-xs text-slate-400">Permite adicionar uma pessoa extra de graça</span>
                     </div>
-                    <div id="groups-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                        <!-- Cards via JS -->
-                    </div>
-                </div>
-
-                <!-- PLANNER (Planejamento - Tarefas e Orçamento) -->
-                <div id="view-planner" class="view-section hidden animate-slide-up pb-12">
-                    <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
-                        
-                        <!-- Checklist -->
-                        <div class="solid-card rounded-2xl p-6 flex flex-col max-h-[600px]">
-                            <div class="flex justify-between items-center mb-6">
-                                <div>
-                                    <h3 class="text-xl font-bold text-white flex items-center"><i class="ph-fill ph-check-square-offset text-primary mr-2"></i> Checklist da Festa</h3>
-                                    <p class="text-sm text-surface-muted mt-1" id="task-progress-text">0 de 0 concluídas</p>
-                                </div>
-                            </div>
-                            
-                            <form onsubmit="addTask(event)" class="flex gap-2 mb-4">
-                                <input type="text" id="new-task-input" class="input-field" placeholder="Ex: Encomendar o bolo..." required>
-                                <button type="submit" class="bg-surface-panel hover:bg-surface-border border border-surface-border text-white px-4 rounded-xl transition-colors">
-                                    <i class="ph-bold ph-plus text-lg"></i>
-                                </button>
-                            </form>
-
-                            <div class="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-2" id="tasks-list">
-                                <!-- Tarefas via JS -->
-                            </div>
-                        </div>
-
-                        <!-- Orçamento -->
-                        <div class="solid-card rounded-2xl p-6 flex flex-col max-h-[600px]">
-                            <div class="flex justify-between items-center mb-6">
-                                <div>
-                                    <h3 class="text-xl font-bold text-white flex items-center"><i class="ph-fill ph-wallet text-emerald-500 mr-2"></i> Orçamento</h3>
-                                    <p class="text-sm text-surface-muted mt-1">Controle de gastos</p>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-xs text-surface-muted font-semibold uppercase">Gasto Total</p>
-                                    <p class="text-2xl font-bold text-white" id="budget-total-spent">R$ 0,00</p>
-                                </div>
-                            </div>
-
-                            <form onsubmit="addExpense(event)" class="grid grid-cols-12 gap-2 mb-4">
-                                <input type="text" id="exp-desc" class="input-field col-span-6 sm:col-span-7" placeholder="Ex: Decoração" required>
-                                <input type="number" id="exp-val" step="0.01" class="input-field col-span-4 sm:col-span-3" placeholder="R$ 0,00" required>
-                                <button type="submit" class="bg-surface-panel hover:bg-surface-border border border-surface-border text-emerald-500 hover:text-emerald-400 col-span-2 rounded-xl flex items-center justify-center transition-colors">
-                                    <i class="ph-bold ph-plus text-lg"></i>
-                                </button>
-                            </form>
-
-                            <div class="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-2" id="expenses-list">
-                                <!-- Despesas via JS -->
-                            </div>
-                        </div>
+                    <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                        <input type="checkbox" name="has-companion" id="has-companion" onchange="toggleCompanionInput()" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 border-transparent appearance-none cursor-pointer checked:right-0 transition-all duration-300">
+                        <label for="has-companion" class="toggle-label block overflow-hidden h-6 rounded-full bg-slate-700 cursor-pointer">
+                            <span class="toggle-dot block w-5 h-5 rounded-full bg-slate-300 mt-0.5 ml-0.5 transition-transform duration-300"></span>
+                        </label>
                     </div>
                 </div>
 
-                <!-- SETTINGS (Configurações) -->
-                <div id="view-settings" class="view-section hidden animate-slide-up max-w-3xl pb-12 space-y-6">
-                    
-                    <!-- Configurações do Evento -->
-                    <div class="solid-card rounded-2xl p-6 sm:p-8">
-                        <div class="flex items-center mb-6 border-b border-surface-border pb-4">
-                            <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mr-4 border border-primary/20">
-                                <i class="ph-fill ph-calendar-star text-primary text-xl"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-xl font-bold text-white">Detalhes do Evento</h3>
-                                <p class="text-sm text-surface-muted">Informações principais da sua festa.</p>
-                            </div>
-                        </div>
-                        
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <div class="sm:col-span-2">
-                                <label class="block text-xs font-semibold uppercase text-surface-muted mb-2">Nome do Evento</label>
-                                <input type="text" id="set-event-name" class="input-field" placeholder="Ex: Aniversário de 30 Anos">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold uppercase text-surface-muted mb-2">Data</label>
-                                <input type="date" id="set-event-date" class="input-field color-scheme-dark">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold uppercase text-surface-muted mb-2">Horário</label>
-                                <input type="time" id="set-event-time" class="input-field color-scheme-dark">
-                            </div>
-                            <div class="sm:col-span-2">
-                                <label class="block text-xs font-semibold uppercase text-surface-muted mb-2">Local / Endereço</label>
-                                <input type="text" id="set-event-location" class="input-field" placeholder="Ex: Salão de Festas...">
-                            </div>
-                        </div>
-                        <div class="mt-6 flex justify-end">
-                            <button onclick="saveEventDetails()" class="btn-primary px-6 py-2.5 rounded-xl font-semibold flex items-center">
-                                <i class="ph-bold ph-floppy-disk mr-2"></i> Salvar Detalhes
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Aparência -->
-                    <div class="solid-card rounded-2xl p-6 sm:p-8">
-                        <div class="flex items-center mb-6">
-                            <div class="w-10 h-10 rounded-full bg-surface-panel flex items-center justify-center mr-4 border border-surface-border">
-                                <i class="ph-fill ph-palette text-white text-xl"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-xl font-bold text-white">Cor de Destaque</h3>
-                                <p class="text-sm text-surface-muted">Personalize o tema do aplicativo.</p>
-                            </div>
-                        </div>
-                        
-                        <div class="flex flex-wrap gap-4 mt-4" id="theme-colors">
-                            <button onclick="setTheme('#a855f7', '#9333ea')" class="w-12 h-12 rounded-full transition-transform hover:scale-110 shadow-lg shadow-purple-500/20 border-2 border-transparent focus:border-white" style="background: #a855f7;"></button>
-                            <button onclick="setTheme('#3b82f6', '#2563eb')" class="w-12 h-12 rounded-full transition-transform hover:scale-110 shadow-lg shadow-blue-500/20 border-2 border-transparent focus:border-white" style="background: #3b82f6;"></button>
-                            <button onclick="setTheme('#ec4899', '#db2777')" class="w-12 h-12 rounded-full transition-transform hover:scale-110 shadow-lg shadow-pink-500/20 border-2 border-transparent focus:border-white" style="background: #ec4899;"></button>
-                            <button onclick="setTheme('#10b981', '#059669')" class="w-12 h-12 rounded-full transition-transform hover:scale-110 shadow-lg shadow-emerald-500/20 border-2 border-transparent focus:border-white" style="background: #10b981;"></button>
-                            <button onclick="setTheme('#f59e0b', '#d97706')" class="w-12 h-12 rounded-full transition-transform hover:scale-110 shadow-lg shadow-amber-500/20 border-2 border-transparent focus:border-white" style="background: #f59e0b;"></button>
-                            <button onclick="setTheme('#ef4444', '#dc2626')" class="w-12 h-12 rounded-full transition-transform hover:scale-110 shadow-lg shadow-red-500/20 border-2 border-transparent focus:border-white" style="background: #ef4444;"></button>
-                        </div>
-                    </div>
-
-                    <!-- Zona de Perigo -->
-                    <div class="solid-card rounded-2xl p-6 sm:p-8 border-rose-500/20">
-                        <div class="flex items-center mb-4">
-                            <div class="w-10 h-10 rounded-full bg-rose-500/10 flex items-center justify-center mr-4">
-                                <i class="ph-fill ph-warning text-rose-500 text-xl"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-xl font-bold text-rose-500">Zona de Perigo</h3>
-                            </div>
-                        </div>
-                        <p class="text-sm text-surface-muted mb-6">Ao apagar os dados, todas as informações (convidados, tarefas, orçamento) serão perdidas permanentemente.</p>
-                        <button onclick="resetData()" class="px-5 py-3 bg-rose-500/10 text-rose-500 hover:bg-rose-600 hover:text-white border border-rose-500/20 rounded-xl transition-all font-semibold flex items-center justify-center w-full sm:w-auto">
-                            <i class="ph-bold ph-trash mr-2"></i> Apagar Todos os Dados
-                        </button>
+                <!-- Companion Name (Animated container height) -->
+                <div id="companion-container" class="max-h-0 overflow-hidden transition-all duration-300 flex flex-col gap-1.5">
+                    <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Nome do Acompanhante</label>
+                    <div class="relative">
+                        <i data-lucide="users" class="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400"></i>
+                        <input type="text" id="companion-name" placeholder="Ex: Maria Júlia" class="w-full pl-11 pr-4 py-3 rounded-xl glass-input text-slate-200 text-sm">
                     </div>
                 </div>
 
-            </div>
-        </main>
+                <!-- Custom Note -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Notas / Observação</label>
+                    <textarea id="guest-notes" rows="2" placeholder="Ex: Vegano, restrição a glúten..." class="w-full px-4 py-3 rounded-xl glass-input text-slate-200 text-sm resize-none"></textarea>
+                </div>
+
+                <div class="flex gap-3 mt-4">
+                    <button type="button" onclick="closeGuestModal()" class="flex-1 py-3 rounded-xl glass-input text-slate-400 hover:text-slate-200 text-sm font-medium transition">Cancelar</button>
+                    <button type="submit" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-sm font-semibold transition">Salvar</button>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <!-- MODAL: CONVIDADO -->
-    <div id="modal-guest" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[50] hidden flex items-center justify-center p-4 transition-opacity duration-300 modal-overlay">
-        <div class="bg-[#121214] border border-surface-border rounded-2xl w-full max-w-2xl shadow-2xl modal-glow flex flex-col max-h-[90vh] animate-scale-in">
-            <div class="px-6 py-5 border-b border-surface-border flex justify-between items-center shrink-0">
-                <h3 class="text-xl font-bold text-white flex items-center" id="modal-guest-title"><i class="ph-fill ph-user-plus text-primary mr-2"></i> Novo Convidado</h3>
-                <button onclick="closeModals()" class="text-surface-muted hover:text-white bg-surface-panel p-2 rounded-xl transition-colors"><i class="ph-bold ph-x"></i></button>
+    <!-- MODAL 2: PARTY SETTINGS (Customizer) -->
+    <div id="config-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="glass-panel w-full max-w-md rounded-3xl p-6 md:p-8 transform scale-95 transition-transform duration-300 flex flex-col gap-6 relative">
+            <div class="flex justify-between items-center">
+                <h3 class="text-xl font-bold text-white">Configurações do Evento</h3>
+                <button onclick="closeConfigModal()" class="p-2 rounded-xl hover:bg-white/5 text-slate-400 transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
             </div>
-            
-            <div class="p-6 overflow-y-auto custom-scrollbar flex-1">
-                <input type="hidden" id="g-id">
-                
-                <div class="space-y-5">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                        <div class="sm:col-span-2">
-                            <label class="block text-xs font-semibold uppercase text-surface-muted mb-1.5">Nome Completo *</label>
-                            <input type="text" id="g-name" class="input-field text-lg font-medium" placeholder="Ex: Ana Clara Souza" required>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-xs font-semibold uppercase text-surface-muted mb-1.5">WhatsApp / Celular</label>
-                            <div class="relative">
-                                <i class="ph-fill ph-whatsapp absolute left-3 top-1/2 transform -translate-y-1/2 text-emerald-500 text-lg"></i>
-                                <input type="tel" id="g-phone" class="input-field pl-10" placeholder="(11) 99999-9999">
-                            </div>
-                        </div>
 
-                        <div>
-                            <label class="block text-xs font-semibold uppercase text-surface-muted mb-1.5">Status Inicial</label>
-                            <select id="g-status" class="input-field font-medium">
-                                <option value="pendente">Pendente</option>
-                                <option value="confirmado">Confirmado</option>
-                                <option value="nao_vai">Não irá</option>
-                            </select>
-                        </div>
+            <form id="config-form" onsubmit="savePartyConfig(event)" class="flex flex-col gap-4">
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Título da Festa</label>
+                    <input type="text" id="config-party-title" required placeholder="Ex: Aniversário do Pedro" class="w-full px-4 py-3 rounded-xl glass-input text-slate-200 text-sm">
+                </div>
 
-                        <div>
-                            <label class="block text-xs font-semibold uppercase text-surface-muted mb-1.5">Círculo Social *</label>
-                            <select id="g-group" class="input-field" required></select>
-                        </div>
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Data & Horário</label>
+                    <input type="datetime-local" id="config-party-date" required class="w-full px-4 py-3 rounded-xl glass-input text-slate-200 text-sm">
+                </div>
 
-                        <div>
-                            <label class="block text-xs font-semibold uppercase text-surface-muted mb-1.5">Restrições Alimentares</label>
-                            <input type="text" id="g-diet" class="input-field" placeholder="Ex: Vegano, Alergia a amendoim...">
-                        </div>
-                    </div>
+                <div class="flex gap-3 mt-4">
+                    <button type="button" onclick="closeConfigModal()" class="flex-1 py-3 rounded-xl glass-input text-slate-400 hover:text-slate-200 text-sm font-medium transition">Cancelar</button>
+                    <button type="submit" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-sm font-semibold transition">Atualizar Festa</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
+    <!-- MODAL 3: STATISTICS DASHBOARD PANEL -->
+    <div id="stats-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="glass-panel w-full max-w-lg rounded-3xl p-6 md:p-8 transform scale-95 transition-transform duration-300 flex flex-col gap-6 relative max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center">
+                <h3 class="text-xl font-bold text-white">Análise Detalhada de Convidados</h3>
+                <button onclick="closeStatsModal()" class="p-2 rounded-xl hover:bg-white/5 text-slate-400 transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Group breakdown list -->
+                <div class="glass-panel p-4 rounded-2xl">
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Divisão por Grupos</h4>
+                    <ul id="stats-groups-list" class="flex flex-col gap-3">
+                        <!-- Rendered by JS -->
+                    </ul>
+                </div>
+
+                <!-- General Metrics -->
+                <div class="glass-panel p-4 rounded-2xl flex flex-col justify-between">
                     <div>
-                        <label class="block text-xs font-semibold uppercase text-surface-muted mb-1.5">Observações Adicionais</label>
-                        <textarea id="g-notes" class="input-field resize-none h-20" placeholder="Presente, onde conheceu, etc."></textarea>
+                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Estimativa de Gastos / Planejamento</h4>
+                        <p class="text-xs text-slate-400 leading-relaxed">Considerando o total de convidados e acompanhantes para o evento:</p>
                     </div>
-
-                    <!-- Acompanhantes -->
-                    <div class="mt-6 pt-5 border-t border-surface-border">
-                        <div class="flex justify-between items-center mb-4">
-                            <label class="block text-sm font-semibold text-white flex items-center">
-                                <i class="ph-fill ph-users-three mr-2 text-primary"></i> Acompanhantes
-                            </label>
-                            <button type="button" onclick="addTempCompanion()" class="text-xs font-semibold bg-surface-panel border border-surface-border hover:bg-surface-border text-white px-3 py-1.5 rounded-lg transition-colors flex items-center">
-                                <i class="ph-bold ph-plus mr-1"></i> Adicionar
-                            </button>
+                    <div class="mt-4 flex flex-col gap-2">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-slate-400">Total Geral:</span>
+                            <span class="font-semibold text-white" id="stats-grand-total">0 pessoas</span>
                         </div>
-                        <div id="g-companions-list" class="space-y-3"></div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-slate-400">Acompanhantes confirmados:</span>
+                            <span class="font-semibold text-sky-400" id="stats-companions-total">0</span>
+                        </div>
                     </div>
                 </div>
             </div>
-            
-            <div class="px-6 py-5 border-t border-surface-border bg-surface-base/50 flex justify-end gap-3 shrink-0 rounded-b-2xl">
-                <button onclick="closeModals()" class="px-5 py-2.5 rounded-xl font-medium text-surface-muted hover:text-white hover:bg-surface-panel transition-all">Cancelar</button>
-                <button onclick="saveGuest()" id="btn-save-guest" class="btn-primary px-8 py-2.5 rounded-xl font-bold flex items-center text-white">
-                    <i class="ph-bold ph-check mr-2"></i> Salvar
+
+            <div class="bg-indigo-950/20 border border-indigo-500/15 rounded-2xl p-4 text-center">
+                <p class="text-sm text-indigo-200">🎉 O planejamento ideal prevê de 10% a 15% de abstenção. Fique atento!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 4: MANAGE GROUPS -->
+    <div id="groups-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="glass-panel w-full max-w-md rounded-3xl p-6 md:p-8 transform scale-95 transition-transform duration-300 flex flex-col gap-6 relative max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center">
+                <h3 class="text-xl font-bold text-white">Gerenciar Grupos</h3>
+                <button onclick="closeGroupsModal()" class="p-2 rounded-xl hover:bg-white/5 text-slate-400 transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
-        </div>
-    </div>
 
-    <!-- MODAL: CÍRCULO -->
-    <div id="modal-group" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[50] hidden flex items-center justify-center p-4 transition-opacity duration-300 modal-overlay">
-        <div class="bg-[#121214] border border-surface-border rounded-2xl w-full max-w-sm shadow-2xl animate-scale-in">
-            <div class="px-6 py-5 border-b border-surface-border flex justify-between items-center">
-                <h3 class="text-xl font-bold text-white flex items-center" id="modal-group-title"><i class="ph-fill ph-circles-three text-primary mr-2"></i> Círculo</h3>
-                <button onclick="closeModals()" class="text-surface-muted hover:text-white bg-surface-panel p-2 rounded-xl"><i class="ph-bold ph-x"></i></button>
-            </div>
-            <div class="p-6">
-                <input type="hidden" id="grp-id">
-                <label class="block text-xs font-semibold uppercase text-surface-muted mb-2">Nome do Círculo</label>
-                <input type="text" id="grp-name" class="input-field text-lg" placeholder="Ex: Família, Faculdade..." required>
-            </div>
-            <div class="px-6 py-5 border-t border-surface-border flex justify-end gap-3 bg-surface-base/50 rounded-b-2xl">
-                <button onclick="closeModals()" class="px-4 py-2 rounded-xl font-medium text-surface-muted hover:bg-surface-panel">Cancelar</button>
-                <button onclick="saveGroup()" class="btn-primary px-6 py-2 rounded-xl font-bold">Salvar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL CONFIRMAÇÃO (O Modo Lindo) -->
-    <div id="modal-confirm" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[60] hidden flex items-center justify-center p-4 transition-opacity duration-300 modal-overlay">
-        <div class="bg-[#121214] border border-rose-500/30 rounded-2xl w-full max-w-sm shadow-2xl shadow-rose-500/10 animate-scale-in relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-rose-500 to-orange-500"></div>
-            
-            <div class="p-6 pt-8 text-center">
-                <div class="w-16 h-16 rounded-full bg-rose-500/10 text-rose-500 flex items-center justify-center mx-auto mb-4 border border-rose-500/20 shadow-inner">
-                    <i class="ph-fill ph-warning text-3xl"></i>
+            <!-- Add new group form -->
+            <form id="group-form" onsubmit="addNewGroup(event)" class="flex gap-2">
+                <div class="relative flex-1">
+                    <i data-lucide="tag" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+                    <input type="text" id="new-group-name" required placeholder="Novo nome do grupo..." class="w-full pl-11 pr-4 py-2.5 rounded-xl glass-input text-slate-200 text-sm">
                 </div>
-                <h3 class="text-xl font-bold text-white mb-2" id="confirm-title">Tem certeza?</h3>
-                <p class="text-sm text-surface-muted" id="confirm-message">Ação irreversível.</p>
+                <button type="submit" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-medium text-sm transition">
+                    Criar
+                </button>
+            </form>
+
+            <!-- Group list dynamic container -->
+            <div class="flex flex-col gap-2 mt-2">
+                <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Grupos Atuais</h4>
+                <div id="groups-list-container" class="flex flex-col gap-2 max-h-64 overflow-y-auto pr-1">
+                    <!-- Loaded dynamically via JS -->
+                </div>
             </div>
-            
-            <div class="px-6 py-5 bg-surface-base/50 border-t border-surface-border flex justify-center gap-3">
-                <button onclick="closeConfirmModal()" class="flex-1 px-4 py-3 rounded-xl font-medium text-surface-muted hover:text-white bg-surface-panel border border-surface-border transition-all">
-                    Cancelar
-                </button>
-                <button onclick="executeConfirmAction()" class="flex-1 px-4 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-500 hover:to-rose-400 shadow-lg shadow-rose-500/20 transition-all flex justify-center items-center">
-                    <i class="ph-bold ph-trash mr-2"></i> Deletar
-                </button>
+
+            <div class="flex gap-3 mt-2">
+                <button onclick="closeGroupsModal()" class="w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 text-slate-200 text-sm font-semibold transition">Fechar</button>
             </div>
         </div>
     </div>
 
-    <!-- Toasts -->
-    <div id="toast-container" class="fixed bottom-6 right-6 z-[70] flex flex-col gap-3 pointer-events-none"></div>
+    <!-- MODAL 5: CONFIRM MODAL (Universal custom confirmation UI instead of native confirm/alert) -->
+    <div id="confirm-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 z-[60] opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="glass-panel w-full max-w-sm rounded-3xl p-6 transform scale-95 transition-transform duration-300 flex flex-col gap-4 text-center">
+            <div class="mx-auto w-12 h-12 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400">
+                <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <h4 id="confirm-title" class="text-lg font-bold text-white">Tem certeza?</h4>
+                <p id="confirm-description" class="text-sm text-slate-400 mt-1">Essa ação não poderá ser desfeita.</p>
+            </div>
+            <div class="flex gap-3 mt-2">
+                <button id="confirm-cancel-btn" onclick="closeConfirmModal()" class="flex-1 py-3 rounded-xl glass-input text-slate-400 hover:text-slate-200 text-sm font-medium transition">Cancelar</button>
+                <button id="confirm-ok-btn" class="flex-1 py-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-sm font-semibold transition">Confirmar</button>
+            </div>
+        </div>
+    </div>
 
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container" class="fixed bottom-6 right-6 flex flex-col gap-2 z-50 pointer-events-none"></div>
+
+    <!-- CORE LOGIC / JAVASCRIPT -->
     <script>
-        /* ================= ESTADO E DADOS ================= */
-        const DEFAULT_GROUPS = [
-            { id: 'g1', name: 'Família' },
-            { id: 'g2', name: 'Amigos' },
-            { id: 'g3', name: 'Trabalho' }
-        ];
-
-        let state = {
-            eventDetails: { name: 'Minha Festa', date: '', time: '', location: '' },
-            guests: [],
-            groups: [],
-            tasks: [],
-            expenses: [],
-            settings: { primaryColor: '#a855f7', primaryHover: '#9333ea' }
+        // Init State Variables
+        let guests = [];
+        let groups = ["Família", "Amigos de Infância", "Trabalho", "Outros"];
+        let currentFilter = 'all';
+        let partyConfig = {
+            title: "Minha Festa Exclusiva",
+            date: "2026-12-31T21:00"
         };
+        let pendingConfirmAction = null;
 
-        let tempCompanions = []; 
-        let confirmActionCallback = null;
+        // On Load Initializer
+        window.onload = function() {
+            // Load guests
+            const storedGuests = localStorage.getItem('festiv_guests');
+            if (storedGuests) {
+                guests = JSON.parse(storedGuests);
+            }
 
-        /* ================= INICIALIZAÇÃO ================= */
-        function initApp() {
-            loadData();
-            applyTheme();
-            updateGroupSelects();
-            populateSettingsForm();
-            navigate('dashboard');
-        }
-
-        function loadData() {
-            const savedData = localStorage.getItem('myPartyDataV2');
-            if (savedData) {
-                const parsed = JSON.parse(savedData);
-                state = { ...state, ...parsed }; // Merge ensuring new keys exist
+            // Load groups
+            const storedGroups = localStorage.getItem('festiv_groups');
+            if (storedGroups) {
+                groups = JSON.parse(storedGroups);
             } else {
-                state.groups = [...DEFAULT_GROUPS];
-                saveData();
+                localStorage.setItem('festiv_groups', JSON.stringify(groups));
             }
-            // Garantir arrays e propriedades em convidados antigos
-            state.guests.forEach(g => { 
-                if(!g.companions) g.companions = []; 
-                if(!g.phone) g.phone = '';
-                if(!g.diet) g.diet = '';
-            });
-        }
 
-        function saveData() {
-            localStorage.setItem('myPartyDataV2', JSON.stringify(state));
-            updateGroupSelects();
-            
-            // Re-renderizar view ativa sem fechar
-            const activeView = document.querySelector('.view-section:not(.hidden)').id;
-            if(activeView === 'view-dashboard') renderDashboard();
-            if(activeView === 'view-guests') renderGuests();
-            if(activeView === 'view-circles') renderGroups();
-            if(activeView === 'view-planner') { renderTasks(); renderExpenses(); }
-        }
+            // Load party config
+            const storedConfig = localStorage.getItem('festiv_party_config');
+            if (storedConfig) {
+                partyConfig = JSON.parse(storedConfig);
+            } else {
+                localStorage.setItem('festiv_party_config', JSON.stringify(partyConfig));
+            }
 
-        function generateId() { return Math.random().toString(36).substr(2, 9); }
-
-        /* ================= NAVEGAÇÃO ================= */
-        const views = {
-            'dashboard': { title: 'O Evento', actionHtml: '' },
-            'guests': { title: 'Lista de Convidados', actionHtml: `<button onclick="exportList()" class="bg-surface-panel hover:bg-surface-border text-white border border-surface-border px-4 py-2 rounded-xl flex items-center text-sm font-semibold transition-colors"><i class="ph-bold ph-printer mr-2"></i> <span class="hidden sm:inline">Exportar</span></button>` },
-            'circles': { title: 'Círculos Sociais', actionHtml: '' },
-            'planner': { title: 'Planejamento', actionHtml: '' },
-            'settings': { title: 'Configurações', actionHtml: '' }
+            updatePartyDisplay();
+            populateGroupDropdown();
+            renderGuests();
+            updateStats();
+            lucide.createIcons();
         };
 
-        function navigate(viewId) {
-            document.querySelectorAll('.view-section').forEach(el => {
-                el.classList.add('hidden');
-                el.classList.remove('animate-slide-up');
+        // Populate Form Select Dropdown
+        function populateGroupDropdown() {
+            const select = document.getElementById('guest-group');
+            if (!select) return;
+            select.innerHTML = '';
+            
+            groups.forEach(g => {
+                const opt = document.createElement('option');
+                opt.value = g;
+                opt.className = "bg-slate-900 text-slate-200";
+                opt.innerText = g;
+                select.appendChild(opt);
             });
+        }
+
+        // UI Displays Update
+        function updatePartyDisplay() {
+            document.getElementById('party-title-display').innerText = partyConfig.title;
             
-            document.querySelectorAll('.nav-btn').forEach(el => {
-                el.classList.remove('bg-primary/10', 'text-primary');
-                el.classList.add('text-surface-muted');
-                el.querySelector('i').classList.remove('text-primary');
+            const dateObj = new Date(partyConfig.date);
+            const formattedDate = dateObj.toLocaleDateString('pt-BR', {
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
             });
+            document.getElementById('party-date-display').innerText = formattedDate;
+        }
 
-            const activeView = document.getElementById(`view-${viewId}`);
-            activeView.classList.remove('hidden');
-            void activeView.offsetWidth; 
-            activeView.classList.add('animate-slide-up');
+        // Stats Update Calculation
+        function updateStats() {
+            const confirmedMain = guests.filter(g => g.status === 'confirmed').length;
+            const pendingMain = guests.filter(g => g.status === 'pending').length;
             
-            document.getElementById('page-title').innerText = views[viewId].title;
-            document.getElementById('header-actions').innerHTML = views[viewId].actionHtml;
+            const confirmedCompanions = guests.filter(g => g.status === 'confirmed' && g.hasCompanion && g.companionName).length;
+            const pendingCompanions = guests.filter(g => g.status === 'pending' && g.hasCompanion && g.companionName).length;
+
+            const totalConfirmed = confirmedMain + confirmedCompanions;
+            const totalPending = pendingMain + pendingCompanions;
+            const totalCompanions = guests.filter(g => g.hasCompanion && g.companionName).length;
+
+            document.getElementById('stat-confirmed').innerText = totalConfirmed;
+            document.getElementById('stat-pending').innerText = totalPending;
+            document.getElementById('stat-companions').innerText = totalCompanions;
+            document.getElementById('stat-total').innerText = totalConfirmed + totalPending;
+
+            document.getElementById('stats-grand-total').innerText = `${totalConfirmed + totalPending} pessoas`;
+            document.getElementById('stats-companions-total').innerText = `${totalCompanions} pessoas`;
+
+            // Calculate Group Distribution statically and dynamically based on custom groups
+            const groupsList = document.getElementById('stats-groups-list');
+            groupsList.innerHTML = '';
             
-            const navEl = document.getElementById(`nav-${viewId}`);
-            navEl.classList.remove('text-surface-muted');
-            navEl.classList.add('bg-primary/10', 'text-primary');
-            navEl.querySelector('i').classList.add('text-primary');
-
-            if(viewId === 'dashboard') renderDashboard();
-            if(viewId === 'guests') renderGuests();
-            if(viewId === 'circles') renderGroups();
-            if(viewId === 'planner') { renderTasks(); renderExpenses(); }
-
-            const sidebar = document.getElementById('sidebar');
-            if (!sidebar.classList.contains('-translate-x-full') && window.innerWidth < 768) {
-                toggleSidebar();
-            }
+            groups.forEach(g => {
+                const count = guests.filter(guest => guest.group === g).length;
+                const li = document.createElement('li');
+                li.className = "flex justify-between items-center text-sm";
+                li.innerHTML = `
+                    <span class="text-slate-400">${g}</span>
+                    <span class="font-bold text-white px-2 py-0.5 rounded bg-white/5 text-xs">${count} convidados</span>
+                `;
+                groupsList.appendChild(li);
+            });
         }
 
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('-translate-x-full');
-            document.getElementById('mobile-overlay').classList.toggle('hidden');
-        }
-
-        /* ================= UI UTILS ================= */
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
+        // Set Active Filter Tab
+        function setFilter(filterType) {
+            currentFilter = filterType;
             
-            const styles = {
-                success: 'bg-[#121214] border-emerald-500/30 text-white',
-                error: 'bg-[#121214] border-rose-500/30 text-white',
-                info: 'bg-[#121214] border-primary/30 text-white'
-            };
-            const icons = { success: 'ph-check-circle text-emerald-500', error: 'ph-warning-circle text-rose-500', info: 'ph-info text-primary' };
-
-            toast.className = `animate-slide-up flex items-center px-5 py-3.5 rounded-xl border shadow-2xl pointer-events-auto ${styles[type]}`;
-            toast.innerHTML = `<i class="ph-fill ${icons[type]} text-2xl mr-3"></i><span class="text-sm font-semibold">${message}</span>`;
-            
-            container.appendChild(toast);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateY(10px)';
-                toast.style.transition = 'all 0.3s ease';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-
-        function formatPhone(val) {
-            return val.replace(/\D/g, ''); // Apenas números para o link do WhatsApp
-        }
-
-        function getWhatsAppLink(phone, name) {
-            const cleanPhone = formatPhone(phone);
-            if(cleanPhone.length < 10) return '#';
-            const msg = encodeURIComponent(`Olá ${name}! Estou organizando minha festa e gostaria de contar com a sua presença. O convite oficial e os detalhes seguem abaixo!`);
-            return `https://wa.me/55${cleanPhone}?text=${msg}`;
-        }
-
-        /* ================= TEMA E CONFIGURAÇÕES ================= */
-        function applyTheme() {
-            document.documentElement.style.setProperty('--primary', state.settings.primaryColor);
-            document.documentElement.style.setProperty('--primary-hover', state.settings.primaryHover);
-        }
-
-        function setTheme(color, hoverColor) {
-            state.settings.primaryColor = color;
-            state.settings.primaryHover = hoverColor;
-            saveData();
-            applyTheme();
-            showToast('Cor atualizada com sucesso!');
-        }
-
-        function populateSettingsForm() {
-            document.getElementById('set-event-name').value = state.eventDetails.name || '';
-            document.getElementById('set-event-date').value = state.eventDetails.date || '';
-            document.getElementById('set-event-time').value = state.eventDetails.time || '';
-            document.getElementById('set-event-location').value = state.eventDetails.location || '';
-        }
-
-        function saveEventDetails() {
-            state.eventDetails.name = document.getElementById('set-event-name').value.trim() || 'Minha Festa';
-            state.eventDetails.date = document.getElementById('set-event-date').value;
-            state.eventDetails.time = document.getElementById('set-event-time').value;
-            state.eventDetails.location = document.getElementById('set-event-location').value.trim();
-            saveData();
-            showToast('Detalhes do evento salvos!');
-        }
-
-        /* ================= DASHBOARD ================= */
-        function renderDashboard() {
-            document.getElementById('dash-event-name').innerText = state.eventDetails.name;
-            
-            let infoText = '';
-            if(state.eventDetails.date) {
-                const dateObj = new Date(state.eventDetails.date + 'T00:00:00');
-                infoText += `<span class="bg-surface-panel px-3 py-1 rounded-lg border border-surface-border text-white text-sm"><i class="ph-bold ph-calendar-blank mr-1"></i> ${dateObj.toLocaleDateString('pt-BR')}</span>`;
-            }
-            if(state.eventDetails.time) infoText += `<span class="bg-surface-panel px-3 py-1 rounded-lg border border-surface-border text-white text-sm"><i class="ph-bold ph-clock mr-1"></i> ${state.eventDetails.time}</span>`;
-            if(state.eventDetails.location) infoText += `<span class="bg-surface-panel px-3 py-1 rounded-lg border border-surface-border text-white text-sm"><i class="ph-bold ph-map-pin mr-1"></i> ${state.eventDetails.location}</span>`;
-            
-            document.getElementById('dash-event-info').innerHTML = infoText || '<span class="text-sm">Configure os detalhes do evento em Configurações.</span>';
-
-            // Countdown
-            const countdownEl = document.getElementById('dash-countdown');
-            if(state.eventDetails.date) {
-                const eventDate = new Date(state.eventDetails.date + 'T23:59:59').getTime();
-                const now = new Date().getTime();
-                const diff = eventDate - now;
-                
-                if (diff < 0) {
-                    countdownEl.innerText = "Chegou!";
-                    countdownEl.classList.replace('text-primary', 'text-emerald-500');
+            const filters = ['all', 'confirmed', 'pending', 'declined'];
+            filters.forEach(f => {
+                const btn = document.getElementById(`filter-${f}`);
+                if (f === filterType) {
+                    btn.className = "flex-1 md:flex-none px-4 py-1.5 rounded-lg text-xs font-medium transition duration-300 text-white bg-violet-600/90 shadow-md whitespace-nowrap";
                 } else {
-                    const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
-                    countdownEl.innerText = `${days} dia${days !== 1 ? 's' : ''}`;
-                    countdownEl.classList.replace('text-emerald-500', 'text-primary');
+                    btn.className = "flex-1 md:flex-none px-4 py-1.5 rounded-lg text-xs font-medium transition duration-300 text-slate-400 hover:text-slate-200 whitespace-nowrap";
                 }
-            } else {
-                countdownEl.innerText = '-- dias';
-            }
-
-            // Totals
-            let total = 0, confirmed = 0, pending = 0, declined = 0;
-            state.guests.forEach(g => {
-                const count = 1 + (g.companions ? g.companions.length : 0);
-                total += count;
-                if (g.status === 'confirmado') confirmed += count;
-                else if (g.status === 'pendente') pending += count;
-                else if (g.status === 'nao_vai') declined += count;
             });
 
-            document.getElementById('dash-total').innerText = total;
-            document.getElementById('dash-confirmed').innerText = confirmed;
-            document.getElementById('dash-pending').innerText = pending;
-            document.getElementById('dash-declined').innerText = declined;
-
-            const progress = total === 0 ? 0 : (confirmed / total) * 100;
-            document.getElementById('dash-progress-confirm').style.width = `${progress}%`;
+            renderGuests();
         }
 
-        /* ================= CONVIDADOS ================= */
-        const statusConfig = {
-            'confirmado': { icon: 'ph-check-circle', color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', label: 'Confirmado' },
-            'pendente': { icon: 'ph-clock', color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/20', label: 'Pendente' },
-            'nao_vai': { icon: 'ph-x-circle', color: 'text-rose-400', bg: 'bg-rose-500/10', border: 'border-rose-500/20', label: 'Não irá' }
-        };
-
+        // Render Guest List Grid
         function renderGuests() {
-            const listContainer = document.getElementById('guests-list');
-            const emptyState = document.getElementById('guests-empty');
-            const searchTerm = document.getElementById('search-guest').value.toLowerCase();
-            const groupFilter = document.getElementById('filter-group').value;
-            const sortType = document.getElementById('filter-sort').value;
+            const container = document.getElementById('guests-container');
+            const emptyState = document.getElementById('empty-state');
+            const searchVal = document.getElementById('search-input').value.toLowerCase();
+            
+            container.innerHTML = '';
 
-            listContainer.innerHTML = '';
-
-            let filteredGuests = state.guests.filter(g => {
-                const matchSearch = g.name.toLowerCase().includes(searchTerm) || (g.companions && g.companions.some(c => c.name.toLowerCase().includes(searchTerm)));
-                const matchGroup = groupFilter === 'all' || g.groupId === groupFilter;
-                return matchSearch && matchGroup;
-            });
-
-            if (sortType === 'name') {
-                filteredGuests.sort((a, b) => a.name.localeCompare(b.name));
-            } else {
-                const statusOrder = { 'confirmado': 1, 'pendente': 2, 'nao_vai': 3 };
-                filteredGuests.sort((a, b) => statusOrder[a.status] - statusOrder[b.status] || a.name.localeCompare(b.name));
-            }
-
-            if (filteredGuests.length === 0) {
-                emptyState.classList.remove('hidden');
-            } else {
-                emptyState.classList.add('hidden');
+            let filtered = guests.filter(g => {
+                const matchesSearch = g.name.toLowerCase().includes(searchVal) || (g.companionName && g.companionName.toLowerCase().includes(searchVal));
                 
-                filteredGuests.forEach((g, i) => {
-                    const group = state.groups.find(gr => gr.id === g.groupId) || { name: 'Sem Círculo' };
-                    const sc = statusConfig[g.status];
-                    const totalPeople = 1 + (g.companions ? g.companions.length : 0);
-                    const animDelay = (i % 15) * 40; 
-                    
-                    const wpLink = getWhatsAppLink(g.phone, g.name);
-                    const wpBtn = g.phone && wpLink !== '#' ? 
-                        `<a href="${wpLink}" target="_blank" title="Enviar Convite no WhatsApp" class="w-9 h-9 rounded-xl bg-emerald-500/10 hover:bg-emerald-500 text-emerald-500 hover:text-white flex items-center justify-center transition-all border border-emerald-500/20"><i class="ph-fill ph-whatsapp text-lg"></i></a>` 
-                        : '';
-
-                    let compsHtml = '';
-                    if(g.companions && g.companions.length > 0) {
-                        compsHtml = `
-                            <div class="mt-4 pt-3 border-t border-surface-border">
-                                <p class="text-xs text-surface-muted mb-2 font-medium flex items-center"><i class="ph-fill ph-users mr-1"></i> Acompanhantes (${g.companions.length})</p>
-                                <div class="flex flex-wrap gap-2">
-                                    ${g.companions.map(c => `<span class="bg-surface-panel text-gray-300 text-xs px-2.5 py-1 rounded-md border border-surface-border shadow-sm">${c.name} ${c.age ? `(${c.age})` : ''}</span>`).join('')}
-                                </div>
-                            </div>`;
-                    }
-
-                    let tagsHtml = `<span class="text-xs font-medium px-2 py-1 rounded-md bg-surface-panel text-surface-muted border border-surface-border"><i class="ph-fill ph-circles-three text-primary mr-1"></i>${group.name}</span>`;
-                    if(g.diet) tagsHtml += `<span class="text-xs font-medium px-2 py-1 rounded-md bg-amber-500/10 text-amber-500 border border-amber-500/20" title="Restrição Alimentar"><i class="ph-fill ph-warning-circle mr-1"></i>${g.diet}</span>`;
-
-                    const cardHtml = `
-                        <div class="solid-card rounded-2xl p-5 flex flex-col animate-scale-in" style="animation-delay: ${animDelay}ms; opacity:0; animation-fill-mode: forwards;" id="guest-card-${g.id}">
-                            <div class="flex justify-between items-start mb-3">
-                                <div class="flex-1 min-w-0 pr-2">
-                                    <h4 class="text-lg font-bold text-white truncate">${g.name}</h4>
-                                    <div class="flex flex-wrap gap-2 mt-2">${tagsHtml}</div>
-                                </div>
-                                <div class="flex gap-1.5 shrink-0">
-                                    ${wpBtn}
-                                    <button onclick="editGuest('${g.id}')" title="Editar Convidado" class="w-9 h-9 rounded-xl bg-surface-panel hover:bg-primary/20 text-surface-muted hover:text-primary flex items-center justify-center transition-all border border-surface-border">
-                                        <i class="ph-bold ph-pencil-simple text-lg"></i>
-                                    </button>
-                                    <button onclick="deleteGuest('${g.id}')" title="Remover" class="w-9 h-9 rounded-xl bg-surface-panel hover:bg-rose-500/20 text-surface-muted hover:text-rose-500 flex items-center justify-center transition-all border border-surface-border">
-                                        <i class="ph-bold ph-trash text-lg"></i>
-                                    </button>
-                                </div>
-                            </div>
-
-                            ${g.notes ? `<p class="text-sm text-surface-muted italic mb-4 bg-surface-panel/50 p-2.5 rounded-lg border border-surface-border/50"><i class="ph-fill ph-info text-surface-muted mr-1"></i> ${g.notes}</p>` : '<div class="mb-2"></div>'}
-                            
-                            <div class="mt-auto pt-2 flex items-center justify-between border-t border-surface-border/50">
-                                <div class="relative group mt-3">
-                                    <button class="text-xs px-3 py-1.5 rounded-lg border ${sc.border} ${sc.bg} ${sc.color} flex items-center font-semibold transition-all">
-                                        <i class="ph-fill ${sc.icon} mr-1.5 text-base"></i> ${sc.label}
-                                        <i class="ph-bold ph-caret-down ml-1 opacity-50"></i>
-                                    </button>
-                                    <select onchange="updateGuestStatus('${g.id}', this.value)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
-                                        <option value="confirmado" ${g.status==='confirmado'?'selected':''}>Confirmado</option>
-                                        <option value="pendente" ${g.status==='pendente'?'selected':''}>Pendente</option>
-                                        <option value="nao_vai" ${g.status==='nao_vai'?'selected':''}>Não irá</option>
-                                    </select>
-                                </div>
-                                <div class="text-xs text-white font-semibold bg-surface-panel px-3 py-1.5 rounded-lg border border-surface-border mt-3">
-                                    Total: <span class="text-primary ml-1 text-sm">${totalPeople}</span>
-                                </div>
-                            </div>
-                            ${compsHtml}
-                        </div>
-                    `;
-                    listContainer.insertAdjacentHTML('beforeend', cardHtml);
-                });
-            }
-        }
-
-        function openGuestModal() {
-            document.getElementById('modal-guest-title').innerHTML = '<i class="ph-fill ph-user-plus text-primary mr-2"></i> Novo Convidado';
-            document.getElementById('btn-save-guest').innerHTML = '<i class="ph-bold ph-check mr-2"></i> Adicionar';
-            
-            document.getElementById('g-id').value = '';
-            document.getElementById('g-name').value = '';
-            document.getElementById('g-phone').value = '';
-            document.getElementById('g-status').value = 'pendente';
-            document.getElementById('g-group').value = state.groups[0]?.id || '';
-            document.getElementById('g-diet').value = '';
-            document.getElementById('g-notes').value = '';
-            
-            tempCompanions = [];
-            renderTempCompanions();
-            document.getElementById('modal-guest').classList.remove('hidden');
-        }
-
-        function editGuest(id) {
-            const guest = state.guests.find(g => g.id === id);
-            if (!guest) return;
-
-            document.getElementById('modal-guest-title').innerHTML = '<i class="ph-fill ph-pencil-simple text-primary mr-2"></i> Editar Convidado';
-            document.getElementById('btn-save-guest').innerHTML = '<i class="ph-bold ph-floppy-disk mr-2"></i> Atualizar';
-
-            document.getElementById('g-id').value = guest.id;
-            document.getElementById('g-name').value = guest.name;
-            document.getElementById('g-phone').value = guest.phone || '';
-            document.getElementById('g-status').value = guest.status;
-            document.getElementById('g-group').value = guest.groupId;
-            document.getElementById('g-diet').value = guest.diet || '';
-            document.getElementById('g-notes').value = guest.notes || '';
-            
-            tempCompanions = guest.companions ? JSON.parse(JSON.stringify(guest.companions)) : [];
-            renderTempCompanions();
-
-            document.getElementById('modal-guest').classList.remove('hidden');
-        }
-
-        function saveGuest() {
-            const id = document.getElementById('g-id').value;
-            const name = document.getElementById('g-name').value.trim();
-            const phone = document.getElementById('g-phone').value.trim();
-            const status = document.getElementById('g-status').value;
-            const groupId = document.getElementById('g-group').value;
-            const diet = document.getElementById('g-diet').value.trim();
-            const notes = document.getElementById('g-notes').value.trim();
-
-            if (!name) { showToast('O nome do convidado é obrigatório.', 'error'); return; }
-            if (!groupId) { showToast('Crie um círculo social primeiro.', 'error'); return; }
-
-            const cleanedCompanions = tempCompanions.filter(c => c.name.trim() !== '');
-
-            if (id) {
-                const index = state.guests.findIndex(g => g.id === id);
-                state.guests[index] = { id, name, phone, status, groupId, diet, notes, companions: cleanedCompanions };
-                showToast('Convidado atualizado!');
-            } else {
-                state.guests.push({ id: generateId(), name, phone, status, groupId, diet, notes, companions: cleanedCompanions });
-                showToast('Convidado adicionado!');
-            }
-
-            saveData();
-            closeModals();
-        }
-
-        function deleteGuest(id) {
-            const guest = state.guests.find(g => g.id === id);
-            if(!guest) return;
-            openConfirmModal('Remover Convidado', `Deseja realmente excluir "${guest.name}" e seus acompanhantes?`, () => {
-                state.guests = state.guests.filter(g => g.id !== id);
-                saveData();
-                showToast('Convidado removido.', 'info');
+                if (currentFilter === 'all') return matchesSearch;
+                return g.status === currentFilter && matchesSearch;
             });
-        }
 
-        function updateGuestStatus(id, newStatus) {
-            const guest = state.guests.find(g => g.id === id);
-            if (guest) {
-                guest.status = newStatus;
-                saveData();
-                showToast(`Status alterado: ${statusConfig[newStatus].label}`, 'success');
-            }
-        }
-
-        function renderTempCompanions() {
-            const container = document.getElementById('g-companions-list');
-            if(tempCompanions.length === 0) {
-                container.innerHTML = '<div class="text-center p-4 border border-surface-border border-dashed rounded-xl bg-surface-panel/30 text-surface-muted text-sm">Nenhum acompanhante adicionado.</div>';
+            if (filtered.length === 0) {
+                container.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                emptyState.classList.add('flex');
                 return;
+            } else {
+                container.classList.remove('hidden');
+                emptyState.classList.add('hidden');
+                emptyState.classList.remove('flex');
             }
 
-            container.innerHTML = tempCompanions.map((comp, index) => `
-                <div class="flex gap-2 items-center bg-surface-panel p-2 rounded-xl border border-surface-border animate-fade-in">
-                    <input type="text" value="${comp.name}" onchange="updateTempCompanion(${index}, 'name', this.value)" placeholder="Nome do acompanhante" class="bg-transparent border-none text-sm text-white flex-1 outline-none px-2">
-                    <input type="number" value="${comp.age || ''}" onchange="updateTempCompanion(${index}, 'age', this.value)" placeholder="Idade" class="bg-[#121214] border border-surface-border rounded-lg text-sm text-center w-16 outline-none py-1.5 focus:border-primary">
-                    <button type="button" onclick="removeTempCompanion(${index})" class="text-surface-muted hover:text-rose-500 hover:bg-rose-500/10 p-2 rounded-lg transition-colors"><i class="ph-bold ph-trash"></i></button>
-                </div>
-            `).join('');
-        }
+            filtered.forEach((g, index) => {
+                const card = document.createElement('div');
+                card.className = "glass-panel p-5 rounded-2xl flex flex-col justify-between hover-trigger animate-fade-in relative group overflow-hidden transition-all duration-300";
+                card.style.animationDelay = `${index * 50}ms`;
 
-        function addTempCompanion() {
-            tempCompanions.push({ id: generateId(), name: '', age: '' });
-            renderTempCompanions();
-            setTimeout(() => {
-                const inputs = document.querySelectorAll('#g-companions-list input[type="text"]');
-                if(inputs.length > 0) inputs[inputs.length - 1].focus();
-            }, 50);
-        }
+                let statusBadge = '';
+                if (g.status === 'confirmed') {
+                    statusBadge = '<span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Confirmado</span>';
+                } else if (g.status === 'pending') {
+                    statusBadge = '<span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20">Pendente</span>';
+                } else {
+                    statusBadge = '<span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-rose-500/10 text-rose-400 border border-rose-500/20">Não vai</span>';
+                }
 
-        function updateTempCompanion(index, field, value) { tempCompanions[index][field] = value; }
-        function removeTempCompanion(index) { tempCompanions.splice(index, 1); renderTempCompanions(); }
+                const companionHTML = (g.hasCompanion && g.companionName) ? `
+                    <div class="mt-3 pt-3 border-t border-white/5 flex items-center gap-2 text-slate-300 text-xs">
+                        <i data-lucide="plus" class="w-3.5 h-3.5 text-sky-400"></i>
+                        <span>Acompanhante: <strong class="text-white">${g.companionName}</strong></span>
+                    </div>
+                ` : '';
 
-        /* ================= CÍRCULOS ================= */
-        function renderGroups() {
-            const listContainer = document.getElementById('groups-list');
-            if (state.groups.length === 0) {
-                 listContainer.innerHTML = `<div class="col-span-full text-center py-16"><p class="text-surface-muted">Nenhum círculo criado. Agrupe seus convidados!</p></div>`;
-                return;
-            }
+                const notesHTML = g.notes ? `
+                    <p class="text-xs text-slate-500 italic mt-2 line-clamp-1" title="${g.notes}">"${g.notes}"</p>
+                ` : '';
 
-            listContainer.innerHTML = state.groups.map((gr, i) => {
-                let count = state.guests.filter(g => g.groupId === gr.id).reduce((acc, g) => acc + 1 + (g.companions ? g.companions.length : 0), 0);
-                return `
-                    <div class="solid-card rounded-2xl p-6 flex flex-col justify-between animate-scale-in group" style="animation-delay: ${(i%10)*50}ms; opacity:0; animation-fill-mode: forwards;">
-                        <div class="flex items-center mb-4">
-                            <div class="w-12 h-12 rounded-full bg-primary/10 border border-primary/20 text-primary flex items-center justify-center mr-4">
-                                <i class="ph-fill ph-users-three text-2xl"></i>
+                card.innerHTML = `
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-slate-800/60 border border-white/5 flex items-center justify-center text-slate-300 font-semibold text-sm">
+                                ${g.name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()}
                             </div>
                             <div>
-                                <h4 class="font-bold text-white text-lg">${gr.name}</h4>
-                                <p class="text-sm text-surface-muted">${count} pessoa${count !== 1 ? 's' : ''}</p>
+                                <h4 class="text-sm font-semibold text-white leading-tight">${g.name}</h4>
+                                <span class="text-[10px] font-semibold text-violet-400/80 tracking-wide uppercase mt-0.5 inline-block">${g.group || 'Sem Grupo'}</span>
                             </div>
                         </div>
-                        <div class="flex justify-end gap-2 border-t border-surface-border pt-4">
-                            <button onclick="editGroup('${gr.id}')" class="px-3 py-1.5 rounded-lg bg-surface-panel hover:bg-primary/20 text-surface-muted hover:text-primary transition-colors text-sm font-medium"><i class="ph-bold ph-pencil-simple mr-1"></i> Editar</button>
-                            <button onclick="deleteGroup('${gr.id}')" class="px-3 py-1.5 rounded-lg bg-surface-panel hover:bg-rose-500/20 text-surface-muted hover:text-rose-500 transition-colors text-sm font-medium"><i class="ph-bold ph-trash mr-1"></i> Apagar</button>
+                        <div>
+                            ${statusBadge}
                         </div>
-                    </div>`;
-            }).join('');
-        }
-
-        function updateGroupSelects() {
-            const filterSelect = document.getElementById('filter-group');
-            const formSelect = document.getElementById('g-group');
-            const options = state.groups.map(gr => `<option value="${gr.id}">${gr.name}</option>`).join('');
-            
-            if (filterSelect) {
-                const currentFilter = filterSelect.value;
-                filterSelect.innerHTML = `<option value="all">Todos Círculos</option>` + options;
-                filterSelect.value = state.groups.find(g => g.id === currentFilter) ? currentFilter : 'all';
-            }
-            if (formSelect) {
-                const currentForm = formSelect.value;
-                formSelect.innerHTML = options;
-                if(state.groups.find(g => g.id === currentForm)) formSelect.value = currentForm;
-            }
-        }
-
-        function openGroupModal() {
-            document.getElementById('modal-group-title').innerHTML = '<i class="ph-fill ph-circles-three text-primary mr-2"></i> Novo Círculo';
-            document.getElementById('grp-id').value = '';
-            document.getElementById('grp-name').value = '';
-            document.getElementById('modal-group').classList.remove('hidden');
-            setTimeout(()=> document.getElementById('grp-name').focus(), 100);
-        }
-
-        function editGroup(id) {
-            const group = state.groups.find(g => g.id === id);
-            if (!group) return;
-            document.getElementById('modal-group-title').innerHTML = '<i class="ph-fill ph-pencil-simple text-primary mr-2"></i> Editar Círculo';
-            document.getElementById('grp-id').value = group.id;
-            document.getElementById('grp-name').value = group.name;
-            document.getElementById('modal-group').classList.remove('hidden');
-        }
-
-        function saveGroup() {
-            const id = document.getElementById('grp-id').value;
-            const name = document.getElementById('grp-name').value.trim();
-            if (!name) { showToast('Defina um nome.', 'error'); return; }
-
-            if (id) {
-                state.groups.find(g => g.id === id).name = name;
-                showToast('Círculo renomeado!');
-            } else {
-                state.groups.push({ id: generateId(), name });
-                showToast('Círculo criado!');
-            }
-            saveData();
-            closeModals();
-        }
-
-        function deleteGroup(id) {
-            const guestsInGroup = state.guests.filter(g => g.groupId === id);
-            if (guestsInGroup.length > 0) {
-                showToast(`Mova os ${guestsInGroup.length} convidados antes de apagar.`, 'error');
-                return;
-            }
-            openConfirmModal('Apagar Círculo', `Remover permanentemente este círculo?`, () => {
-                state.groups = state.groups.filter(g => g.id !== id);
-                saveData();
-                showToast('Círculo apagado.', 'info');
-            });
-        }
-
-        /* ================= PLANEJAMENTO (TAREFAS E ORÇAMENTO) ================= */
-        function renderTasks() {
-            const container = document.getElementById('tasks-list');
-            const total = state.tasks.length;
-            const done = state.tasks.filter(t => t.done).length;
-            
-            document.getElementById('task-progress-text').innerText = `${done} de ${total} concluídas`;
-
-            if(total === 0) {
-                container.innerHTML = '<p class="text-surface-muted text-sm text-center py-4 border border-dashed border-surface-border rounded-xl">Nenhuma tarefa. Adicione algo acima!</p>';
-                return;
-            }
-
-            // Ordenar: Pendentes primeiro, concluídas por último
-            const sortedTasks = [...state.tasks].sort((a,b) => (a.done === b.done) ? 0 : a.done ? 1 : -1);
-
-            container.innerHTML = sortedTasks.map(t => `
-                <div class="flex items-center justify-between p-3 bg-surface-panel rounded-xl border ${t.done ? 'border-surface-border opacity-60' : 'border-surface-border/80'} transition-all">
-                    <label class="flex items-center gap-3 cursor-pointer flex-1">
-                        <input type="checkbox" class="custom-checkbox shrink-0" ${t.done ? 'checked' : ''} onchange="toggleTask('${t.id}')">
-                        <span class="text-sm font-medium ${t.done ? 'text-surface-muted line-through' : 'text-white'}">${t.text}</span>
-                    </label>
-                    <button onclick="deleteTask('${t.id}')" class="text-surface-muted hover:text-rose-500 p-1.5"><i class="ph-bold ph-trash"></i></button>
-                </div>
-            `).join('');
-        }
-
-        function addTask(e) {
-            e.preventDefault();
-            const input = document.getElementById('new-task-input');
-            const text = input.value.trim();
-            if(!text) return;
-            state.tasks.push({ id: generateId(), text, done: false });
-            input.value = '';
-            saveData();
-        }
-
-        function toggleTask(id) {
-            const task = state.tasks.find(t => t.id === id);
-            if(task) { task.done = !task.done; saveData(); }
-        }
-
-        function deleteTask(id) {
-            state.tasks = state.tasks.filter(t => t.id !== id);
-            saveData();
-        }
-
-        function renderExpenses() {
-            const container = document.getElementById('expenses-list');
-            let total = 0;
-            
-            if(state.expenses.length === 0) {
-                container.innerHTML = '<p class="text-surface-muted text-sm text-center py-4 border border-dashed border-surface-border rounded-xl">Nenhum gasto registrado.</p>';
-                document.getElementById('budget-total-spent').innerText = 'R$ 0,00';
-                return;
-            }
-
-            container.innerHTML = state.expenses.map(e => {
-                total += parseFloat(e.amount);
-                return `
-                <div class="flex items-center justify-between p-3 bg-surface-panel rounded-xl border border-surface-border transition-all">
-                    <div class="flex-1 min-w-0 pr-2">
-                        <p class="text-sm font-medium text-white truncate">${e.desc}</p>
-                        <p class="text-xs text-surface-muted mt-0.5">R$ ${parseFloat(e.amount).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
                     </div>
-                    <button onclick="deleteExpense('${e.id}')" class="text-surface-muted hover:text-rose-500 p-1.5 bg-[#121214] rounded-lg border border-surface-border"><i class="ph-bold ph-trash"></i></button>
-                </div>
-            `}).join('');
 
-            document.getElementById('budget-total-spent').innerText = `R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+                    ${companionHTML}
+                    ${notesHTML}
+
+                    <div class="flex items-center justify-end gap-2 mt-4 pt-3 border-t border-white/5">
+                        <button onclick="editGuest('${g.id}')" class="p-2 rounded-lg bg-white/5 hover:bg-violet-600/20 text-slate-400 hover:text-violet-400 transition animate-fade-in" title="Editar Convidado">
+                            <i data-lucide="edit" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="triggerDeleteGuest('${g.id}')" class="p-2 rounded-lg bg-white/5 hover:bg-rose-600/20 text-slate-400 hover:text-rose-400 transition animate-fade-in" title="Excluir Convidado">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+
+            lucide.createIcons();
         }
 
-        function addExpense(e) {
-            e.preventDefault();
-            const desc = document.getElementById('exp-desc').value.trim();
-            const amount = document.getElementById('exp-val').value;
-            if(!desc || !amount) return;
+        // Companion Input toggle animation height
+        function toggleCompanionInput() {
+            const hasCompanion = document.getElementById('has-companion').checked;
+            const container = document.getElementById('companion-container');
+            const compInput = document.getElementById('companion-name');
+
+            if (hasCompanion) {
+                container.style.maxHeight = '100px';
+                container.style.marginTop = '0.5rem';
+                compInput.setAttribute('required', 'true');
+            } else {
+                container.style.maxHeight = '0px';
+                container.style.marginTop = '0px';
+                compInput.removeAttribute('required');
+                compInput.value = '';
+            }
+        }
+
+        // Universal Modals Control
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            modal.classList.remove('pointer-events-none');
+            modal.classList.add('opacity-100');
+            modal.firstElementChild.classList.add('scale-100');
+            modal.firstElementChild.classList.remove('scale-95');
+        }
+
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            modal.classList.add('pointer-events-none');
+            modal.classList.remove('opacity-100');
+            modal.firstElementChild.classList.remove('scale-100');
+            modal.firstElementChild.classList.add('scale-95');
+        }
+
+        // SPECIFIC MODALS OPENERS/CLOSERS
+        function openAddModal() {
+            document.getElementById('modal-title').innerText = "Adicionar Convidado";
+            document.getElementById('guest-id').value = "";
+            document.getElementById('guest-form').reset();
             
-            state.expenses.push({ id: generateId(), desc, amount });
-            document.getElementById('exp-desc').value = '';
-            document.getElementById('exp-val').value = '';
-            saveData();
+            // Re-populate and dynamic select setup
+            populateGroupDropdown();
+            
+            const compContainer = document.getElementById('companion-container');
+            compContainer.style.maxHeight = '0px';
+            compContainer.style.marginTop = '0px';
+
+            openModal('guest-modal');
         }
 
-        function deleteExpense(id) {
-            state.expenses = state.expenses.filter(e => e.id !== id);
-            saveData();
+        function closeGuestModal() {
+            closeModal('guest-modal');
         }
 
-        /* ================= MODAIS EXTRAS ================= */
-        function openConfirmModal(title, message, callback) {
+        function openConfigModal() {
+            document.getElementById('config-party-title').value = partyConfig.title;
+            document.getElementById('config-party-date').value = partyConfig.date;
+            openModal('config-modal');
+        }
+
+        function closeConfigModal() {
+            closeModal('config-modal');
+        }
+
+        function openStatsModal() {
+            updateStats();
+            openModal('stats-modal');
+        }
+
+        function closeStatsModal() {
+            closeModal('stats-modal');
+        }
+
+        // GROUPS MANAGEMENT MODAL LOGIC
+        function openGroupsModal() {
+            renderGroupsList();
+            openModal('groups-modal');
+        }
+
+        function closeGroupsModal() {
+            closeModal('groups-modal');
+        }
+
+        // Render groups dynamic listing
+        function renderGroupsList() {
+            const container = document.getElementById('groups-list-container');
+            container.innerHTML = '';
+
+            groups.forEach(group => {
+                const div = document.createElement('div');
+                div.className = "flex items-center justify-between p-3 rounded-xl bg-slate-900/60 border border-white/5 hover:border-white/10 transition duration-200 animate-fade-in";
+                
+                const count = guests.filter(g => g.group === group).length;
+
+                div.innerHTML = `
+                    <div class="flex flex-col">
+                        <span class="text-sm font-semibold text-white">${group}</span>
+                        <span class="text-xs text-slate-400">${count} ${count === 1 ? 'convidado vinculado' : 'convidados vinculados'}</span>
+                    </div>
+                    <button onclick="triggerDeleteGroup('${group}')" class="p-2 rounded-lg bg-white/5 hover:bg-rose-600/20 text-slate-400 hover:text-rose-400 transition" title="Excluir Grupo">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                `;
+
+                container.appendChild(div);
+            });
+
+            lucide.createIcons();
+        }
+
+        // Create Custom Group Handler
+        function addNewGroup(event) {
+            event.preventDefault();
+            const input = document.getElementById('new-group-name');
+            const newGroup = input.value.trim();
+
+            if (!newGroup) return;
+
+            if (groups.includes(newGroup)) {
+                showToast("Esse grupo já existe!");
+                return;
+            }
+
+            groups.push(newGroup);
+            localStorage.setItem('festiv_groups', JSON.stringify(groups));
+            
+            input.value = '';
+            renderGroupsList();
+            populateGroupDropdown();
+            updateStats();
+            showToast(`Grupo "${newGroup}" criado com sucesso!`);
+        }
+
+        // Confirm Modal handlers (replaces native alert/confirm)
+        function showConfirmModal(title, description, onConfirm) {
             document.getElementById('confirm-title').innerText = title;
-            document.getElementById('confirm-message').innerText = message;
-            confirmActionCallback = callback;
-            document.getElementById('modal-confirm').classList.remove('hidden');
+            document.getElementById('confirm-description').innerText = description;
+            
+            const okBtn = document.getElementById('confirm-ok-btn');
+            
+            // Clean old event listeners
+            const newOkBtn = okBtn.cloneNode(true);
+            okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+            
+            newOkBtn.addEventListener('click', () => {
+                onConfirm();
+                closeConfirmModal();
+            });
+
+            openModal('confirm-modal');
         }
 
         function closeConfirmModal() {
-            document.getElementById('modal-confirm').classList.add('hidden');
-            confirmActionCallback = null;
+            closeModal('confirm-modal');
         }
 
-        function executeConfirmAction() {
-            if (confirmActionCallback) confirmActionCallback();
-            closeConfirmModal();
+        // Group delete helper (with custom confirmation)
+        function triggerDeleteGroup(groupName) {
+            const count = guests.filter(g => g.group === groupName).length;
+            let warningText = `Deseja realmente remover o grupo "${groupName}"?`;
+            if (count > 0) {
+                warningText += ` Os ${count} convidados deste grupo ficarão sem grupo definido.`;
+            }
+
+            showConfirmModal(
+                "Remover Grupo?",
+                warningText,
+                () => {
+                    // Remove group from state
+                    groups = groups.filter(g => g !== groupName);
+                    localStorage.setItem('festiv_groups', JSON.stringify(groups));
+
+                    // Reset guests linked to deleted group
+                    guests.forEach(g => {
+                        if (g.group === groupName) {
+                            g.group = "Outros"; // fall back
+                        }
+                    });
+                    localStorage.setItem('festiv_guests', JSON.stringify(guests));
+
+                    renderGroupsList();
+                    populateGroupDropdown();
+                    renderGuests();
+                    updateStats();
+                    showToast(`Grupo "${groupName}" removido.`);
+                }
+            );
         }
 
-        function closeModals() {
-            document.querySelectorAll('.modal-overlay').forEach(m => m.classList.add('hidden'));
+        // Guest save logic
+        function saveGuest(event) {
+            event.preventDefault();
+
+            const guestId = document.getElementById('guest-id').value;
+            const name = document.getElementById('guest-name').value;
+            const status = document.querySelector('input[name="guest-status"]:checked').value;
+            const group = document.getElementById('guest-group').value;
+            const hasCompanion = document.getElementById('has-companion').checked;
+            const companionName = document.getElementById('companion-name').value;
+            const notes = document.getElementById('guest-notes').value;
+
+            if (guestId) {
+                const index = guests.findIndex(g => g.id === guestId);
+                if (index !== -1) {
+                    guests[index] = { ...guests[index], name, status, group, hasCompanion, companionName, notes };
+                    showToast("Convidado atualizado com sucesso!");
+                }
+            } else {
+                const newGuest = {
+                    id: Date.now().toString(),
+                    name,
+                    status,
+                    group,
+                    hasCompanion,
+                    companionName,
+                    notes
+                };
+                guests.push(newGuest);
+                showToast(`${name} adicionado à lista!`);
+            }
+
+            localStorage.setItem('festiv_guests', JSON.stringify(guests));
+            
+            closeGuestModal();
+            renderGuests();
+            updateStats();
         }
 
-        function resetData() {
-            openConfirmModal('Apagar Todos os Dados', 'Certeza? Você perderá todos os convidados, tarefas e orçamentos para sempre.', () => {
-                localStorage.removeItem('myPartyDataV2');
-                state = { eventDetails: {name: 'Minha Festa', date: '', time: '', location: ''}, guests: [], groups: [...DEFAULT_GROUPS], tasks: [], expenses: [], settings: { primaryColor: '#a855f7', primaryHover: '#9333ea' } };
-                saveData();
-                applyTheme();
-                populateSettingsForm();
-                navigate('dashboard');
-                showToast('Aplicativo resetado com sucesso.', 'success');
+        // Pre-populating edit mode triggered
+        function editGuest(id) {
+            const g = guests.find(guest => guest.id === id);
+            if (!g) return;
+
+            document.getElementById('modal-title').innerText = "Editar Convidado";
+            document.getElementById('guest-id').value = g.id;
+            document.getElementById('guest-name').value = g.name;
+            
+            const radios = document.querySelectorAll('input[name="guest-status"]');
+            radios.forEach(radio => {
+                if (radio.value === g.status) {
+                    radio.checked = true;
+                }
             });
+
+            // Populate group select before picking value
+            populateGroupDropdown();
+            
+            // Set dynamic value
+            document.getElementById('guest-group').value = g.group || "Outros";
+            
+            const companionCheckbox = document.getElementById('has-companion');
+            companionCheckbox.checked = g.hasCompanion;
+            
+            const companionContainer = document.getElementById('companion-container');
+            const compInput = document.getElementById('companion-name');
+            if (g.hasCompanion) {
+                companionContainer.style.maxHeight = '100px';
+                companionContainer.style.marginTop = '0.5rem';
+                compInput.value = g.companionName || '';
+                compInput.setAttribute('required', 'true');
+            } else {
+                companionContainer.style.maxHeight = '0px';
+                companionContainer.style.marginTop = '0px';
+                compInput.value = '';
+                compInput.removeAttribute('required');
+            }
+
+            document.getElementById('guest-notes').value = g.notes || '';
+
+            openModal('guest-modal');
         }
 
-        // Fechar ao clicar fora do modal
-        document.querySelectorAll('.modal-overlay').forEach(el => {
-            el.addEventListener('mousedown', (e) => {
-                if(e.target === el) closeModals();
-            });
-        });
+        // Delete guest with customized confirmation
+        function triggerDeleteGuest(id) {
+            const g = guests.find(guest => guest.id === id);
+            if (!g) return;
 
-        // Impressão rápida
-        function exportList() { window.print(); }
+            showConfirmModal(
+                "Remover Convidado?",
+                `Você quer remover "${g.name}" da lista de convidados?`,
+                () => {
+                    guests = guests.filter(guest => guest.id !== id);
+                    localStorage.setItem('festiv_guests', JSON.stringify(guests));
+                    showToast(`"${g.name}" foi removido.`);
+                    renderGuests();
+                    updateStats();
+                }
+            );
+        }
 
-        // Inicializar
-        window.onload = initApp;
+        // Party setup save
+        function savePartyConfig(event) {
+            event.preventDefault();
+            
+            partyConfig.title = document.getElementById('config-party-title').value;
+            partyConfig.date = document.getElementById('config-party-date').value;
+
+            localStorage.setItem('festiv_party_config', JSON.stringify(partyConfig));
+            updatePartyDisplay();
+            closeConfigModal();
+            showToast("Dados do evento salvos com sucesso!");
+        }
+
+        // Toast notifications system
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            
+            const toast = document.createElement('div');
+            toast.className = "glass-panel px-5 py-3.5 rounded-2xl flex items-center gap-3 text-slate-100 text-sm shadow-xl shadow-slate-950/40 pointer-events-auto border-l-4 border-l-violet-500 animate-fade-in";
+            toast.style.animation = "slideInRight 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards";
+            
+            toast.innerHTML = `
+                <i data-lucide="check" class="w-4 h-4 text-violet-400"></i>
+                <span>${message}</span>
+            `;
+
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                toast.style.animation = "slideOutRight 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards";
+                setTimeout(() => {
+                    toast.remove();
+                }, 350);
+            }, 3000);
+        }
+
+        // Hard reset with customized confirmation dialog
+        function triggerClearAllData() {
+            showConfirmModal(
+                "Limpar todos os dados?",
+                "Isso removerá permanentemente todos os convidados, acompanhantes e grupos criados por você.",
+                () => {
+                    localStorage.removeItem('festiv_guests');
+                    localStorage.removeItem('festiv_party_config');
+                    localStorage.removeItem('festiv_groups');
+                    
+                    guests = [];
+                    groups = ["Família", "Amigos de Infância", "Trabalho", "Outros"];
+                    partyConfig = {
+                        title: "Minha Festa Exclusiva",
+                        date: "2026-12-31T21:00"
+                    };
+                    
+                    updatePartyDisplay();
+                    populateGroupDropdown();
+                    renderGuests();
+                    updateStats();
+                    showToast("Todos os dados foram resetados.");
+                }
+            );
+        }
     </script>
 </body>
 </html>
