@@ -3,7 +3,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <!-- Use a friendly modern UI font -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
-<title>Bloom Mist</title>
+<title>FarmUp</title>
 <style>
   :root{
     /* stronger UI contrast, warmer accent, clearer readable tones and larger tappable areas via CSS vars */
@@ -178,6 +178,9 @@
   .panel .pbody{
     scrollbar-width:thin;
     scrollbar-color:rgba(244,176,62,0.28) rgba(0,0,0,0.06);
+    /* allow touch scrolling inside panels/panels' scroll body */
+    touch-action: auto;
+    -webkit-overflow-scrolling: touch;
   }
   /* seed / item name truncation inside panels (keeps long names from overflowing their cards) */
   .panel .pbody .seedName{
@@ -553,8 +556,8 @@
   body.menu-active #scrim {display:none !important; opacity:0 !important; pointer-events:none !important;}
   #menu.hide{opacity:0;pointer-events:none;}
   #menuInner{display:flex;flex-direction:column;align-items:center;gap:6px;padding:22px;animation:floatIn .9s ease;}
-  #menu h1{font-size:clamp(34px,10vw,66px);margin:0 0 20px;color:#fff7e8;text-align:center;line-height:.92;
-    text-shadow:0 5px 24px rgba(0,0,0,.55),0 2px 0 #4d7a3c;letter-spacing:1px;}
+  #menu h1{font-size:clamp(24px,8vw,46px);margin:0 0 16px;color:#fff7e8;text-align:center;line-height:.92;
+    text-shadow:0 4px 18px rgba(0,0,0,.45),0 2px 0 #4d7a3c;letter-spacing:1px;}
   #menu h1 span{display:block;font-size:.46em;color:#ffe08a;letter-spacing:8px;font-weight:normal;margin-top:4px;}
   .mbtns{display:flex;flex-direction:column;gap:10px;width:min(80vw,300px);}
   .mbtn{pointer-events:auto;padding:14px 20px;border-radius:18px;background:var(--glass);
@@ -652,9 +655,9 @@
 
 <div id="menu" bis_skin_checked="1" style="backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)">
   <div id="menuInner" bis_skin_checked="1" style="padding:18px;gap:8px;align-items:center">
-    <h1 style="margin-bottom:14px;font-weight:900;letter-spacing:2px">
-      Bloom
-      <span style="display:block;font-size:0.9em;color:#ffd97a;margin-top:6px;letter-spacing:6px;font-weight:600">MIST</span>
+    <h1 style="margin-bottom:10px;font-weight:900;letter-spacing:1.5px;display:flex;flex-direction:row;align-items:center;gap:6px;line-height:1">
+      <span style="font-size:1.1em;color:#fff;font-weight:900">Farm</span>
+      <span style="font-size:1.1em;color:#ffd97a;font-weight:900">Up</span>
     </h1>
     <div style="display:flex;gap:10px;align-items:center;justify-content:center;width:100%;flex-direction:column">
       <div class="mbtn primary" id="mPlay" style="width:90%;padding:14px 20px;border-radius:14px">▶ Play</div>
@@ -667,11 +670,7 @@
   </div>
 </div>
 <div id="flash" bis_skin_checked="1"></div>
-<div id="farewell" bis_skin_checked="1">
-  <h2>🌾 See you soon!</h2>
-  <div style="opacity:.85;max-width:80vw;padding:0 20px;line-height:1.5" bis_skin_checked="1">Thanks for visiting Bloom Mist.<br>Your farm will be waiting for you.</div>
-  <div class="mbtn primary" id="fwBack" style="width:auto;padding:12px 30px" bis_skin_checked="1">Return to Menu</div>
-</div>
+
 
 <div id="top" class="hud" bis_skin_checked="1">
   <div class="chip" bis_skin_checked="1" id="coinsChip">
@@ -698,7 +697,7 @@
   <div class="chip" bis_skin_checked="1" id="levelChip" style="display:flex;align-items:center;gap:8px;">
     <span class="ico">⭐</span>
     <div style="display:flex;flex-direction:column;min-width:0;line-height:1">
-      <span id="lvl">Lv 1</span>
+      <span id="lvl">Level 1</span>
       <span style="opacity:.9;margin-top:4px;font-size:12px;color:#ffd97a;font-weight:900">0/50 XP</span>
     </div>
   </div>
@@ -742,6 +741,14 @@
     <div class="tab" data-tab="upg" bis_skin_checked="1">Upgrades</div>
   </div>
   <div class="pbody" id="shopBody" bis_skin_checked="1"></div>
+</div>
+
+<!-- SELL RESULT MODAL -->
+<div id="sellModal" class="panel" bis_skin_checked="1" style="width:min(86vw,420px);">
+  <div class="phead" bis_skin_checked="1"><h2>Sale Summary</h2><div class="xbtn" data-close="sellModal" bis_skin_checked="1">✕</div></div>
+  <div class="pbody" id="sellModalBody" bis_skin_checked="1" style="display:flex;flex-direction:column;gap:12px;max-height:52vh;overflow:auto">
+    <!-- populated dynamically -->
+  </div>
 </div>
 
 <!-- QUESTS -->
@@ -850,7 +857,7 @@
   <div class="phead" bis_skin_checked="1"><h2>✨ Credits</h2><div class="xbtn" data-close="credits" bis_skin_checked="1">✕</div></div>
   <div class="pbody" style="text-align:center;line-height:1.7" bis_skin_checked="1">
     <div style="font-size:44px;margin:8px 0" bis_skin_checked="1">🌻</div>
-    <div class="nm" style="font-size:19px" bis_skin_checked="1">Bloom Mist</div>
+    <div class="nm" style="font-size:19px" bis_skin_checked="1">FarmUp</div>
     <div class="ds" style="font-size:13px;margin-bottom:14px" bis_skin_checked="1">Version 1.1 — Definitive Edition</div>
     <div style="font-size:13px;opacity:.9" bis_skin_checked="1">A cozy voxel farming world.<br>Design · Code · Art · Music<br><br>Plant. Water. Harvest. Relax.<br><br>Thank you for playing!</div>
   </div>
@@ -923,7 +930,7 @@ const S = {
   seeds:{carrot:3}, harvested:{},
   tool:'carrot', // seed key or 'water'
   water:8, waterCap:8,
-  upg:{sprinkler:0, fert:0, goldcan:0, plots:0, lights:0, auto_seed:4, auto_seed_enabled:true, _lastPlantTime:0},
+  upg:{sprinkler:0, fert:0, goldcan:0, plots:0, lights:0, auto_seed:0, auto_seed_enabled:false, _lastPlantTime:0},
   quest:0, qprog:0,
   tiles:[], // filled below
   season:'spring',
@@ -1685,8 +1692,23 @@ function updateDayNight(dt){
   skyMat.uniforms.top.value.copy(k.top); skyMat.uniforms.hor.value.copy(k.hor);
   let fogCol=k.hor.clone(); if(rainT>0)fogCol.lerp(new THREE.Color('#6a7686'),0.5*rainInt);
   scene.fog.color.copy(fogCol);
-  sun.color.copy(k.sun); sun.intensity=Math.max(0.1,k.int*(rainT>0?0.5:1));
-  hemi.color.copy(k.hemi); hemi.groundColor.copy(k.hg); hemi.intensity=k.amb*(rainT>0?0.7:1);
+
+  // desaturate & clamp sunlight to reduce overall scene saturation and avoid harsh color/brightness spikes
+  // take the configured sun color, nudge it slightly toward a neutral warm tone, and cap intensity
+  const sunCol = new THREE.Color(k.sun);
+  // lerp a small amount toward a neutral warm base to lower saturation without changing hue dramatically
+  sunCol.lerp(new THREE.Color('#e6dacb'), 0.22);
+  sun.color.copy(sunCol);
+  // clamp intensity so it can't spike when presets toggle; apply rain dimming factor
+  const rainDim = rainT>0 ? 0.55 : 1.0;
+  sun.intensity = Math.max(0.25, Math.min(1.6, k.int)) * rainDim;
+
+  // slightly reduce hemisphere saturation as well for better midtone balance
+  const hemiTop = new THREE.Color(k.hemi).lerp(new THREE.Color('#cfc8bd'), 0.18);
+  const hemiGround = new THREE.Color(k.hg).lerp(new THREE.Color('#6b7368'), 0.12);
+  hemi.color.copy(hemiTop); hemi.groundColor.copy(hemiGround);
+  hemi.intensity = k.amb*(rainT>0?0.7:1);
+
   // wico
   document.getElementById('wico').textContent = sunHeight>0.1 ? '☀️' : (sunHeight>-0.15 ? '🌇' : '🌙');
   // keep the label and number on separate lines: label remains 'Day', number is updated separately
@@ -1840,9 +1862,38 @@ function waterSplash(x,z){
   for(let i=0;i<7;i++){const a=Math.random()*6.28;spawnParticle(x,0.5,z,Math.cos(a)*1.5,2+Math.random()*2,Math.sin(a)*1.5,'#8fe0ee',0.12,0.5,-11);}
 }
 function tryCut(t){
+  // Tutorial guard: if tutorial is active and the player hasn't completed the "water" step yet,
+  // redirect them to the pond: rotate camera to pond, select Watering Can and ask them to refill first.
   if(!t.unlocked){toast('🔒 Locked plot');return;}
   if(!t.crop){toast('✂️ Nothing to harvest here');return;}
   if(t.prog<1){toast('🌱 Not ready — let it grow');return;}
+
+  // If tutorial running and the player hasn't reached the harvest step, require a refill sequence before harvest.
+  if(typeof tutorialActive !== 'undefined' && tutorialActive && typeof tut !== 'undefined' && tut < 3){
+    // compute pond coordinates used elsewhere (HALF+4, HALF+4). Center camera target on pond and nudge camera orientation.
+    const px = HALF + 4;
+    const pz = HALF + 4;
+    // set camera target to pond so camera smoothly recenters next update
+    camTarget.set(px, 0, pz);
+    // compute yaw/pitch to look at pond from current cam distance
+    const dir = new THREE.Vector3();
+    dir.subVectors(camera.position, camTarget).normalize();
+    // derive yaw/pitch from direction
+    camYaw = Math.atan2(Math.sign(dir.x||1)*Math.abs(dir.x), Math.sign(dir.z||1)*Math.abs(dir.z));
+    camPitch = THREE.MathUtils.clamp(Math.acos(THREE.MathUtils.clamp(dir.y, -1, 1)), 0.55, 1.35);
+    camDistTarget = 18; // zoom a bit toward pond for clarity
+    // force Watering Can selected and refresh UI
+    S.tool = 'water';
+    refreshHotbar();
+    // set a small tutorial flag so refillCan knows to advance the tutorial on completion
+    window._tutorialAwaitRefill = true;
+    toast('🔁 Tutorial: select the Watering Can and tap the pond to refill the can');
+    sfx('click');
+    // do not perform harvest now
+    return;
+  }
+
+  // normal harvest flow
   harvest(t);
   advanceTutorial('selcut');
 }
@@ -1891,6 +1942,16 @@ function refillCan(){
   updateWaterMeterUI(); sfx('water');
   waterSplash(HALF+4,HALF+4);
 
+  // Tutorial hook: if tutorial expected a refill, advance it when the player refills the pond
+  if(window._tutorialAwaitRefill){
+    // clear the tutorial awaiting flag and advance tutorial's "water" step
+    window._tutorialAwaitRefill = false;
+    // ensure we progress the tutorial step for watering
+    try{ advanceTutorial('water'); }catch(e){}
+    // small confirm toast for tutorial clarity
+    toast('✅ Refilled — now continue to harvest when ready');
+  }
+
   // playful bonus: small chance to find coins or rare tidbit in the pond
   if(Math.random() < 0.20){
     const bonus = 5 + Math.floor(Math.random()*11); // 5-15 coins
@@ -1900,7 +1961,8 @@ function refillCan(){
     sfx('coin');
     toast('💧 Refilled! You found '+bonus+'🪙 in the pond!');
   } else {
-    toast('💧 Watering can refilled');
+    // only show generic refill toast if tutorial didn't already show a confirm
+    if(!window._tutorialAwaitRefill) toast('💧 Watering can refilled');
   }
 }
 
@@ -1971,19 +2033,52 @@ function fish(){
 }
 function sellAll(){
   let total=0,items=0;
-  for(const k in S.harvested){const n=S.harvested[k];if(n>0){total+=Math.round(n*CROPS[k].sell*SELL_PENALTY);items+=n;}}
+  const detailLines=[];
+  for(const k in S.harvested){
+    const n = S.harvested[k] || 0;
+    if(n>0){
+      const each = Math.round(CROPS[k].sell*SELL_PENALTY);
+      const sub = n*each;
+      total += sub;
+      items += n;
+      detailLines.push({key:k,name:CROPS[k].name,em:CROPS[k].em,qty:n,each:each,subtotal:sub});
+    }
+  }
   if(items===0){toast('Nothing to sell');return;}
+  // clear harvested after computing details
   S.harvested={};
   gainCoins(total); progressQuest('earn',total);
-  // award XP based on earnings
   gainXP(Math.floor(total/10));
-  // autosave after selling all
   try{ saveGame(true); }catch(e){}
-  toast('💰 Sold '+items+' crops for '+total+' coins!');
-  // coin jingle staggered
+  // Coin jingle
   for(let i=0;i<Math.min(6,items);i++)setTimeout(()=>sfx('coin'),i*70);
   renderShop(true); updateShopBadge();
   advanceTutorial('sell');
+
+  // show modal with sale summary
+  const body = document.getElementById('sellModalBody');
+  if(body){
+    body.innerHTML = '';
+    const header = document.createElement('div'); header.style.display='flex'; header.style.justifyContent='space-between'; header.style.alignItems='center';
+    header.innerHTML = `<div style="font-weight:900">You sold ${items} item${items>1?'s':''}</div><div style="color:#ffd97a;font-weight:900">${total} 🪙</div>`;
+    body.appendChild(header);
+    const list = document.createElement('div'); list.style.display='flex'; list.style.flexDirection='column'; list.style.gap='8px'; list.style.marginTop='8px';
+    detailLines.forEach(d=>{
+      const row = document.createElement('div');
+      row.style.display='flex'; row.style.justifyContent='space-between'; row.style.alignItems='center'; row.style.padding='8px'; row.style.borderRadius='10px';
+      row.style.background='rgba(255,255,255,0.02)'; row.innerHTML = `<div style="display:flex;gap:8px;align-items:center"><div style="font-size:20px">${d.em}</div><div style="min-width:0"><div style="font-weight:800">${d.name} ×${d.qty}</div><div style="font-size:12px;opacity:.8">${d.each}🪙 each</div></div></div><div style="font-weight:900;color:#ffd97a">${d.subtotal}🪙</div>`;
+      list.appendChild(row);
+    });
+    body.appendChild(list);
+    const btnWrap = document.createElement('div'); btnWrap.style.display='flex'; btnWrap.style.justifyContent='center'; btnWrap.style.marginTop='12px';
+    const ok = document.createElement('div'); ok.className='buy gold'; ok.textContent='Close'; ok.style.width='120px'; ok.style.textAlign='center';
+    ok.onclick = ()=>{ panel('sellModal',false); sfx('click'); };
+    btnWrap.appendChild(ok);
+    body.appendChild(btnWrap);
+    panel('sellModal', true);
+  } else {
+    toast('💰 Sold '+items+' crops for '+total+' coins!');
+  }
 }
 function gainCoins(n){S.coins+=n;S.totalEarned+=n;updateCoinsUI();}
 function gainXP(n){
@@ -2050,7 +2145,7 @@ function updateCoinsUI(){
 function updateLevelUI(){
   const el = document.getElementById('levelChip');
   if(!el) return;
-  el.innerHTML = `<span class="ico">⭐</span><div style="display:flex;flex-direction:column;min-width:0;line-height:1"><span id="lvl">Lv ${S.level}</span><span style="opacity:.9;margin-top:4px;font-size:12px;color:#ffd97a;font-weight:900">${S.xp}/${50*S.level} XP</span></div>`;
+  el.innerHTML = `<span class="ico">⭐</span><div style="display:flex;flex-direction:column;min-width:0;line-height:1"><span id="lvl">Level ${S.level}</span><span style="opacity:.9;margin-top:4px;font-size:12px;color:#ffd97a;font-weight:900">${S.xp}/${50*S.level} XP</span></div>`;
 }
 
 // ---------- quests ----------
@@ -2242,6 +2337,8 @@ function renderShop(skipAnim=false){
     }
     const prevScroll = b.scrollTop;
     b.innerHTML = h;
+    // position persistent Sell tab arrow for non-tutorial guidance
+    try{ if(window.showSellArrow) window.showSellArrow(); }catch(e){}
     // trigger enter animation class for the new content only when animations are allowed
     try{
       if(!skipAnim){
@@ -2274,16 +2371,42 @@ document.getElementById('shopBody').addEventListener('click',e=>{
   const sellEl = e.target.closest('[data-sell]');
   if(sellEl){
     const k = sellEl.dataset.sell; const n = S.harvested[k]||0;
+    try{ const btn = sellEl.querySelector('.buy'); if(btn) buyPop(btn); }catch(e){}
     if(n>0){
       const v = Math.round(n*CROPS[k].sell*SELL_PENALTY);
+      // clear and apply
       S.harvested[k]=0; gainCoins(v); sfx('coin'); progressQuest('earn',v);
       try{ saveGame(true); }catch(e){}
       renderShop(); updateShopBadge(); advanceTutorial('sell');
+      // show the sell modal for single-item sale
+      const body = document.getElementById('sellModalBody');
+      if(body){
+        body.innerHTML = '';
+        const header = document.createElement('div'); header.style.display='flex'; header.style.justifyContent='space-between'; header.style.alignItems='center';
+        header.innerHTML = `<div style="font-weight:900">You sold ${n} × ${CROPS[k].name}</div><div style="color:#ffd97a;font-weight:900">${v} 🪙</div>`;
+        body.appendChild(header);
+        const row = document.createElement('div');
+        row.style.display='flex'; row.style.justifyContent='space-between'; row.style.alignItems='center'; row.style.padding='10px'; row.style.marginTop='8px';
+        row.style.borderRadius='10px'; row.style.background='rgba(255,255,255,0.02)';
+        row.innerHTML = `<div style="display:flex;gap:12px;align-items:center"><div style="font-size:28px">${CROPS[k].em}</div><div style="min-width:0"><div style="font-weight:800">${CROPS[k].name}</div><div style="font-size:12px;opacity:.8">${Math.round(CROPS[k].sell*SELL_PENALTY)}🪙 each</div></div></div><div style="font-weight:900;color:#ffd97a">${v}🪙</div>`;
+        body.appendChild(row);
+        const btnWrap = document.createElement('div'); btnWrap.style.display='flex'; btnWrap.style.justifyContent='center'; btnWrap.style.marginTop='12px';
+        const ok = document.createElement('div'); ok.className='buy gold'; ok.textContent='Close'; ok.style.width='120px'; ok.style.textAlign='center';
+        ok.onclick = ()=>{ panel('sellModal',false); sfx('click'); };
+        btnWrap.appendChild(ok);
+        body.appendChild(btnWrap);
+        panel('sellModal', true);
+      } else {
+        toast('Sold '+n+' '+CROPS[k].name+' for '+v+' coins');
+      }
     }
     return;
   }
 
-  if(e.target.id==='sellAllBtn'){ sellAll(); return; }
+  if(e.target.id==='sellAllBtn'){
+    try{ const btn = document.getElementById('sellAllBtn'); if(btn) buyPop(btn); }catch(e){}
+    sellAll(); return;
+  }
 
   // handle on/off toggles for upgrades (e.g., Seed Bot enable/disable)
   const tog = e.target.closest('[data-toggle]');
@@ -2358,6 +2481,10 @@ function showUpgradePrompt(key, price){
 document.querySelectorAll('#shop .tab').forEach(tab=>tab.addEventListener('click',()=>{
   document.querySelectorAll('#shop .tab').forEach(t=>t.classList.remove('on'));tab.classList.add('on');
   shopTab=tab.dataset.tab;sfx('click');renderShop();updateShopBadge();
+  // hide the persistent Sell arrow when the Sell tab is explicitly clicked
+  try{ const sellArrow = document.getElementById('sellTabArrow'); if(sellArrow) sellArrow.style.opacity = '0'; }catch(e){}
+  // permanently suppress the sell arrow from appearing outside of the tutorial after user opens Sell
+  try{ window._sellArrowSuppressed = true; }catch(e){}
 }));
 function buyPop(el){el.animate([{transform:'scale(1)'},{transform:'scale(1.25)'},{transform:'scale(1)'}],{duration:250});}
 function updateShopBadge(){
@@ -2623,7 +2750,15 @@ function hoverAt(x,y){
 }
 canvas.addEventListener('pointerdown',e=>{
   ptrDown=true;dragged=false;downX=lastX=e.clientX;downY=lastY=e.clientY;downT=performance.now();
-  canvas.setPointerCapture(e.pointerId);
+  // Guard pointer capture: only call if pointerId exists and the API is supported; swallow errors to avoid InvalidStateError
+  try{
+    if(e.pointerId != null && typeof canvas.setPointerCapture === 'function'){
+      canvas.setPointerCapture(e.pointerId);
+    }
+  }catch(err){
+    // Some platforms/browsers may reject setPointerCapture if the pointer isn't eligible; ignore to keep input responsive.
+    // console.debug('setPointerCapture skipped:', err);
+  }
 },{passive:false});
 canvas.addEventListener('pointermove',e=>{
   // Always update hover for mouse (desktop) so moving the cursor highlights/selects tiles even while holding the pointer.
@@ -2672,10 +2807,31 @@ canvas.addEventListener('pointerup',e=>{
     }, 0);
   }
 },{passive:false});
-canvas.addEventListener('wheel',e=>{e.preventDefault();camDistTarget=THREE.MathUtils.clamp(camDistTarget+e.deltaY*0.02,15,40);},{passive:false});
+canvas.addEventListener('wheel', e => {
+  // Block page/game zoom via mouse wheel to keep app fixed; still prevent default to avoid scroll/gesture
+  e.preventDefault();
+  // intentionally do NOT change camDistTarget (zoom disabled)
+}, { passive: false });
 // pinch
-canvas.addEventListener('touchstart',e=>{if(e.touches.length===2){pinchDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);}},{passive:false});
-canvas.addEventListener('touchmove',e=>{if(e.touches.length===2){e.preventDefault();const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);camDistTarget=THREE.MathUtils.clamp(camDistTarget-(d-pinchDist)*0.05,15,40);pinchDist=d;dragged=true;}},{passive:false});
+canvas.addEventListener('touchstart', e => {
+  // Prevent pinch-to-zoom gestures from affecting camera; track touches without enabling zoom
+  // Keep pointer handling disabled for multi-touch to avoid accidental gestures
+  if (e.touches && e.touches.length >= 2) {
+    // consume gesture but do not compute pinch distance for zoom
+    pinchDist = 0;
+    e.preventDefault();
+  }
+}, { passive: false });
+canvas.addEventListener('touchmove', e => {
+  // Disable pinch-to-zoom: consume multi-touch move events but do not change camera distance
+  if (e.touches && e.touches.length >= 2) {
+    e.preventDefault();
+    // keep drag state to prevent accidental pointer interactions but do not modify camDistTarget
+    dragged = true;
+    return;
+  }
+  // single-touch behavior is still handled in pointer events; nothing else required here
+}, { passive: false });
 function handleTap(x,y){
   const h=pickTile(x,y);
   if(!h) return;
@@ -2840,6 +2996,8 @@ function openMenu(){
     inMenu = true;
     // disable canvas pointer interactions while the menu is active so UI buttons work reliably
     setCanvasPointer(false);
+    // ensure gfx UI matches the current applied preset when menu opens
+    try{ if(typeof reflectGfxButtonState === 'function') reflectGfxButtonState(S.graphics || 'med'); }catch(e){}
     // focus primary play button if present (small accessibility nicety)
     try{ document.getElementById('mPlay')?.focus(); }catch(e){}
   }
@@ -2929,37 +3087,204 @@ function updateHintText(){
 // add subtle pulsing/highlight to relevant UI elements based on current tutorial step
 function updateHintUI(){
   clearTutorialUI();
+  // ensure the tutorial arrow element exists (create once)
+  if(!document.getElementById('tutorialArrow')){
+    const a = document.createElement('div');
+    a.id = 'tutorialArrow';
+    a.style.position = 'fixed';
+    a.style.zIndex = 1500;
+    a.style.pointerEvents = 'none';
+    a.style.width = '44px';
+    a.style.height = '44px';
+    a.style.transition = 'transform .22s cubic-bezier(.2,.9,.2,1),opacity .22s';
+    a.style.opacity = '0';
+    // use user's pixel-art arrow SVG (kept at original pixel detail but scaled by the container)
+    a.innerHTML = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="44" height="44" shape-rendering="crispEdges">
+  <path fill="#2A1605" d="M13 2h2v1h-2Z M12 3h1v1h-1Z M17 3h1v1h-1Z M11 4h1v1h-1Z M18 4h1v1h-1Z M10 5h1v1h-1Z M19 5h1v1h-1Z M9 6h1v1h-1Z M20 6h1v1h-1Z M8 7h1v1h-1Z M21 7h1v1h-1Z M7 8h1v1h-1Z M22 8h1v1h-1Z M6 9h1v1h-1Z M23 9h1v1h-1Z M5 10h1v1h-1Z M24 10h1v1h-1Z M4 11h1v1h-1Z M25 11h1v1h-1Z M3 12h1v1h-1Z M26 12h1v1h-1Z M3 13h1v1h-1Z M26 13h1v1h-1Z M3 14h1v1h-1Z M26 14h1v1h-1Z M3 15h7v1h-7Z M20 15h7v1h-7Z M9 16h1v1h-1Z M20 16h1v1h-1Z M9 17h1v1h-1Z M20 17h1v1h-1Z M9 18h1v1h-1Z M20 18h1v1h-1Z M9 19h1v1h-1Z M20 19h1v1h-1Z M9 20h1v1h-1Z M20 20h1v1h-1Z M9 21h1v1h-1Z M20 21h1v1h-1Z M9 22h1v1h-1Z M20 22h1v1h-1Z M9 23h12v1h-12Z" />
+  <path fill="#A65300" d="M15 3h2v1h-2Z M16 4h2v1h-2Z M17 5h2v1h-2Z M18 6h2v1h-2Z M19 7h2v1h-2Z M20 8h2v1h-2Z M21 9h2v1h-2Z M22 10h2v1h-2Z M23 11h2v1h-2Z M24 12h2v1h-2Z M4 13h6v1h-6Z M18 13h8v1h-8Z M4 14h6v1h-6Z M18 14h8v1h-8Z M18 15h2v1h-2Z M18 16h2v1h-2Z M18 17h2v1h-2Z M18 18h2v1h-2Z M18 19h2v1h-2Z M18 20h2v1h-2Z M10 21h10v1h-10Z M10 22h10v1h-10Z" />
+  <path fill="#E08E00" d="M15 4h1v1h-1Z M16 5h1v1h-1Z M17 6h1v1h-1Z M18 7h1v1h-1Z M19 8h1v1h-1Z M20 9h1v1h-1Z M21 10h1v1h-1Z M22 11h1v1h-1Z M6 12h4v1h-4Z M17 12h7v1h-7Z M17 13h1v1h-1Z M17 14h1v1h-1Z M17 15h1v1h-1Z M17 16h1v1h-1Z M17 17h1v1h-1Z M17 18h1v1h-1Z M17 19h1v1h-1Z M12 20h6v1h-6Z" />
+  <path fill="#FFC107" d="M14 4h1v1h-1Z M13 5h3v1h-3Z M12 6h5v1h-5Z M11 7h7v1h-7Z M10 8h9v1h-9Z M9 9h11v1h-11Z M8 10h13v1h-13Z M7 11h15v1h-15Z M10 12h7v1h-7Z M12 13h5v1h-5Z M12 14h5v1h-5Z M12 15h5v1h-5Z M12 16h5v1h-5Z M12 17h5v1h-5Z M12 18h5v1h-5Z M12 19h5v1h-5Z" />
+  <path fill="#FFF463" d="M13 3h2v1h-2Z M12 4h2v1h-2Z M11 5h2v1h-2Z M10 6h2v1h-2Z M9 7h2v1h-2Z M8 8h2v1h-2Z M7 9h2v1h-2Z M6 10h2v1h-2Z M5 11h2v1h-2Z M4 12h2v1h-2Z M10 13h2v1h-2Z M10 14h2v1h-2Z M10 15h2v1h-2Z M10 16h2v1h-2Z M10 17h2v1h-2Z M10 18h2v1h-2Z M10 19h2v1h-2Z M10 20h2v1h-2Z" />
+</svg>
+    `;
+    document.body.appendChild(a);
+
+    // add a gentle CSS keyframe-driven bounce + scale pulse via inline style sheet so it's self-contained
+    const styleId = 'tutorialArrowStyle';
+    if(!document.getElementById(styleId)){
+      const st = document.createElement('style');
+      st.id = styleId;
+      st.textContent = `
+        @keyframes tutBounce {
+          0% { transform: translateY(0) scale(0.98); }
+          40% { transform: translateY(-5px) scale(1.02); }
+          70% { transform: translateY(-2px) scale(1.01); }
+          100% { transform: translateY(0) scale(0.98); }
+        }
+        @keyframes tutPulse {
+          0% { filter: drop-shadow(0 3px 8px rgba(244,176,62,0.08)); }
+          50% { filter: drop-shadow(0 7px 16px rgba(244,176,62,0.14)); }
+          100% { filter: drop-shadow(0 3px 8px rgba(244,176,62,0.08)); }
+        }
+        #tutorialArrow { will-change: transform, opacity; width:44px; height:44px; }
+        #tutorialArrow.show { animation: tutBounce 1.4s ease-in-out infinite, tutPulse 1.6s ease-in-out infinite; opacity:1 !important; }
+      `;
+      document.head.appendChild(st);
+    }
+  }
+  const arrow = document.getElementById('tutorialArrow');
+  function showArrowFor(el, opts = {}) {
+    if(!el){ arrow.style.opacity='0'; return; }
+    const rect = el.getBoundingClientRect();
+    // default place above element pointing down; allow overrides
+    const place = opts.place || 'top';
+    // smaller offsets so the arrow sits closer to targets
+    const halfW = 22;
+    let x = rect.left + rect.width/2 - halfW;
+    let y = rect.top - (opts.ypad || 62);
+    let rot = 0;
+    if(place==='top'){ y = rect.top - (opts.ypad || 62); rot = 180; }
+    else if(place==='bottom'){ y = rect.bottom + (opts.ypad || 8); rot = 0; }
+    else if(place==='left'){ x = rect.left - (opts.xpad || 66); y = rect.top + rect.height/2 - halfW; rot = 90; }
+    else if(place==='right'){ x = rect.right + (opts.xpad || 8); y = rect.top + rect.height/2 - halfW; rot = -90; }
+    // clamp to viewport so arrow doesn't go offscreen
+    x = Math.max(6, Math.min(window.innerWidth - (halfW*2+6), x));
+    y = Math.max(6, Math.min(window.innerHeight - (halfW*2+6), y));
+    arrow.style.left = x + 'px';
+    arrow.style.top = y + 'px';
+    arrow.style.transform = `rotate(${rot}deg) scale(1)`;
+    arrow.style.opacity = '1';
+  }
+
   if(tut===0){
-    // highlight a seed slot (prefer the currently selected tool or carrot)
     const seedKey = S.tool && CROPS[S.tool] ? S.tool : 'carrot';
     const el = document.querySelector('#hotbar [data-tool="'+seedKey+'"]');
     if(el) el.classList.add('pulse');
-    // hint pointer
+    showArrowFor(el, {place:'top'});
   } else if(tut===1){
-    // highlight water tool
-    const el = document.querySelector('#hotbar [data-tool="water"]');
-    if(el) el.classList.add('pulse');
+    // If player already selected the Watering Can, do not show the tutorial arrow here.
+    // The arrow will reappear later at the Harvest step.
+    if(S.tool === 'water'){
+      // ensure arrow hidden and no pulse on the element
+      const el = document.querySelector('#hotbar [data-tool="water"]');
+      if(el) el.classList.remove('pulse');
+      showArrowFor(null);
+    } else {
+      const el = document.querySelector('#hotbar [data-tool="water"]');
+      if(el) el.classList.add('pulse');
+      showArrowFor(el, {place:'top'});
+    }
   } else if(tut===2){
-    // highlight farm area subtly by pulsing hint and water meter
-    const el = document.getElementById('watermeter');
-    if(el) el.classList.add('pulse');
+    // If the player already has the Watering Can selected, suppress the arrow at the watermeter step as well.
+    if(S.tool === 'water'){
+      const el = document.getElementById('watermeter');
+      if(el) el.classList.remove('pulse');
+      showArrowFor(null);
+    } else {
+      const el = document.getElementById('watermeter');
+      if(el) el.classList.add('pulse');
+      // point arrow directly at water meter from above
+      showArrowFor(el, {place:'top'});
+    }
   } else if(tut===3){
-    // highlight harvest tool
     const el = document.querySelector('#hotbar [data-tool="cut"]');
     if(el) el.classList.add('pulse');
+    showArrowFor(el, {place:'top'});
   } else if(tut===4){
-    // highlight shop button
-    const el = document.getElementById('shopBtn');
-    if(el) el.classList.add('pulse');
+    // Prefer to point at the Sell tab in the Shop if the panel exists, otherwise fall back to the shop button
+    const sellTabEl = document.querySelector('#shop .tab[data-tab="sell"]');
+    if(sellTabEl){
+      // ensure the shop is visible so the tab is in view; if not visible, point at the Shop button to guide opening it
+      const shopPanel = document.getElementById('shop');
+      const shopBtn = document.getElementById('shopBtn');
+      if(shopPanel && shopPanel.classList && shopPanel.classList.contains('on')){
+        // shop is open: point directly at Sell tab (place arrow slightly above the tab)
+        sellTabEl.classList.add('pulse');
+        showArrowFor(sellTabEl, {place:'top', ypad: 38});
+      } else {
+        // shop not open: point at Shop button to instruct the player to open the market first
+        if(shopBtn) shopBtn.classList.add('pulse');
+        showArrowFor(shopBtn, {place:'left', xpad: 46});
+      }
+    } else {
+      // fallback to shop button if Sell tab element isn't present yet
+      const el = document.getElementById('shopBtn');
+      if(el) el.classList.add('pulse');
+      showArrowFor(el, {place:'left', xpad: 46});
+    }
+  } else {
+    // hide arrow on completion or unknown step
+    if(arrow) arrow.style.opacity='0';
   }
 }
-// remove pulses
+ // remove pulses
 function clearTutorialUI(){
   // remove tutorial-driven pulse class from all elements (keeps unrelated visual styles intact)
   document.querySelectorAll('.pulse').forEach(el=>{
     el.classList.remove('pulse');
   });
+  // hide and reset tutorial arrow if present
+  try{
+    const arrow = document.getElementById('tutorialArrow');
+    if(arrow){ arrow.style.opacity = '0'; arrow.style.transform = 'scale(0.9)'; }
+  }catch(e){}
 }
+
+/* Persistent Sell-tab arrow (visible even when not in tutorial) */
+/* Creates a small arrow element and exposes showSellArrow() to position it atop the Sell tab or fallback Shop button. */
+(function createSellTabArrow(){
+  if(document.getElementById('sellTabArrow')) return;
+  const a = document.createElement('div');
+  a.id = 'sellTabArrow';
+  a.style.position = 'fixed';
+  a.style.zIndex = 1500;
+  a.style.pointerEvents = 'none';
+  a.style.width = '44px';
+  a.style.height = '44px';
+  a.style.transition = 'transform .22s cubic-bezier(.2,.9,.2,1),opacity .22s';
+  a.style.opacity = '0';
+  a.innerHTML = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="44" height="44" shape-rendering="crispEdges">
+  <path fill="#2A1605" d="M13 2h2v1h-2Z M12 3h1v1h-1Z M17 3h1v1h-1Z M11 4h1v1h-1Z M18 4h1v1h-1Z M10 5h1v1h-1Z M19 5h1v1h-1Z M9 6h1v1h-1Z M20 6h1v1h-1Z M8 7h1v1h-1Z M21 7h1v1h-1Z M7 8h1v1h-1Z M22 8h1v1h-1Z M6 9h1v1h-1Z M23 9h1v1h-1Z M5 10h1v1h-1Z M24 10h1v1h-1Z M4 11h1v1h-1Z M25 11h1v1h-1Z M3 12h1v1h-1Z M26 12h1v1h-1Z M3 13h1v1h-1Z M26 13h1v1h-1Z M3 14h1v1h-1Z M26 14h1v1h-1Z M3 15h7v1h-7Z M20 15h7v1h-7Z M9 16h1v1h-1Z M20 16h1v1h-1Z M9 17h1v1h-1Z M20 17h1v1h-1Z M9 18h1v1h-1Z M20 18h1v1h-1Z M9 19h1v1h-1Z M20 19h1v1h-1Z M9 20h1v1h-1Z M20 20h1v1h-1Z M9 21h1v1h-1Z M20 21h1v1h-1Z M9 22h1v1h-1Z M20 22h1v1h-1Z M9 23h12v1h-12Z" />
+  <path fill="#A65300" d="M15 3h2v1h-2Z M16 4h2v1h-2Z M17 5h2v1h-2Z M18 6h2v1h-2Z M19 7h2v1h-2Z M20 8h2v1h-2Z M21 9h2v1h-2Z M22 10h2v1h-2Z M23 11h2v1h-2Z M24 12h2v1h-2Z M4 13h6v1h-6Z M18 13h8v1h-8Z M4 14h6v1h-6Z M18 14h8v1h-8Z M18 15h2v1h-2Z M18 16h2v1h-2Z M18 17h2v1h-2Z M18 18h2v1h-2Z M18 19h2v1h-2Z M18 20h2v1h-2Z M10 21h10v1h-10Z M10 22h10v1h-10Z" />
+  <path fill="#E08E00" d="M15 4h1v1h-1Z M16 5h1v1h-1Z M17 6h1v1h-1Z M18 7h1v1h-1Z M19 8h1v1h-1Z M20 9h1v1h-1Z M21 10h1v1h-1Z M22 11h1v1h-1Z M6 12h4v1h-4Z M17 12h7v1h-7Z M17 13h1v1h-1Z M17 14h1v1h-1Z M17 15h1v1h-1Z M17 16h1v1h-1Z M17 17h1v1h-1Z M17 18h1v1h-1Z M17 19h1v1h-1Z M12 20h6v1h-6Z" />
+  <path fill="#FFC107" d="M14 4h1v1h-1Z M13 5h3v1h-3Z M12 6h5v1h-5Z M11 7h7v1h-7Z M10 8h9v1h-9Z M9 9h11v1h-11Z M8 10h13v1h-13Z M7 11h15v1h-15Z M10 12h7v1h-7Z M12 13h5v1h-5Z M12 14h5v1h-5Z M12 15h5v1h-5Z M12 16h5v1h-5Z M12 17h5v1h-5Z M12 18h5v1h-5Z M12 19h5v1h-5Z" />
+  <path fill="#FFF463" d="M13 3h2v1h-2Z M12 4h2v1h-2Z M11 5h2v1h-2Z M10 6h2v1h-2Z M9 7h2v1h-2Z M8 8h2v1h-2Z M7 9h2v1h-2Z M6 10h2v1h-2Z M5 11h2v1h-2Z M4 12h2v1h-2Z M10 13h2v1h-2Z M10 14h2v1h-2Z M10 15h2v1h-2Z M10 16h2v1h-2Z M10 17h2v1h-2Z M10 18h2v1h-2Z M10 19h2v1h-2Z M10 20h2v1h-2Z" />
+</svg>
+  `;
+  document.body.appendChild(a);
+
+  window.showSellArrow = function(){
+    // Only show sell arrow while the tutorial is actively guiding the player.
+    // If the user explicitly opened the Sell tab, permanently suppress the arrow.
+    try{
+      if(window._sellArrowSuppressed) { a.style.opacity = '0'; return; }
+      if(typeof tutorialActive === 'undefined' || !tutorialActive){ a.style.opacity = '0'; return; }
+    }catch(e){
+      a.style.opacity = '0'; return;
+    }
+    const el = document.querySelector('#shop .tab[data-tab="sell"]') || document.getElementById('shopBtn');
+    if(!el) { a.style.opacity='0'; return; }
+    const rect = el.getBoundingClientRect();
+    const halfW = 22;
+    // default place to the left of the target so it's visually close to the tab/button
+    let x = rect.left - (halfW + 8);
+    let y = rect.top + rect.height/2 - halfW;
+    // clamp to viewport
+    x = Math.max(6, Math.min(window.innerWidth - (halfW*2+6), x));
+    y = Math.max(6, Math.min(window.innerHeight - (halfW*2+6), y));
+    a.style.left = x + 'px';
+    a.style.top = y + 'px';
+    a.style.transform = 'rotate(90deg)';
+    a.style.opacity = '1';
+  };
+
+  // hide arrow when panels/menu hide or on small screens if necessary
+  window.addEventListener('resize', ()=>{ try{ if(window.showSellArrow) window.showSellArrow(); }catch(e){} });
+  // attempt initial placement
+  setTimeout(()=>{ try{ if(window.showSellArrow) window.showSellArrow(); }catch(e){} }, 300);
+})();
 
 function advanceTutorial(ev){
   // robust tutorial progression:
@@ -3101,12 +3426,21 @@ function detectGraphicsQuality(){
 }
 
 function applyGraphicsQuality(level){
-  // clearer per-mode properties and a robust shadow enable/disable path to avoid intermittent shadow bugs
+  // Prevent duplicate/competing updates: if we've already locked & applied this exact preset, exit early.
+  // This stops background detection or duplicate init code from briefly switching presets.
+  if(window._gfxLocked && window._gfxLockedLevel === level){
+    // already applied and locked; keep it
+    return;
+  }
+  // mark chosen preset in state immediately and lock it to prevent any later auto-detection from overriding
   S.graphics = level;
+  window._gfxLocked = true;
+  window._gfxLockedLevel = level;
+
   try{
     const now = new Date();
     // respect whether this change was triggered by a user action (window._gfxUserSet)
-    const userLocked = !!window._gfxUserSet;
+    const userLocked = !!window._gfxUserSet || true; // we persist the chosen preset as locked to ensure consistency
     localStorage.setItem('bloom_gfx', JSON.stringify({
       level: level,
       dateISO: now.toISOString(),
@@ -3141,7 +3475,7 @@ function applyGraphicsQuality(level){
       antialias: true,
       shadows: true,
       shadowMapSize: 1024,
-      bloomStrength: 0.35,
+      bloomStrength: 0.28,
       toneMapping: 'ACESFilmic',
       particles: 45,
       rain: 80,
@@ -3154,36 +3488,40 @@ function applyGraphicsQuality(level){
       cropUpdateFraction: 1.0
     },
     high: {
-      pixelRatio: Math.min(2.0, devicePixelRatio || 1.5),
+      pixelRatio: Math.min(1.6, devicePixelRatio || 1.5),
       antialias: true,
       shadows: true,
-      shadowMapSize: 4096,
-      bloomStrength: 0.55,
+      // cap shadow map size to avoid huge textures that cause spikes
+      shadowMapSize: 2048,
+      // slightly reduce bloom to avoid oversaturation and shimmer
+      bloomStrength: 0.36,
       toneMapping: 'ACESFilmic',
-      particles: 80,
-      rain: 140,
-      flies: 25,
+      particles: 64,
+      rain: 120,
+      flies: 20,
       flowers: 42,
       treeLeaves: true,
-      bloombyteShards: 12,
+      bloombyteShards: 10,
       swayFactor: 1.0,
       geomQuality: 'high',
       cropUpdateFraction: 1.0
     },
     epic: {
-      pixelRatio: Math.min(3.0, devicePixelRatio || 2.0),
+      pixelRatio: Math.min(2.0, devicePixelRatio || 1.75),
       antialias: true,
       shadows: true,
-      shadowMapSize: 8192,
-      bloomStrength: 0.45,
+      // keep a practical upper bound for shadow maps to preserve stability on varied hardware
+      shadowMapSize: 4096,
+      // moderate bloom to avoid oversaturation
+      bloomStrength: 0.30,
       toneMapping: 'ACESFilmic',
-      particles: 200,
-      rain: 300,
-      flies: 60,
-      flowers: 96,
+      particles: 120,
+      rain: 220,
+      flies: 40,
+      flowers: 80,
       treeLeaves: true,
-      bloombyteShards: 20,
-      swayFactor: 1.2,
+      bloombyteShards: 14,
+      swayFactor: 1.1,
       geomQuality: 'ultra',
       cropUpdateFraction: 1.0
     }
@@ -3191,8 +3529,60 @@ function applyGraphicsQuality(level){
 
   const p = PRESETS[level] || PRESETS.med;
 
-  // Pixel ratio & antialias preference
-  try{ renderer.setPixelRatio(p.pixelRatio); renderer.antialias = !!p.antialias; }catch(e){}
+  // Helper: fully recreate renderer if antialias or major backend flags need to change,
+  // because some context attributes (like antialias) can't be toggled on an existing WebGL context.
+  function recreateRendererIfNeeded(opts){
+    try{
+      const needAA = !!opts.antialias;
+      // detect current antialias state from renderer.capabilities (best-effort)
+      const curAA = !!(renderer && renderer.getContext && renderer.getContext().getContextAttributes && renderer.getContext().getContextAttributes().antialias);
+      const needRecreate = (curAA !== needAA);
+      if(!needRecreate) {
+        // still update pixelRatio if changed
+        renderer.setPixelRatio(opts.pixelRatio);
+        return;
+      }
+      // store previous canvas and size, dispose old renderer resources cleanly
+      const oldCanvas = renderer.domElement;
+      const w = oldCanvas.width; const h = oldCanvas.height;
+      try{
+        renderer.dispose();
+      }catch(e){}
+      // create a new renderer with desired antialias setting
+      const newR = new THREE.WebGLRenderer({
+        canvas: oldCanvas,
+        antialias: needAA,
+        powerPreference: isMobile ? 'low-power' : 'high-performance',
+        preserveDrawingBuffer: false,
+      });
+      // copy key renderer config used elsewhere
+      newR.setPixelRatio(opts.pixelRatio);
+      newR.setSize(window.innerWidth, window.innerHeight);
+      newR.outputColorSpace = THREE.SRGBColorSpace;
+      newR.toneMapping = renderer.toneMapping || THREE.ACESFilmicToneMapping;
+      newR.toneMappingExposure = renderer.toneMappingExposure || 1.02;
+      newR.shadowMap.enabled = !!opts.shadows;
+      newR.shadowMap.type = opts.shadows ? THREE.PCFSoftShadowMap : THREE.NoShadowMap;
+      // replace global renderer reference so the rest of the code continues to use it
+      window.renderer = newR;
+      renderer = newR;
+      // rebuild composer to bind to the new renderer properly
+      if(composer){
+        try{ composer.dispose(); }catch(e){}
+        composer = new EffectComposer(renderer);
+        composer.addPass(new RenderPass(scene,camera));
+        const bloom = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), p.bloomStrength || 0.0, 0.35, 0.85);
+        composer.addPass(bloom);
+        composer.addPass(new OutputPass());
+      }
+    }catch(err){
+      // fallback: just set pixel ratio and continue
+      try{ renderer.setPixelRatio(opts.pixelRatio); }catch(e){}
+    }
+  }
+
+  // Recreate renderer if antialias requirement changed; also set pixelRatio safely.
+  recreateRendererIfNeeded(p);
 
   // Tone mapping selection
   if(p.toneMapping === 'ACESFilmic'){ renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = (level==='high'||level==='epic')?1.05:1.02; }
@@ -3252,7 +3642,8 @@ function applyGraphicsQuality(level){
   // Lamps & glow configuration
   try{
     lamps.forEach(l=>{
-      l.visible = (S.upg.lights>0) && !!p.treeLeaves; // reuse treeLeaves flag for lit posts visibility
+      // Always show lamp posts when the player has purchased Farm Lights, regardless of graphics preset.
+      l.visible = (S.upg.lights > 0);
       const lt = l.userData.light;
       if(lt){
         lt.intensity = l.visible ? (level==='epic' ? 12.0 : (level==='high' ? 8.0 : 4.0)) : 0;
@@ -3261,7 +3652,10 @@ function applyGraphicsQuality(level){
         lt.needsUpdate = true;
       }
       const glow = l.userData.glow;
-      if(glow && glow.material){ glow.material.opacity = l.visible ? (level==='epic' ? 1.0 : 0.85) : 0.0; glow.material.needsUpdate = true; }
+      if(glow && glow.material){
+        glow.material.opacity = l.visible ? (level==='epic' ? 1.0 : 0.85) : 0.0;
+        glow.material.needsUpdate = true;
+      }
     });
   }catch(e){}
 
@@ -3273,15 +3667,23 @@ function applyGraphicsQuality(level){
 
   // Reflect UI state for buttons
   try{
-    const bLow = document.getElementById('gfxLowBtn');
-    const bMed = document.getElementById('gfxMedBtn');
-    const bHigh = document.getElementById('gfxHighBtn');
-    const bEpic = document.getElementById('gfxEpicBtn');
-    [bLow,bMed,bHigh,bEpic].forEach(b=>b && b.classList.remove('primary'));
-    if(level==='low' && bLow) bLow.classList.add('primary');
-    if(level==='med' && bMed) bMed.classList.add('primary');
-    if(level==='high' && bHigh) bHigh.classList.add('primary');
-    if(level==='epic' && bEpic) bEpic.classList.add('primary');
+    // Robustly update graphics preset buttons by querying DOM elements directly.
+    // This ensures the UI reflects the applied preset even if elements were not cached earlier.
+    const ids = ['gfxLowBtn','gfxMedBtn','gfxHighBtn','gfxEpicBtn'];
+    ids.forEach(id=>{
+      const el = document.getElementById(id);
+      if(el){
+        el.classList.remove('primary');
+        el.setAttribute('aria-pressed','false');
+      }
+    });
+    const map = { low:'gfxLowBtn', med:'gfxMedBtn', high:'gfxHighBtn', epic:'gfxEpicBtn' };
+    const chosenId = map[level] || 'gfxMedBtn';
+    const chosenEl = document.getElementById(chosenId);
+    if(chosenEl){
+      chosenEl.classList.add('primary');
+      chosenEl.setAttribute('aria-pressed','true');
+    }
   }catch(e){}
 
   // Force resize/update to propagate new settings immediately
@@ -3314,13 +3716,15 @@ try{
       const candidate = (parsed && parsed.level) ? parsed.level : savedRaw;
       const norm = normalizePresetKey(String(candidate));
       if(norm) S.graphics = norm;
-      // restore whether the user previously locked their choice (prevents future auto-adjust)
-      window._gfxUserSet = !!(parsed && parsed.userLocked);
+      // If there's a saved preset, treat it as the user's explicit choice and lock it so nothing auto-overrides it.
+      // This ensures a persisted choice is applied consistently and never downgraded by background heuristics.
+      window._gfxUserSet = true;
       S.graphicsSavedAt = (parsed && parsed.dateISO) ? parsed.dateISO : null;
     }catch(e){
       const norm = normalizePresetKey(String(savedRaw));
       if(norm) S.graphics = norm;
-      window._gfxUserSet = false;
+      // safest fallback: consider this a user choice as well so auto-detect won't override a present saved value
+      window._gfxUserSet = true;
       S.graphicsSavedAt = null;
     }
   } else {
@@ -3411,18 +3815,92 @@ try{
   });
 }catch(e){}
 
+/* helper: ensure graphics preset buttons reflect the active preset (resilient global helper) */
+function reflectGfxButtonState(level){
+  try{
+    const ids = ['gfxLowBtn','gfxMedBtn','gfxHighBtn','gfxEpicBtn'];
+    ids.forEach(id=>{
+      const el = document.getElementById(id);
+      if(el){
+        el.classList.remove('primary');
+        el.setAttribute('aria-pressed','false');
+      }
+    });
+    const map = { low:'gfxLowBtn', med:'gfxMedBtn', high:'gfxHighBtn', epic:'gfxEpicBtn' };
+    const chosenId = map[level] || 'gfxMedBtn';
+    const chosenEl = document.getElementById(chosenId);
+    if(chosenEl){
+      chosenEl.classList.add('primary');
+      chosenEl.setAttribute('aria-pressed','true');
+    }
+    // keep S.graphics normalized and persisted so UI and state stay in sync
+    if(level) S.graphics = level;
+    try{ localStorage.setItem('bloom_gfx', JSON.stringify({ level: level })); }catch(e){}
+  }catch(e){}
+}
+
 // ---------- keyboard ----------
 const keys={};
-addEventListener('keydown',e=>{keys[e.code]=performance.now();
-  if(e.code==='Space'){e.preventDefault();}
-  if(e.code.startsWith('Digit')){const n=+e.code.slice(5);const tools=[...CROPKEYS,'water','cut'];if(tools[n-1]){S.tool=tools[n-1];refreshHotbar();if(S.tool==='water')advanceTutorial('selwater');}}
-  if(e.code==='KeyE'){S.tool='water';refreshHotbar();advanceTutorial('selwater');}
-  if(e.code==='KeyC'){S.tool='cut';refreshHotbar();}
-  if(e.code==='Escape'){if(!inMenu)openMenu();}
+addEventListener('keydown', e => {
+  // block common browser/app zoom shortcuts (Ctrl/Cmd + +/-/=/scroll) to keep the app fixed
+  if ((e.ctrlKey || e.metaKey) && (e.code === 'Equal' || e.code === 'NumpadAdd' || e.code === 'Minus' || e.code === 'NumpadSubtract' || e.code === 'Digit0')) {
+    e.preventDefault();
+    return;
+  }
+  keys[e.code] = performance.now();
+  if (e.code === 'Space') { e.preventDefault(); }
+  if (e.code.startsWith('Digit')) {
+    const n = +e.code.slice(5);
+    const tools = [...CROPKEYS, 'water', 'cut'];
+    if (tools[n - 1]) { S.tool = tools[n - 1]; refreshHotbar(); if (S.tool === 'water') advanceTutorial('selwater'); }
+  }
+  if (e.code === 'KeyE') { S.tool = 'water'; refreshHotbar(); advanceTutorial('selwater'); }
+  if (e.code === 'KeyC') { S.tool = 'cut'; refreshHotbar(); }
+  if (e.code === 'Escape') { if (!inMenu) openMenu(); }
 });
 addEventListener('keyup',e=>{delete keys[e.code];});
 addEventListener('blur',()=>{for(const k in keys)delete keys[k];});
-document.addEventListener('visibilitychange',()=>{if(document.hidden)for(const k in keys)delete keys[k];});
+/* Keep the game running when the tab is hidden:
+   - clear input state on hide
+   - start a background interval that calls the main loop at a modest rate
+   - stop the interval when tab becomes visible again so rAF remains the primary driver
+*/
+let _bgTickerId = null;
+const _bgTickHz = 20; // background tick frequency (Hz) — modest to reduce CPU while keeping simulation progressing
+
+function startBackgroundTicker(){
+  if(_bgTickerId) return;
+  // When hidden, run a lightweight step loop on an interval instead of calling loop()
+  // (calling loop() from setInterval can create nested rAFs and lead to huge slowdowns).
+  _bgTickerId = setInterval(()=>{
+    try{ step(1/_bgTickHz, false); }catch(e){ /* swallow errors */ }
+  }, Math.round(1000 / _bgTickHz));
+}
+
+function stopBackgroundTicker(){
+  if(!_bgTickerId) return;
+  clearInterval(_bgTickerId);
+  _bgTickerId = null;
+}
+
+document.addEventListener('visibilitychange',()=>{
+  // clear transient key state on visibility changes to avoid stuck inputs
+  for(const k in keys) delete keys[k];
+
+  if(document.hidden){
+    // start background ticking when hidden so the game continues to simulate
+    startBackgroundTicker();
+    // resume audio context if it was suspended (best-effort)
+    try{ if(AC && AC.state === 'suspended') AC.resume(); }catch(e){}
+  } else {
+    // stop extra background ticks when visible so rAF drives the loop again
+    stopBackgroundTicker();
+    // refresh clock to avoid a large delta on next frame
+    try{ clock.getDelta(); }catch(e){}
+    // ensure audio resumes if needed
+    try{ if(AC && AC.state === 'suspended') AC.resume(); }catch(e){}
+  }
+});
 function updateKeys(dt){
   // Disable keyboard-driven camera translation/rotation:
   // We keep key bookkeeping for other shortcuts, but do not change camTarget or camYaw here.
@@ -3532,10 +4010,17 @@ function autoSeedTick(){
     // consume one seed and plant
     S.seeds[choice] = Math.max(0, (S.seeds[choice]||0) - 1);
     setCrop(tile, choice);
+
+    // Seed Bot now waters the newly planted tile so it can grow from rain or be treated as watered.
+    // This marks the tile as moist and flags it as wateredOnce (does not consume player's can).
+    tile.moist = Math.min(1, tile.moist + 1);
+    tile.wateredOnce = true;
+
     tile.prog = 0; tile.stage = 0; refreshCropStage(tile);
     burst(tile.x,0.6,tile.z,CROPS[choice].leaf,10,3.5,0.14);
-    floatText(tile.x,1.2,tile.z,'🤖 Planted '+CROPS[choice].em,'#9be27a');
+    floatText(tile.x,1.2,tile.z,'🤖 Planted & Watered '+CROPS[choice].em,'#9be27a');
     sfx('plant');
+    sfx('water');
     planted++;
   }
 
@@ -3576,9 +4061,68 @@ addEventListener('resize',resize);addEventListener('orientationchange',()=>setTi
 applyUnlocks();
 const _loaded = loadGame();
 
-// Ensure the graphics preset from the loaded save (or auto-detect fallback) is applied immediately
-// so the renderer and the settings UI always reflect the true, active preset (prevents Epic showing as Medium).
-try{ applyGraphicsQuality(S.graphics || 'med'); }catch(e){}
+// Insert first-night modal state flag if not present in save (persist it via S so it survives saves)
+if (typeof S._firstNightModalShown === 'undefined') S._firstNightModalShown = false;
+
+(function setupFirstNightModal(){
+  // create modal HTML and append to body (re-uses .panel styles)
+  const html = `
+    <div id="firstNightModal" class="panel" style="width:min(86vw,420px);">
+      <div class="phead"><h2>Illuminate your farm</h2><div class="xbtn" data-close="firstNightModal">✕</div></div>
+      <div class="pbody" style="display:flex;flex-direction:column;gap:12px;max-height:52vh;overflow:auto">
+        <div style="font-weight:800;font-size:15px">It's your first night — want to see the farm more clearly?</div>
+        <div style="opacity:.9">Farm Lights will place four lamp posts around your fields to brighten them at night. You can purchase it from the Market's Upgrades tab.</div>
+        <div style="display:flex;gap:8px;margin-top:6px">
+          <div class="buy gold" id="firstNightBuy" style="flex:1;text-align:center;padding:12px">Buy Upgrade</div>
+          <div class="buy" id="firstNightClose" style="flex:1;text-align:center;padding:12px">Close</div>
+        </div>
+      </div>
+    </div>`;
+  const wrap = document.createElement('div');
+  wrap.innerHTML = html;
+  document.body.appendChild(wrap.firstElementChild);
+
+  // handler: Buy Upgrade -> open shop to upgrades and scroll to Farm Lights
+  document.getElementById('firstNightBuy').onclick = () => {
+    // ensure shop is rendered and open on upgrades tab
+    shopTab = 'upg';
+    renderShop(true);
+    panel('shop', true);
+    // mark intention so renderShop can scroll to the lights upgrade after content is injected
+    window._scrollToLightsFromFirstNight = true;
+    // small delay to allow shop content to render then find the lights entry and scroll to it
+    setTimeout(()=>{
+      try{
+        const upgEl = document.querySelector('#shopBody [data-upg="lights"]');
+        if(upgEl) upgEl.scrollIntoView({behavior:'smooth',block:'center'});
+        // also gently pulse the upgrade entry to draw attention
+        if(upgEl) upgEl.classList.add('pulse');
+        setTimeout(()=>{ if(upgEl) upgEl.classList.remove('pulse'); }, 1600);
+      }catch(e){}
+    }, 220);
+    // mark shown so it won't reappear
+    S._firstNightModalShown = true;
+    try{ saveGame(true); }catch(e){}
+    // hide the modal itself
+    panel('firstNightModal', false);
+    sfx('click');
+  };
+
+  document.getElementById('firstNightClose').onclick = () => {
+    S._firstNightModalShown = true;
+    try{ saveGame(true); }catch(e){}
+    panel('firstNightModal', false);
+    sfx('click');
+  };
+
+  // wire the panel close X
+  document.querySelector('#firstNightModal .xbtn').onclick = () => {
+    S._firstNightModalShown = true;
+    try{ saveGame(true); }catch(e){}
+    panel('firstNightModal', false);
+    sfx('click');
+  };
+})();
 
 if(!_loaded){
   // Fresh new player: give a friendly starter pack and show only the Tutorial button relabeled as primary
@@ -3617,6 +4161,12 @@ ensureAudio();
    and add a body class so CSS can hide HUD/notifications while menu is active */
 setCanvasPointer(false);
 document.body.classList.add('menu-active');
+// Ensure the graphics quality buttons reflect the currently applied preset (fix UI not matching persisted setting)
+try{ if(typeof reflectGfxButtonState === 'function') reflectGfxButtonState(S.graphics || 'med'); }catch(e){}
+
+// Show the first-night modal once when the player's first night begins
+// This check will run in the main loop; set a global guard to avoid repeated checks per-frame.
+window._firstNightModalReady = true;
 
 // ---------- main loop ----------
 const clock=new THREE.Clock();
@@ -3627,6 +4177,20 @@ function loop(){
   windGust=0.5+Math.sin(clock.elapsedTime*0.4)*0.3+Math.sin(clock.elapsedTime*1.3)*0.15;
   updateKeys(dt);
   updateDayNight(dt);
+
+  // show the first-night tip modal once: when it's day 1 and night has fallen (sunHeight low), and not already shown
+  if(window._firstNightModalReady && !S._firstNightModalShown && S.day === 1 && sunHeight < -0.02){
+    // Show modal (only when not in menu and no other panel open)
+    if(!inMenu && !openPanel){
+      try{
+        panel('firstNightModal', true);
+        // mark flag so it won't attempt again until user closes / buys (modal handlers save S._firstNightModalShown)
+      }catch(e){}
+    }
+    // only attempt once per session (guard)
+    window._firstNightModalReady = false;
+  }
+
   updateWeather(dt);
   updateCrops(dt);
   updateTileColors();
@@ -3700,6 +4264,10 @@ function loop(){
   if(composer)composer.render(); else renderer.render(scene,camera);
 }
 resize();loop();
+// If the page is already hidden on load, start the background ticker so the game continues simulating.
+if (document.hidden) {
+  try { startBackgroundTicker(); } catch (e) {}
+}
 </script>
 
 <!-- Lucide icons -->
@@ -3707,5 +4275,168 @@ resize();loop();
 <script>
   // initialize Lucide icons for button glyphs
   lucide.createIcons();
+</script>
+
+<!-- Behavioral overrides: prevent native gestures, selection, drag/drop, context menu, and many default shortcuts -->
+<script>
+(function(){
+  // Make images non-draggable
+  function disableImageDrag(){
+    document.querySelectorAll('img, image, svg').forEach(el=>{
+      try{ el.setAttribute('draggable','false'); el.draggable = false; }catch(e){}
+    });
+  }
+  disableImageDrag();
+  // Re-apply for dynamically added images
+  const mo = new MutationObserver(() => disableImageDrag());
+  mo.observe(document.documentElement || document.body, {childList:true, subtree:true});
+
+  // CSS adjustments to further lock touch/selection behavior and remove callouts/highlight
+  const css = `
+    * { -webkit-user-select: none !important; user-select: none !important; -webkit-touch-callout: none !important; -webkit-tap-highlight-color: transparent !important; touch-action: none !important; }
+    img, svg { -webkit-user-drag: none !important; user-drag: none !important; }
+    :focus { outline: none !important; }
+    html, body { overscroll-behavior: none !important; -webkit-overflow-scrolling: auto !important; }
+  `;
+  const s = document.createElement('style'); s.textContent = css; document.head.appendChild(s);
+
+  // Prevent context menu (right-click)
+  document.addEventListener('contextmenu', e => { e.preventDefault(); }, {passive:false});
+
+  // Prevent selection via mouse drag
+  document.addEventListener('selectstart', e => { e.preventDefault(); }, {passive:false});
+
+  // Prevent drag & drop onto page
+  ['dragstart','dragover','drop','dragenter','dragleave'].forEach(ev=>{
+    document.addEventListener(ev, e => { e.preventDefault(); }, {passive:false});
+  });
+
+  // Prevent double-tap to zoom
+  let lastTouch = 0;
+  document.addEventListener('touchstart', function(e){
+    const t = Date.now();
+    if (t - lastTouch <= 300 && e.touches && e.touches.length === 1){
+      e.preventDefault();
+    }
+    lastTouch = t;
+  }, {passive:false});
+
+  // Prevent pinch-to-zoom and other gesturestart
+  document.addEventListener('gesturestart', e => { e.preventDefault(); }, {passive:false});
+
+  // Prevent two-finger double tap zoom and pinch (extra measure)
+  document.addEventListener('touchmove', function(e){
+    // still block multi-touch gestures (pinch/pinch-zoom)
+    if(e.touches && e.touches.length > 1){ e.preventDefault(); return; }
+
+    // allow native scrolling when the touch originated inside a scrollable panel body
+    // (helps modals/panels be scrollable on mobile while preserving global gesture blocks)
+    try{
+      const t = e.target;
+      if(t && t.closest && t.closest('.panel .pbody')){
+        // let the panel's internal scroll handle the touchmove (do not call preventDefault)
+        return;
+      }
+    }catch(err){}
+
+    // prevent pull-to-refresh at top-level and other undesired page scrolls
+    const st = window.scrollY || document.documentElement.scrollTop;
+    if(st <= 0 && e.touches && e.touches[0] && e.touches.length === 1){
+      e.preventDefault();
+    }
+  }, {passive:false});
+
+  // Prevent focus on touch/click focusing side-effects
+  document.addEventListener('focusin', function(e){ try{ if(e.target && e.target.blur) e.target.blur(); }catch(e){} });
+
+  // Block common browser shortcuts to reduce interference
+  document.addEventListener('keydown', function(e){
+    // always allow input in editable fields
+    const tag = (e.target && e.target.tagName) || '';
+    if(tag === 'INPUT' || tag === 'TEXTAREA' || e.target && e.target.isContentEditable) return;
+
+    // Allow scroll keys when focus is inside a scrollable modal body; otherwise block them to keep the app fixed.
+    const scrollKeys = ['ArrowUp','ArrowDown','PageUp','PageDown','Space','Home','End'];
+    try{
+      const el = e.target;
+      const insidePanelBody = el && el.closest && el.closest('.panel .pbody');
+      if(scrollKeys.includes(e.code) && !insidePanelBody){
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+    }catch(err){}
+
+    const ctrl = e.ctrlKey || e.metaKey;
+    // map of blocked key combos
+    const blocked = [
+      // function keys
+      'F1','F3','F5','F11',
+      // single keys with ctrl/meta
+      'KeyR','KeyS','KeyP','KeyF','KeyU','KeyA'
+    ];
+    // Ctrl+Shift combos
+    if(ctrl && e.shiftKey && (e.code === 'KeyI' || e.code === 'KeyC' || e.code === 'KeyJ')){ e.preventDefault(); e.stopPropagation(); return; }
+    // specific blocked combos
+    if(blocked.indexOf(e.code) !== -1){
+      // allow F11 on some hosts if you want it left alone; here we block it
+      e.preventDefault(); e.stopPropagation(); return;
+    }
+    // block common ctrl combos explicitly
+    if(ctrl && (e.code==='KeyR' || e.code==='KeyS' || e.code==='KeyP' || e.code==='KeyF' || e.code==='KeyU' || e.code==='KeyA')){
+      e.preventDefault(); e.stopPropagation(); return;
+    }
+    // block Ctrl+W / Ctrl+Tab is not attempted (browser controls), skip those
+  }, {passive:false});
+
+  // Prevent a variety of navigation gestures: back/forward via wheel with alt/shift etc.
+  // Allow wheel events over the canvas to control camera zoom; block page scroll elsewhere except inside panel scroll bodies.
+  window.addEventListener('wheel', function(e){
+    try{
+      const el = e.target;
+      // let panel scroll areas handle wheel normally
+      if(el && el.closest && el.closest('.panel .pbody')) return;
+      // if wheel is over the canvas (or a child of it), let the canvas handler control zoom (canvas handler already prevents default)
+      if(el && (el === canvas || el.closest && el.closest('#c'))) return;
+    }catch(err){}
+    // otherwise prevent page scroll and attempted history gestures on some devices
+    if(e.ctrlKey || e.metaKey || e.shiftKey || Math.abs(e.deltaY) > 0 || Math.abs(e.deltaX) > 0){
+      e.preventDefault();
+    }
+  }, {passive:false});
+
+  // Prevent browser gestures that might navigate (history back) - best effort
+  window.addEventListener('popstate', function(e){
+    // If popstate occurs and the game is active, push state back to avoid leaving
+    try{ history.pushState(null, document.title, location.href); }catch(err){}
+  });
+
+  // Pointer lock disabled by default to avoid hiding the cursor unexpectedly on first click.
+  // If you want pointer lock, call requestPointerLock explicitly from a dedicated UI control.
+  function tryPointerLock(elem){
+    // intentionally left empty to prevent automatic pointer lock on initial clicks
+    return;
+  }
+  // do not auto-enable pointer lock on page load / first click
+  // tryPointerLock(document.querySelector('canvas'));
+
+  // Prevent copy / context menu via touch hold on iOS Safari by disabling touch callout and selection above,
+  // and attempt to intercept copy events
+  document.addEventListener('copy', function(e){ e.preventDefault(); }, {passive:false});
+  document.addEventListener('cut', function(e){ e.preventDefault(); }, {passive:false});
+  document.addEventListener('paste', function(e){ e.preventDefault(); }, {passive:false});
+
+  // Ensure body does not scroll / bounce on iOS — extra precaution
+  document.documentElement.style.overscrollBehavior = 'none';
+  document.body.style.overscrollBehavior = 'none';
+  document.body.style.touchAction = 'none';
+
+  // Hide native focus outlines and prevent auto-scrolling caused by focus
+  window.addEventListener('focus', function(e){ try{ if(e.target && e.target.blur) e.target.blur(); }catch(e){} }, true);
+
+  // Accessibility note: these changes are aggressive — they intentionally disable many native behaviors
+  // to create an app-like fixed experience as requested.
+
+})();
 </script>
 </body></html>
