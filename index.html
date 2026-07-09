@@ -1,10 +1,11 @@
 <html lang="en"><script src="chrome-extension://eppiocemhmnlbhjplcgkofciiegomcon/content/location/location.js" id="eppiocemhmnlbhjplcgkofciiegomcon"></script><script src="chrome-extension://eppiocemhmnlbhjplcgkofciiegomcon/libs/extend-native-history-api.js"></script><script src="chrome-extension://eppiocemhmnlbhjplcgkofciiegomcon/libs/requests.js"></script><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<!-- Use a friendly modern UI font -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+<!-- Use game fonts: Fredoka for titles/buttons, Nunito for text/descriptions -->
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700;800&family=Nunito:wght@400;600&display=swap" rel="stylesheet">
 <title>FarmUp</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;800&display=swap');
   :root{
     /* stronger UI contrast, warmer accent, clearer readable tones and larger tappable areas via CSS vars */
     --glass: rgba(255,255,255,0.16);
@@ -15,9 +16,77 @@
     /* sizes for touch targets */
     --ui-hit: 52px;
   }
-  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; text-shadow: 0 1px 2px rgba(0,0,0,0.55);}
+  /* Global text defaults: use Nunito for app text (semi-bold by default), Fredoka for headings/buttons */
+  :root{
+    --font-title: 'Fredoka', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-button: 'Fredoka', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-text: 'Nunito', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-desc: 'Nunito', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
   html,body{margin:0;padding:0;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;background:#0b1020;
-    font-family: 'Poppins', 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;}
+    font-family: var(--font-text); font-weight:600; /* Nunito SemiBold for general UI text */; text-transform:none;}
+
+  /* Typography mapping:
+     - Titles (headers/panel titles, main menu title) → Fredoka Bold
+     - Buttons (primary/pill buttons, shop/buy elements, hotbar labels) → Fredoka SemiBold
+     - Text content → Nunito SemiBold (default above)
+     - Descriptions / secondary text → Nunito Regular (400)
+  */
+  /* Titles */
+  #menu h1, .phead h2, #streakHead h3, .day7 .desc, .dayTile .dayIdx { font-family: var(--font-title); font-weight:800; letter-spacing:0.2px; }
+
+  /* HUD chip labels: explicitly use Fredoka SemiBold for Coins, Day, Weather and Level text */
+  /* Ensures consistent Fredoka SemiBold styling for those key HUD labels */
+  #coinsLabel,
+  .wlabel,
+  #lvl {
+    font-family: var(--font-button);
+    font-weight: 600;
+    font-variation-settings: "wght" 600;
+    /* keep uppercase mapping from body; ensure subtle text shadow to match other UI */
+    text-transform: uppercase;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.55);
+  }
+
+  /* Weather type label (Clear / Rain / ...) should use Nunito Regular (descriptive text), not Fredoka */
+  #wxlbl {
+    font-family: var(--font-desc);
+    font-weight: 400;
+    text-transform: none; /* keep natural casing for the weather value */
+    font-size: 0.95em;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.32);
+  }
+
+  /* Buttons / interactive controls */
+  .mbtn, .buy, .rbtn, .claimBtn, .claimBig, .slot .lbl, .slot .cnt { font-family: var(--font-button); font-weight:600; }
+
+  /* Ensure texts rendered with Fredoka (titles/buttons) keep their natural casing (do not force uppercase) */
+  /* Applies to headings and controls that explicitly use Fredoka Bold / SemiBold */
+  #menu h1,
+  .phead h2,
+  #streakHead h3,
+  .day7 .desc,
+  .dayTile .dayIdx,
+  .mbtn, .buy, .rbtn, .claimBtn, .claimBig, .slot .lbl, .slot .cnt,
+  #coinsLabel, .wlabel, #wxlbl, #lvl {
+    text-transform: none;
+  }
+
+  /* Ensure panel bodies and general labels keep Nunito SemiBold */
+  .pbody, .chip, #hint, .row .nm, .slot .lbl, #coinsChip, #weatherChip, #levelChip { font-family: var(--font-text); font-weight:600; }
+
+  /* Keep panel body text (shop descriptions and other panel content) in natural casing
+     (override global uppercasing applied to body). Target shop panel specifically to avoid
+     altering large-title casing elsewhere. */
+  #shop .pbody,
+  #shop .pbody * {
+    text-transform: none !important;
+  }
+
+  /* Descriptions and secondary text (lighter) */
+  .ds, .pbody .ds, .pbody small, .day7 .sub, .streakHead p, .row .ds, .seedName { font-family: var(--font-desc); font-weight:400; opacity:0.95; }
+
   #c{position:fixed;inset:0;display:block;}
   .hud{position:fixed;z-index:10;color:var(--cream);transition:transform .28s ease,opacity .28s ease;will-change:transform,opacity;}
   /* top bar */
@@ -68,75 +137,213 @@
   .rbtn:active{transform:scale(.9);background:var(--glass2);}
   .rbtn .badge{position:absolute;top:-5px;right:-5px;background:var(--red);color:#fff;font-size:11px;font-weight:bold;
      border-radius:10px;padding:1px 6px;box-shadow:0 2px 6px rgba(0,0,0,.3);}
-  /* hotbar */
-  #hotbar{bottom:16vh;left:50%;transform:translateX(-50%);display:flex;gap:6px;padding:7px;border-radius:20px;
-     background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--stroke);
-     box-shadow:0 8px 24px rgba(0,0,0,.25);}
+
+  /* Side-button color themes matching Watering Can (water), Fishing Rod (rod) and Harvest (cut) visual language
+     Use data-tool on .rbtn so the modal/open buttons visually match tool slots and accept per-button color. */
+  .rbtn[data-tool="water"]{
+    /* Watering: bright cyan glassy */
+    background:linear-gradient(180deg,rgba(95,191,210,0.10),rgba(143,224,238,0.05));
+    border:1px solid rgba(80,168,210,0.14);
+    box-shadow:0 10px 26px rgba(80,168,210,0.06), inset 0 -4px 8px rgba(255,255,255,0.02);
+  }
+  .rbtn[data-tool="water"]:active{ transform:scale(.95); background:linear-gradient(180deg,#5fbfd222,#8fe6f022); box-shadow:0 14px 38px rgba(80,168,210,0.12); }
+
+  .rbtn[data-tool="rod"]{
+    /* Fishing Rod: teal / deep-blue accent */
+    background:linear-gradient(180deg,rgba(74,163,208,0.10),rgba(74,163,208,0.04));
+    border:1px solid rgba(74,163,208,0.14);
+    box-shadow:0 10px 26px rgba(74,163,208,0.06), inset 0 -4px 8px rgba(255,255,255,0.02);
+  }
+  .rbtn[data-tool="rod"]:active{ transform:scale(.95); background:linear-gradient(180deg,#2b6fa322,#4aa3d011); box-shadow:0 14px 38px rgba(74,163,208,0.12); }
+
+  .rbtn[data-tool="cut"]{
+    /* Harvest / Cut: warm golden / orange */
+    background:linear-gradient(180deg,rgba(255,242,160,0.09),rgba(255,210,140,0.03));
+    border:1px solid rgba(255,210,140,0.14);
+    box-shadow:0 10px 26px rgba(244,176,62,0.06), inset 0 -4px 8px rgba(255,255,255,0.02);
+  }
+  .rbtn[data-tool="cut"]:active{ transform:scale(.95); background:linear-gradient(180deg,#ffd89a22,#f4b03e11); box-shadow:0 18px 44px rgba(244,176,62,0.12); }
+
+  /* Settings → neutral glassy (keeps UI consistency but non-distracting) */
+  #setBtn{
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.04));
+    border:1px solid rgba(255,255,255,0.06);
+    box-shadow:0 8px 20px rgba(0,0,0,0.18), inset 0 -3px 6px rgba(255,255,255,0.02);
+  }
+  #setBtn:active{ transform:scale(.95); background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(0,0,0,0.06)); box-shadow:0 12px 28px rgba(0,0,0,0.24); }
+
+  /* Active / pulse states for side buttons (match slot 'sel' glow) */
+  #streakBtn.active, #streakBtn.pulse { box-shadow: 0 18px 50px rgba(87,182,201,0.18), 0 0 22px rgba(143,224,238,0.14); transform: translateY(-4px); }
+  #questBtn.active, #questBtn.pulse { box-shadow: 0 18px 50px rgba(90,180,150,0.16), 0 0 18px rgba(155,230,200,0.12); transform: translateY(-4px); }
+  #shopBtn.active, #shopBtn.pulse  { box-shadow: 0 18px 50px rgba(244,176,62,0.22), 0 0 20px rgba(244,176,62,0.12); transform: translateY(-4px); }
+  #setBtn.active, #setBtn.pulse   { box-shadow: 0 14px 40px rgba(0,0,0,0.22); transform: translateY(-3px); }
+
+  /* Ensure touch targets remain large and clickable */
+  #sidebtns .rbtn { min-width:48px; min-height:48px; border-radius:12px; }
+  /* =========================================
+     A HOTBAR (Efeito de Vidro) - custom polished style
+  ========================================= */
+  #hotbar {
+    display: flex;
+    gap: 16px;
+    padding: 16px 24px;
+    background: rgba(15, 15, 20, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 2px 10px rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+    bottom: 16vh;
+    left: 50%;
+    transform: translateX(-50%);
+    position: fixed;
+    z-index: 12;
+  }
   /* Hotbar slot: improved spacing, smoother transitions and pop animation for better tactile feedback */
-  .slot{
-    pointer-events:auto;
-    width:clamp(42px,11.4vw,60px);
-    height:clamp(52px,13.5vw,68px);
-    border-radius:14px;
-    background:rgba(255,255,255,.08);
-    border:2px solid transparent;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    cursor:pointer;
-    transition:transform .18s cubic-bezier(.2,.9,.2,1),border-color .22s,background .22s,box-shadow .22s;
-    position:relative;
-    color:var(--cream);
-    will-change:transform,box-shadow;
+  /* =========================================
+     OS SLOTS (Itens do Inventário)
+  ========================================= */
+  .slot {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.32s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    user-select: none;
+    will-change: transform, box-shadow;
+    color: var(--cream);
   }
-  .slot .em{
-    font-size:clamp(24px,7vw,32px);
-    line-height:1;
-    filter:drop-shadow(0 4px 10px rgba(0,0,0,.42));
-    transform-origin:center;
-    transition:transform .18s cubic-bezier(.2,.9,.2,1),filter .18s;
-    display:inline-block;
+  /* =========================================
+     EMOJIS (Os Ícones)
+  ========================================= */
+  .em {
+    font-size: 28px;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.4));
+    transition: transform 0.34s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: inline-block;
   }
-  .slot .lbl{
-    font-size:clamp(9px,2.8vw,11px);
-    margin-top:6px;
-    opacity:.96;
-    font-weight:900;
-    letter-spacing:0.2px;
-    text-transform:capitalize;
-    text-align:center;
-    /* keep label text inside the slot box */
-    display:block;
-    max-width:100%;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
+
+  .slot:hover .em {
+    transform: scale(1.2) rotate(5deg);
+  }
+
+  .slot.sel .em {
+    transform: scale(1.3) translateY(-4px);
+    filter: drop-shadow(0 4px 10px rgba(0, 255, 204, 0.6));
+  }
+  /* =========================================
+     TEXTOS (Labels)
+  ========================================= */
+  .lbl {
+    position: absolute;
+    bottom: -25px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: white;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    background: rgba(0, 0, 0, 0.7);
+    padding: 4px 8px;
+    border-radius: 8px;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .slot:hover .lbl,
+  .slot.sel .lbl {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .slot.sel .lbl {
+    /* default selected label (keeps previous green for generic selected state) */
+    color: #002211;
+    background: #00ffcc;
+    box-shadow: 0 0 10px #00ffcc;
+  }
+
+  /* Tool-specific selected label colors */
+  .slot[data-tool="water"].sel .lbl {
+    background: linear-gradient(180deg,#dff9fb,#8fe0ee);
+    color: #002b33;
+    box-shadow: 0 0 14px rgba(143,224,238,0.92);
+  }
+
+  .slot[data-tool="rod"].sel .lbl {
+    background: linear-gradient(180deg,#2b6fa3,#4aa3d0);
+    color: #ffffff;
+    box-shadow: 0 0 14px rgba(74,163,208,0.9);
+  }
+
+  .slot[data-tool="cut"].sel .lbl {
+    background: linear-gradient(180deg,#ffd97a,#f4b03e);
+    color: #08220b;
+    box-shadow: 0 0 14px rgba(244,176,62,0.88);
   }
   /* Watering Can: brighter, glassy look and animated ripple when selected */
   .slot[data-tool="water"]{
-    background:linear-gradient(180deg,rgba(87,182,201,0.12),rgba(143,224,238,0.06));
-    border:1px solid rgba(87,182,201,0.14);
-    box-shadow:0 8px 18px rgba(87,182,201,0.06), inset 0 -6px 12px rgba(255,255,255,0.02);
+    background:linear-gradient(180deg,rgba(80,168,210,0.12),rgba(110,200,230,0.06));
+    border:1px solid rgba(80,168,210,0.14);
+    box-shadow:0 8px 18px rgba(80,168,210,0.06), inset 0 -6px 10px rgba(255,255,255,0.02);
   }
-  .slot[data-tool="water"] .em{transform:translateY(-2px) scale(1); filter:drop-shadow(0 8px 22px rgba(87,182,201,0.14));}
+  .slot[data-tool="water"] .em{transform:translateY(-2px) scale(1); filter:drop-shadow(0 8px 20px rgba(80,168,210,0.14));}
   .slot[data-tool="water"].sel{
-    border-color:#57b6c9;
-    background:linear-gradient(180deg,#69c0cf22,#9fe6f022);
-    box-shadow:0 12px 36px rgba(87,182,201,0.18);
+    border-color:#4fb7c9;
+    background:linear-gradient(180deg,#5fbfd222,#8fe6f022);
+    box-shadow:0 12px 34px rgba(80,168,210,0.16);
   }
   .slot[data-tool="water"].sel::after{
     content:'';
     position:absolute;
     inset:6px;
     border-radius:12px;
-    background:radial-gradient(circle at 50% 20%, rgba(143,224,238,0.18), rgba(143,224,238,0.02) 40%);
+    background:radial-gradient(circle at 50% 20%, rgba(110,200,230,0.18), rgba(110,200,230,0.02) 40%);
     opacity:0;
     transform:scale(.9);
     transition:opacity .28s, transform .36s;
     pointer-events:none;
   }
   .slot[data-tool="water"].sel::after{opacity:1;transform:scale(1.02);}
+
+  /* Fishing Rod slot: teal / ocean accent */
+  .slot[data-tool="rod"]{
+    background:linear-gradient(180deg,rgba(100,190,160,0.10),rgba(140,220,200,0.05));
+    border:1px solid rgba(90,180,150,0.12);
+    box-shadow:0 8px 18px rgba(90,180,150,0.05), inset 0 -6px 10px rgba(255,255,255,0.02);
+  }
+  .slot[data-tool="rod"] .em{filter:drop-shadow(0 8px 20px rgba(90,180,150,0.12));}
+  .slot[data-tool="rod"].sel{
+    border-color:#63c79a;
+    background:linear-gradient(180deg,#8fe0d022,#9be7d022);
+    box-shadow:0 12px 34px rgba(90,180,150,0.14);
+  }
+  .slot[data-tool="rod"].sel::after{
+    content:'';
+    position:absolute; inset:6px; border-radius:12px;
+    background:radial-gradient(circle at 50% 20%, rgba(155,230,200,0.12), rgba(155,230,200,0.02) 40%);
+    opacity:0; transform:scale(.9); transition:opacity .28s, transform .36s; pointer-events:none;
+  }
+  .slot[data-tool="rod"].sel::after{opacity:1; transform:scale(1.02);}
+
+  /* Harvest (cut) slot: warm golden accent and quick pop on select */
+  .slot[data-tool="cut"]{
+    background:linear-gradient(180deg,rgba(255,242,160,0.09),rgba(255,210,140,0.03));
+    border:1px solid rgba(255,210,140,0.14);
+    box-shadow:0 6px 16px rgba(244,176,62,0.06);
+  }
+  .slot[data-tool="cut"] .em{transform:translateY(-2px);filter:drop-shadow(0 8px 20px rgba(244,176,62,0.12));}
+  .slot[data-tool="cut"].sel{border-color:#f4b03e;background:linear-gradient(180deg,#ffd89a22,#f4b03e11);box-shadow:0 14px 40px rgba(244,176,62,0.18);}
 
   /* Harvest (cut) slot: warm golden accent and quick pop on select */
   .slot[data-tool="cut"]{
@@ -148,13 +355,28 @@
   .slot[data-tool="cut"].sel{border-color:#f4b03e;background:linear-gradient(180deg,#ffd89a22,#f4b03e11);box-shadow:0 14px 40px rgba(244,176,62,0.18);}
 
   /* Selected slot emphasis */
-  .slot.sel{
-    border-color:var(--accent);
-    background:rgba(244,176,62,.18);
-    box-shadow:0 10px 28px rgba(244,176,62,.28);
-    transform:translateY(-6px) scale(1.02);
+  /* =========================================
+     SLOT SELECIONADO (A Explosão de Dopamina)
+  ========================================= */
+  .slot.sel {
+    transform: translateY(-12px) scale(1.15);
+    background: linear-gradient(135deg, rgba(0, 255, 204, 0.2), rgba(0, 153, 255, 0.2));
+    border-color: #00ffcc;
+    box-shadow: 0 15px 30px rgba(0, 255, 204, 0.3), 0 0 20px #00ffcc, inset 0 0 15px rgba(0, 255, 204, 0.4);
+    animation: pulse-glow 2s infinite alternate ease-in-out;
+    z-index: 10;
   }
   .slot.sel .em{transform:translateY(-2px) scale(1.12);}
+
+  /* Mobile override: reduce lift & scale so selected slot doesn't overlap neighbors and remains easy to tap adjacent tools */
+  @media (max-width:760px){
+    .slot.sel {
+      transform: translateY(-6px) scale(1.08) !important;
+      z-index: 11;
+    }
+    /* slightly increase effective hit padding for small-screen taps without changing visual size */
+    #hotbar .slot { touch-action: manipulation; padding: 6px !important; }
+  }
 
   /* Count badge */
   .slot .cnt{
@@ -170,7 +392,7 @@
 
   /* ensure accessible minimum hit target on mobile */
   @media (max-width:760px){
-    .slot{min-width:48px;min-height:52px;border-radius:12px;}
+    .slot{min-width:40px;min-height:44px;border-radius:10px;}
     .slot .lbl{font-size:10px;margin-top:4px}
   }
 
@@ -197,15 +419,73 @@
     border-radius:10px;border:2px solid rgba(0,0,0,0.06);
     box-shadow:0 6px 14px rgba(0,0,0,0.24) inset;
   }
-  #watermeter{position:fixed;z-index:10;bottom:calc(12vh + 24px);left:50%;transform:translateX(-50%);
-     width:clamp(120px,42vw,180px);height:9px;border-radius:9px;background:rgba(0,0,0,.3);border:1px solid var(--stroke);
-     overflow:hidden;box-shadow:0 3px 8px rgba(0,0,0,.2);}
+  /* Water meter styled to match the tool-slot visual language (water / rod / harvest)
+     - increased visual prominence: taller, brighter gradient, soft glow and subtle pulse */
+  #watermeter{
+    position:fixed;
+    z-index:14;
+    bottom:calc(12vh + 22px);
+    left:50%;
+    transform:translateX(-50%);
+    width:clamp(140px,46vw,220px);
+    height:14px; /* slightly taller for touch/readability */
+    border-radius:14px;
+    /* richer glass base to contrast the fill */
+    background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(4,20,22,0.16));
+    border:1px solid rgba(255,255,255,0.06);
+    overflow:hidden;
+    box-shadow:0 14px 36px rgba(6,22,24,0.6), inset 0 -6px 14px rgba(255,255,255,0.02);
+    transition:transform .28s ease, box-shadow .28s ease, border-color .22s ease;
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+    padding:3px;
+    /* make it feel alive */
+    will-change:transform,box-shadow;
+  }
+  /* The fill is now vivid cyan with inner glow and a gentle breathing animation */
+  #watermeter #waterfill{
+    height:100%;
+    width:100%;
+    border-radius:12px;
+    transition:width .28s ease, background .28s ease, box-shadow .28s ease, transform .25s ease;
+    background:linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+    box-shadow: inset 0 -6px 14px rgba(0,0,0,0.22);
+    transform-origin:left center;
+  }
+  /* subtle pulse animation for the fill (runs while not empty) */
+  @keyframes waterPulse {
+    0% { box-shadow: inset 0 -6px 10px rgba(87,182,201,0.06), 0 0 0 0 rgba(143,224,238,0.00); }
+    50% { box-shadow: inset 0 -8px 16px rgba(87,182,201,0.12), 0 8px 30px rgba(143,224,238,0.06); }
+    100% { box-shadow: inset 0 -6px 10px rgba(87,182,201,0.06), 0 0 0 0 rgba(143,224,238,0.00); }
+  }
+  /* Selected / Water tool active: brighter cyan glassy fill and glow to match .slot[data-tool="water"].sel */
+  #watermeter.sel{
+    border-color: rgba(79,183,201,0.34);
+    box-shadow: 0 20px 56px rgba(79,183,201,0.10), inset 0 -6px 18px rgba(143,224,238,0.04);
+    transform:translateX(-50%) scale(1.04);
+  }
+  #watermeter.sel #waterfill{
+    background: linear-gradient(90deg,#5ad0db,#8fe0ee 80%);
+    box-shadow: 0 12px 40px rgba(87,182,201,0.14), inset 0 -8px 18px rgba(255,255,255,0.04);
+    animation: waterPulse 3.8s ease-in-out infinite;
+    transform: translateZ(0);
+  }
+  /* low-water hint: when water is low, add a thin rim glow to draw attention */
+  #watermeter.low {
+    box-shadow: 0 18px 40px rgba(244,110,86,0.12), inset 0 -6px 12px rgba(255,160,140,0.04);
+    border-color: rgba(222,111,99,0.18);
+  }
+  #watermeter.low #waterfill{
+    background: linear-gradient(90deg,#ffb3a0,#ff8a70);
+    animation: none;
+  }
 
   /* Mobile: nudge the water meter a bit lower so it doesn't compete with hotbar/hints
      and adapt top HUD for narrow screens: smaller chips, inline weather+level, tighter spacing */
   @media (max-width:760px){
     /* water meter moved closer to bottom on small screens */
-    #watermeter{bottom:calc(6vh + 18px); width:clamp(120px,52vw,200px);}
+    #watermeter{bottom:calc(6vh + 18px); width:clamp(120px,52vw,200px); height:10px; border-radius:10px; padding:2px;}
 
     /* make top HUD more compact and ensure all chips fit on one row */
     #top{
@@ -243,8 +523,16 @@
     #sidebtns .rbtn{width:48px;height:48px;border-radius:12px;font-size:18px;}
     /* hotbar and other bottom elements get small nudge so everything fits without scrolling */
     #hotbar{bottom:18vh; gap:6px; padding:6px; border-radius:16px;}
-    .slot{width:46px;height:54px;border-radius:12px;}
-    .slot .em{font-size:18px;}
+    /* Make key action slots less cramped on mobile: add extra horizontal spacing specifically
+       for Watering Can, Fishing Rod and Harvest so they are easier to tap and visually separated.
+       Use symmetric horizontal margins so neighboring slots don't get unexpectedly overlapped by selection. */
+    #hotbar .slot[data-tool="water"],
+    #hotbar .slot[data-tool="rod"],
+    #hotbar .slot[data-tool="cut"] {
+      margin: 0 10px; /* left/right spacing to keep them isolated from neighbors */
+    }
+    .slot{width:44px;height:50px;border-radius:12px;}
+    .slot .em{font-size:16px;}
     .slot .lbl{font-size:10px;}
     /* crop progress (centered under top chips) on mobile: place below the top chips, centered and slightly larger for touch */
     #cropProgress{
@@ -278,9 +566,9 @@
     pointer-events:auto;
   }
 
-  /* when the Water tool is selected, show a clearer selected state for the water meter */
-  #watermeter.sel{border-color:var(--accent);box-shadow:0 10px 30px rgba(244,176,62,0.12);transform:translateX(-50%) scale(1.02);}
-  #watermeter.sel #waterfill{box-shadow:0 6px 18px rgba(96,160,176,0.12);}
+  /* when the Water tool is selected, show a clearer selected state for the water meter (reinforced) */
+  #watermeter.sel{border-color:var(--accent);box-shadow:0 18px 48px rgba(79,183,201,0.14), inset 0 -6px 18px rgba(143,224,238,0.03); transform:translateX(-50%) scale(1.04);}
+  #watermeter.sel #waterfill{box-shadow:0 12px 40px rgba(87,182,201,0.14), inset 0 -8px 18px rgba(255,255,255,0.04); animation: waterPulse 3.8s ease-in-out infinite;}
 
   /* Default (not selected) water fill is neutral — blue gradient appears only when water is selected */
   #waterfill{height:100%;width:100%;background:linear-gradient(90deg,rgba(255,255,255,0.06),rgba(255,255,255,0.03));transition:width .25s;}
@@ -580,6 +868,178 @@
   #top .chip .ico { display: none !important; }
 }
 
+/* ===== Added HUD / side button styling for Market, Quests, Rewards and Settings ===== */
+:root{
+  --hud-bg: rgba(255,255,255,0.04);
+  --hud-border: rgba(255,255,255,0.06);
+  --slot-bg: rgba(255,255,255,0.04);
+  --slot-hover: rgba(255,255,255,0.08);
+}
+
+/* =========================================
+   CONTAINER LATERAL (Alcance do polegar)
+========================================= */
+#sidebtns.hud {
+  position: fixed;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 12px;
+
+  background: var(--hud-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+
+  border: 1px solid var(--hud-border);
+  border-radius: 32px;
+  box-shadow: -5px 10px 30px rgba(0, 0, 0, 0.3),
+              inset 2px 2px 5px rgba(255, 255, 255, 0.05);
+  /* Lowered so panels (.panel) and modals (z-index:120+) render above these HUD buttons */
+  z-index: 90;
+}
+
+/* Ensure side HUD doesn't overlap or feel intrusive on small screens:
+   - reduce padding/gap and make individual buttons slightly smaller for thumb reach.
+   - move the container a bit inward so it doesn't collide with centered modals.
+*/
+@media (max-width: 760px) {
+  /* Compacted side HUD on small screens to avoid modal overlap and free thumb space */
+  #sidebtns.hud {
+    right: 6px;
+    gap: 6px;
+    padding: 4px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.02);
+  }
+  /* smaller individual buttons for a tighter mobile layout and to prevent overlapping modals */
+  #sidebtns .rbtn {
+    width: 36px;
+    height: 36px;
+    font-size: 15px;
+    border-radius: 10px;
+    min-width:36px;
+    min-height:36px;
+  }
+  /* reduce internal badge size so it fits new button dimensions */
+  #sidebtns .rbtn .badge {
+    top: -4px;
+    right: -4px;
+    width: 18px;
+    height: 18px;
+    font-size: 11px;
+  }
+  /* add a safe offset when a panel is open to avoid overlap (panels have z-index:120+) */
+  body .panel.on + #sidebtns.hud,
+  body .panel.on ~ #sidebtns.hud {
+    /* nudge further right when a panel is visible to reduce chance of overlay */
+    right: 4px;
+    transform: translateY(-50%) translateX(0);
+  }
+}
+
+/* =========================================
+   BOTÕES REDONDOS (Squircle appeal)
+========================================= */
+.rbtn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 18px;
+  background: var(--slot-bg);
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Efeito ao passar o dedo/mouse */
+.rbtn:hover {
+  background: var(--slot-hover);
+  color: #fff;
+  transform: scale(1.15) translateX(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* O "Squish" - Feedback tátil perfeito ao clicar */
+.rbtn:active {
+  transform: scale(0.9);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.rbtn svg {
+  transition: transform 0.3s ease;
+}
+
+.rbtn:hover svg {
+  transform: rotate(5deg);
+}
+
+/* =========================================
+   O BOTÃO DE PRESENTE (Destaque natural)
+========================================= */
+.rbtn.streak-btn {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 140, 0, 0.1));
+  border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.rbtn.streak-btn:hover {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 140, 0, 0.2));
+  border-color: rgba(255, 215, 0, 0.8);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+}
+
+/* =========================================
+   BADGES (A máquina de Dopamina)
+========================================= */
+.badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 22px;
+  height: 22px;
+  background: #ff2a5f;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 3px solid #1a1a2e;
+  box-shadow: 0 0 10px rgba(255, 42, 95, 0.6);
+  z-index: 2;
+  animation: badgeAlert 1.5s infinite cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* KEYFRAMES */
+@keyframes badgeAlert {
+  0% {
+    transform: scale(0.9);
+    box-shadow: 0 0 0 0 rgba(255, 42, 95, 0.7);
+  }
+  50% {
+    transform: scale(1.15);
+    box-shadow: 0 0 0 8px rgba(255, 42, 95, 0);
+  }
+  100% {
+    transform: scale(0.9);
+    box-shadow: 0 0 0 0 rgba(255, 42, 95, 0);
+  }
+}
+
+/* Tweak: ensure panel-like UI (shop, quests, settings, streak) inherits subtle rounded shadow */
+#shop.on, #quests.on, #settings.on, #streakModal.on { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+/* Ensure close buttons maintain squircle feel inside panels */
+.panel .xbtn { border-radius: 12px; background: var(--slot-bg); transition: transform .18s ease; }
+.panel .xbtn:hover { transform: translateY(-3px); background: var(--slot-hover); }
+
+/* End added HUD styles */
+
 /* Show icons inline (to the left) on larger screens and tablets in landscape:
    - Desktop (wide) and tablets in landscape orientation should present the chip
      content in a row so emoji/icon appears beside the label (not above).
@@ -704,9 +1164,14 @@
 </div>
 
 <div id="sidebtns" class="hud" bis_skin_checked="1">
-  <div class="rbtn" id="shopBtn" bis_skin_checked="1"><i data-lucide="shopping-cart"></i><span class="badge" id="shopBadge" style="display:none">!</span></div>
-  <div class="rbtn" id="questBtn" bis_skin_checked="1"><i data-lucide="clipboard-list"></i><span class="badge" id="questBadge" style="display:none">!</span></div>
-  <div class="rbtn" id="setBtn" bis_skin_checked="1"><i data-lucide="settings"></i></div>
+  <!-- Market -> styled as Harvest (cut) -->
+  <div class="rbtn" id="shopBtn" data-tool="cut" bis_skin_checked="1" title="Market"><i data-lucide="shopping-cart"></i><span class="badge" id="shopBadge" style="display:none">!</span></div>
+  <!-- Quests -> styled as Fishing Rod (rod) -->
+  <div class="rbtn" id="questBtn" data-tool="rod" bis_skin_checked="1" title="Quests / Fishing"><i data-lucide="clipboard-list"></i><span class="badge" id="questBadge" style="display:none">!</span></div>
+  <!-- Streak Rewards quick-open button -> styled as Watering Can (water) -->
+  <div class="rbtn" id="streakBtn" data-tool="water" bis_skin_checked="1" title="Weekly Streak"><span style="font-size:20px">🎁</span></div>
+  <!-- Settings remain neutral -->
+  <div class="rbtn" id="setBtn" bis_skin_checked="1" title="Settings"><i data-lucide="settings"></i></div>
 </div>
 
 <div id="watermeter" class="hud" bis_skin_checked="1"><div id="waterfill" bis_skin_checked="1" style="width: 100%;"></div></div>
@@ -1103,15 +1568,17 @@ let lamps=[];
   }
   // path from stall to farm
   for(let i=0;i<6;i++) box(D, -HALF-2-i*1.4, 0.02, 0, 1.1,0.1,1.1,'#c8b184',0.08);
-  // trees ring
-  const treeLeaf=['#5fae57','#6fbf62','#4f9a4a'];
+  // trees ring (leaf tones vary between lighter and darker green per tree)
+  const _treeLeafLight = '#6fbf62';
+  const _treeLeafDark  = '#3f8a3a';
   for(let i=0;i<16;i++){
     const a=i/16*6.28+0.2, r=HALF+6+((i%3))*1.6;
     const x=Math.cos(a)*r, z=Math.sin(a)*r;
     if(x<-HALF-3&&Math.abs(z)<3) continue; // keep stall clear
     const th=2.2+Math.random()*1.2;
     box(D,x,th/2,z,0.7,th,0.7,'#7a5636',0.05);
-    const lc=treeLeaf[i%3];
+    // choose a lighter or darker green randomly per tree for natural variation
+    const lc = (Math.random() < 0.5) ? _treeLeafLight : _treeLeafDark;
     box(D,x,th+0.7,z,2.6,1.6,2.6,lc,0.08);
     box(D,x,th+1.7,z,1.8,1.2,1.8,lc,0.08);
     box(D,x-0.8,th+0.5,z+0.4,1.2,1.0,1.2,lc,0.08);
@@ -1276,7 +1743,9 @@ let flowerDummy;
 function buildFlowers(){
   const stem=new THREE.BoxGeometry(0.1,0.5,0.1); stem.translate(0,0.25,0); shadeGeo(stem,'#5aa04f',{jitter:0});
   const pet=new THREE.BoxGeometry(0.35,0.14,0.35); pet.translate(0,0.55,0); shadeGeo(pet,'#ffffff',{jitter:0});
-  const g=mergeGeometries([stem,pet]);
+  // small yellow center square for each flower (subtle, not overpowering)
+  const center = new THREE.BoxGeometry(0.12,0.12,0.12); center.translate(0,0.68,0); shadeGeo(center,'#ffd97a',{jitter:0.01});
+  const g=mergeGeometries([stem,pet,center]);
   // expanded flower palette for greater visual variety
   const cols=['#f4b3d0','#f6d24a','#c79be0','#f4a06a','#ffffff','#ffd97a','#9be27a','#8fe0ee','#f6a6c0','#c9f4d8'];
   const mat=new THREE.MeshLambertMaterial({vertexColors:true,flatShading:true});
@@ -2983,6 +3452,8 @@ document.getElementById('mPlayTut').onclick = startTutorial;
 
 document.getElementById('shopBtn').onclick=()=>{renderShop();panel('shop',true);advanceTutorial('shop');};
 document.getElementById('questBtn').onclick=()=>{renderQuests();panel('quests',true);};
+// Streak button: open the Reward Streak modal (uses exposed helper if present)
+document.getElementById('streakBtn').onclick=()=>{ try{ if(window.showStreakModal) window.showStreakModal(); else { document.getElementById('streakModal')?.classList.add('on'); } }catch(e){} };
 document.getElementById('setBtn').onclick=()=>{panel('settings',true);};
 document.querySelectorAll('[data-close]').forEach(x=>x.onclick=()=>panel(x.dataset.close,false));
 scrim.onclick=()=>{if(openPanel)panel(openPanel,false);};
@@ -3815,28 +4286,59 @@ try{
   });
 }catch(e){}
 
-/* helper: ensure graphics preset buttons reflect the active preset (resilient global helper) */
+/* helper: ensure graphics preset buttons reflect the active preset (resilient global helper)
+   - robust: tolerates missing DOM, normalizes keys, updates both UI and state without forcing unwanted locks.
+   - does NOT override an explicit user lock unless explicitly asked elsewhere. */
 function reflectGfxButtonState(level){
   try{
-    const ids = ['gfxLowBtn','gfxMedBtn','gfxHighBtn','gfxEpicBtn'];
-    ids.forEach(id=>{
-      const el = document.getElementById(id);
-      if(el){
-        el.classList.remove('primary');
-        el.setAttribute('aria-pressed','false');
-      }
-    });
+    // normalize incoming level; fall back to S.graphics or 'med'
+    function norm(v){
+      if(!v) return null;
+      v = String(v).trim().toLowerCase();
+      if(v.startsWith('low')) return 'low';
+      if(v.startsWith('med') || v.startsWith('medium')) return 'med';
+      if(v.startsWith('high')) return 'high';
+      if(v.startsWith('epic')) return 'epic';
+      return null;
+    }
+    const chosen = norm(level) || norm(S.graphics) || 'med';
+    // button id map
     const map = { low:'gfxLowBtn', med:'gfxMedBtn', high:'gfxHighBtn', epic:'gfxEpicBtn' };
-    const chosenId = map[level] || 'gfxMedBtn';
+    // safely remove 'primary' from all if present
+    ['gfxLowBtn','gfxMedBtn','gfxHighBtn','gfxEpicBtn'].forEach(id=>{
+      const el = document.getElementById(id);
+      if(!el) return;
+      el.classList.remove('primary');
+      el.setAttribute('aria-pressed','false');
+    });
+    // apply chosen state
+    const chosenId = map[chosen];
     const chosenEl = document.getElementById(chosenId);
     if(chosenEl){
       chosenEl.classList.add('primary');
       chosenEl.setAttribute('aria-pressed','true');
     }
-    // keep S.graphics normalized and persisted so UI and state stay in sync
-    if(level) S.graphics = level;
-    try{ localStorage.setItem('bloom_gfx', JSON.stringify({ level: level })); }catch(e){}
-  }catch(e){}
+    // update S.graphics only if different (keeps state consistent)
+    if(chosen && S.graphics !== chosen){
+      S.graphics = chosen;
+    }
+    // persist the minimal record for UI restore (do not force userLocked here)
+    try{
+      const existingRaw = localStorage.getItem('bloom_gfx');
+      let payload = { level: chosen };
+      if(existingRaw){
+        try{
+          const parsed = JSON.parse(existingRaw);
+          // preserve userLocked flag if present
+          if(parsed && typeof parsed.userLocked !== 'undefined') payload.userLocked = parsed.userLocked;
+        }catch(e){}
+      }
+      localStorage.setItem('bloom_gfx', JSON.stringify(payload));
+    }catch(e){}
+  }catch(e){
+    // avoid blowing up UI rendering if something goes wrong
+    console.warn('reflectGfxButtonState error', e);
+  }
 }
 
 // ---------- keyboard ----------
@@ -4439,4 +4941,674 @@ if (document.hidden) {
 
 })();
 </script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap');
+
+  /* Reset preventivo para garantir que paddings não estoure as contas de tamanho */
+  #streakModal *, #streakModal *::before, #streakModal *::after {
+    box-sizing: border-box !important;
+  }
+
+  /* WRAPPER COBRE A TELA COM BLOQUEIO DE SCROLL */
+  #streakModal {
+    position: fixed;
+    inset: 0;
+    z-index: 10050;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    opacity: 0;
+    background-color: rgba(0,0,0,0);
+    backdrop-filter: blur(0px);
+    transition: opacity .36s ease, background-color .36s ease, backdrop-filter .36s ease;
+    overflow: hidden !important; /* Proíbe estritamente qualquer scroll vindo do fundo */
+    padding: clamp(8px, 2vh, 20px);
+  }
+  
+  #streakModal.on {
+    opacity: 1;
+    pointer-events: auto;
+    background-color: rgba(12, 10, 20, 0.7); /* Escurecimento premium */
+    backdrop-filter: blur(8px);
+  }
+  
+  #streakModal.closing {
+    opacity: 0;
+    pointer-events: none;
+    background-color: rgba(0,0,0,0);
+    backdrop-filter: blur(0px);
+  }
+
+  /* PAINEL CENTRAL INDESTRUTÍVEL (Se molda à altura e largura perfeitamente) */
+  #streakPanel {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    background: radial-gradient(120% 120% at 50% 0%, #1e1b38 0%, #0c0a14 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.8), inset 0 2px 15px rgba(255, 255, 255, 0.04), 0 0 40px rgba(138, 43, 226, 0.1);
+    border-radius: clamp(16px, 3.5vh, 28px);
+    padding: clamp(14px, 3vh, 28px) clamp(16px, 4vw, 32px);
+    color: #ffffff;
+    
+    /* Configurações críticas de tamanho para impedir overflows */
+    width: clamp(290px, 92vw, 460px); 
+    max-height: min(92dvh, 720px); /* Ocupa no máximo 92% da altura real disponível do dispositivo */
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Distribui as seções perfeitamente para eliminar espaço ocioso */
+    
+    position: relative;
+    overflow: hidden !important; /* Trava absoluta contra scroll horizontal/vertical interno */
+    transform: translateY(12px);
+    transition: transform .36s cubic-bezier(.16,.9,.2,1);
+  }
+  
+  #streakPanel.closing {
+    transform: translateY(12px) scale(.98);
+    opacity: 0;
+    transition: transform .36s cubic-bezier(.16,.9,.2,1), opacity .28s ease;
+  }
+  
+  #streakModal.on #streakPanel { 
+    transform: none; 
+    animation: modalEnter 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; 
+  }
+
+  /* COLOQUEI O SHIMMER COM COORDENADAS SEGURAS PARA NÃO EXTRAVASAR A TELA */
+  #streakPanel::before {
+    content: ''; position: absolute; top: 0; left: -100%; width: 30%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.04), transparent);
+    transform: skewX(-20deg); 
+    animation: sweepShimmer 5s infinite cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none; z-index: 10;
+  }
+
+  /* HEADER */
+  #streakHead { 
+    display: flex; justify-content: space-between; align-items: center; 
+    margin-bottom: clamp(12px, 2vh, 22px); 
+    position: relative; z-index: 2; 
+  }
+  
+  #streakTitle {
+    font-family: 'Outfit', sans-serif; margin: 0 0 2px 0; 
+    font-size: clamp(18px, 4.5vw, 24px); font-weight: 900;
+    background: linear-gradient(to right, #fff, #ffe082, #ffb300, #fff); 
+    background-size: 200% auto;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+    animation: gradientText 4s linear infinite; letter-spacing: -0.5px;
+  }
+  
+  #streakSub { 
+    margin: 0; 
+    font-size: clamp(10.5px, 2.2vh, 12px); 
+    color: #9ba1ba; font-weight: 500; line-height: 1.4; 
+  }
+
+  /* BADGE DE CONTRE */
+  .streak-badge {
+    background: rgba(255, 255, 255, 0.03); 
+    border: 1px solid rgba(255, 217, 122, 0.2); 
+    padding: clamp(4px, 1vh, 8px) clamp(10px, 2vw, 16px);
+    border-radius: 100px; display: flex; align-items: center; gap: 6px;
+    backdrop-filter: blur(10px);
+  }
+
+  /* GRID DE DIAS SUPER FLUIDO */
+  .streakGrid { 
+    display: grid; 
+    grid-template-columns: repeat(3, 1fr); 
+    gap: clamp(6px, 1.5vh, 12px); 
+    margin-bottom: clamp(12px, 2vh, 22px); 
+    position: relative; z-index: 2; 
+  }
+  
+  .dayTile {
+    background: rgba(255, 255, 255, 0.02); 
+    border: 1px solid rgba(255, 255, 255, 0.05); 
+    border-radius: clamp(10px, 2vh, 18px);
+    padding: clamp(6px, 1.2vh, 14px) 4px; text-align: center; 
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    overflow: hidden; backdrop-filter: blur(8px); 
+    height: clamp(70px, 13vh, 98px); /* Altura controlada pela proporção da tela */
+  }
+  
+  .dayTile:hover {
+    transform: translateY(-3px) scale(1.03); background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.2); 
+  }
+
+  .dayTile.claimed { 
+    background: rgba(0, 230, 118, 0.04); border-color: rgba(0, 230, 118, 0.25); 
+  }
+  
+  .dayTile.claimed::after {
+    content: '✔'; position: absolute; 
+    top: clamp(4px, 1vh, 10px); right: clamp(4px, 1vh, 10px); 
+    color: #00e676; font-size: clamp(10px, 1.8vh, 13px); font-weight: 900;
+    text-shadow: 0 0 8px rgba(0, 230, 118, 0.6);
+  }
+
+  /* AURAS (Suavizadas) */
+  .dayTile[data-day="5"]::before { content: ''; position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px; background: #00d2ff; filter: blur(20px); opacity: 0.25; animation: breathe 3s infinite alternate; pointer-events: none; }
+  .dayTile[data-day="6"]::before { content: ''; position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px; background: #b000ff; filter: blur(20px); opacity: 0.25; animation: breathe 3s infinite alternate-reverse; pointer-events: none; }
+  
+  .dayIdx { 
+    font-size: clamp(8.5px, 1.8vh, 10px); color: #787d99; font-weight: 800; 
+    text-transform: uppercase; letter-spacing: 0.5px; 
+    margin-bottom: clamp(2px, 0.8vh, 8px); z-index: 2; position: relative; 
+  }
+  
+  .dayTile.claimed .dayIdx { color: #00e676; }
+  
+  .dayEm { 
+    font-size: clamp(20px, 4.5vh, 28px); filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4)); 
+    margin-bottom: clamp(2px, 0.8vh, 8px); z-index: 2; position: relative; 
+    animation: floatEmoji 4s ease-in-out infinite; 
+  }
+  
+  .dayTile:hover .dayEm { transform: scale(1.15) rotate(6deg); animation: none; }
+  
+  .dayReward { 
+    font-size: clamp(9px, 1.8vh, 11px); font-weight: 700; 
+    color: #e2e4ed; z-index: 2; position: relative; line-height: 1.1; 
+  }
+  
+  /* BOTÕES CLAIM INTERNOS */
+  .claimBtn {
+    background: linear-gradient(90deg, #ff7a00, #ff007a); 
+    color: #fff; font-size: clamp(8.5px, 1.8vh, 9.5px); 
+    padding: clamp(4px, 0.8vh, 6px) clamp(8px, 1.5vw, 12px);
+    border-radius: 100px; margin-top: clamp(4px, 0.8vh, 8px); text-transform: uppercase; 
+    font-weight: 800; border: none; cursor: pointer; z-index: 2; position: relative;
+    box-shadow: 0 4px 10px rgba(255, 0, 122, 0.3); transition: all 0.2s;
+  }
+  .claimBtn:hover { transform: scale(1.04); }
+  .claimBtn.dim { background: rgba(255,255,255,0.04); color: #787d99; box-shadow:none; border: 1px solid rgba(255,255,255,0.03); pointer-events:none; }
+
+  /* DIA 7 - DESIGN COMPACTO E MAGNÍFICO */
+  .day7Wrap {
+    background: linear-gradient(45deg, #ff7a00, #ff007a, #7a00ff, #00d2ff); background-size: 300% 300%;
+    padding: 2px; border-radius: clamp(12px, 2.5vh, 20px); position: relative; 
+    animation: shiftingBorder 6s ease infinite; z-index: 2; 
+  }
+  
+  .day7 { 
+    background: #0d0a14; border-radius: clamp(10px, 2.3vh, 18px); 
+    padding: clamp(10px, 2vh, 18px) clamp(12px, 2.5vw, 20px); 
+    display: flex; align-items: center; justify-content: space-between; 
+    position: relative; overflow: hidden;
+  }
+  
+  .day7::before {
+    content: ''; position: absolute; top: -150%; left: -150%; width: 400%; height: 400%;
+    background: conic-gradient(from 0deg, transparent 0deg, rgba(255, 122, 0, 0.05) 45deg, transparent 90deg, rgba(122, 0, 255, 0.05) 135deg, transparent 180deg, rgba(255, 0, 122, 0.05) 225deg, transparent 270deg, rgba(0, 210, 255, 0.05) 315deg, transparent 360deg);
+    animation: spinRays 25s linear infinite; pointer-events: none; z-index: 1;
+  }
+  
+  .day7 .left { display: flex; align-items: center; gap: clamp(10px, 2vw, 14px); z-index: 2; }
+  .day7 .bigEm { font-size: clamp(28px, 6vh, 38px); filter: drop-shadow(0 0 15px rgba(255,217,122,0.4)); animation: floatEmoji 3s ease-in-out infinite; }
+  
+  .day7 .desc {
+    font-family: 'Outfit', sans-serif; font-size: clamp(12px, 2.2vh, 16px); font-weight: 800; color: #fff; text-transform: uppercase;
+    letter-spacing: 0.5px; margin-bottom: 1px; background: linear-gradient(to right, #ffc107, #ff6b00);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  
+  .day7 .sub { font-size: clamp(9.5px, 1.8vh, 11px); color: #a4a9c2; font-weight: 600; }
+  
+  #day7Status { 
+    font-weight: 800; color: #fff; font-size: clamp(8.5px, 1.6vh, 10px); text-transform: uppercase; 
+    letter-spacing: 0.5px; background: rgba(255,255,255,0.04); 
+    padding: 5px 12px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.08); 
+  }
+
+  /* SPARKLES */
+  .sparkles { position: absolute; top: 0; right: 0; width: 100px; height: 100%; pointer-events: none; z-index: 1; overflow: hidden; }
+  .sparkle { position: absolute; bottom: -20px; width: 3px; height: 3px; background: #fff; border-radius: 50%; opacity: 0; animation: floatSparkle 2s ease-in infinite; }
+  .sparkle:nth-child(1) { right: 15px; animation-delay: 0.1s; background: #ff007a; }
+  .sparkle:nth-child(2) { right: 40px; animation-delay: 0.5s; width: 4px; height: 4px; }
+  .sparkle:nth-child(3) { right: 60px; animation-delay: 0.2s; background: #00d2ff; }
+
+  /* PROGRESS BAR */
+  #streakProgress { 
+    height: clamp(8px, 1.5vh, 10px); background: rgba(255,255,255,0.03); border-radius: 100px; 
+    margin: clamp(12px, 2.5vh, 20px) 0 clamp(12px, 2.5vh, 18px); 
+    border: 1px solid rgba(255,255,255,0.05); position: relative; z-index: 2; 
+  }
+  
+  #streakFill { 
+    height: 100%; background: linear-gradient(90deg, #ff7a00, #ff007a, #ffb300); 
+    background-size: 200% 100%; border-radius: 100px; 
+    transition: width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1); 
+    animation: shiftingBorder 3s linear infinite; position: relative; 
+  }
+  
+  #streakFill::after { 
+    content: ''; position: absolute; right: 0; top: 50%; transform: translate(50%, -50%); 
+    width: clamp(10px, 2vh, 14px); height: clamp(10px, 2vh, 14px); 
+    background: #fff; border-radius: 50%; box-shadow: 0 0 10px #ff007a; 
+  }
+
+  /* BOTÃO DA BASE (AWESOME) */
+  .buy#streakClose { 
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); 
+    color: #fff; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; 
+    padding: clamp(10px, 2vh, 14px) clamp(28px, 5vw, 42px) !important; 
+    border-radius: 100px !important; cursor: pointer; 
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); 
+    font-size: clamp(11px, 2vh, 12.5px); z-index: 2; position: relative; backdrop-filter: blur(10px); 
+  }
+  
+  .buy#streakClose:hover { 
+    background: #fff; color: #0c0a14; transform: translateY(-2px); 
+    box-shadow: 0 10px 20px rgba(255, 255, 255, 0.15); 
+  }
+
+  /* ANIMAÇÕES */
+  @keyframes modalEnter { 0% { transform: translateY(20px) scale(0.97); opacity: 0; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
+  @keyframes sweepShimmer { 0%, 30% { left: -110%; } 70%, 100% { left: 110%; } }
+  @keyframes gradientText { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+  @keyframes floatEmoji { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+  @keyframes breathe { 0% { transform: translate(-50%, -50%) scale(0.85); opacity: 0.15; } 100% { transform: translate(-50%, -50%) scale(1.15); opacity: 0.35; } }
+  @keyframes shiftingBorder { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+  @keyframes spinRays { 100% { transform: rotate(360deg); } }
+  @keyframes floatSparkle { 0% { transform: translateY(0) scale(0); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateY(-50px) scale(1.2); opacity: 0; } }
+  @keyframes popIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+</style>
+
+<div id="streakModal" aria-hidden="true">
+  <div id="streakPanel" role="dialog" aria-modal="true" aria-labelledby="streakTitle">
+    
+    <div id="streakHead">
+      <div>
+        <h3 id="streakTitle">Weekly Rewards</h3>
+        <p id="streakSub">Claim daily to unlock the Legendary Harvest.</p>
+      </div>
+      <div class="streak-badge">
+        <div style="font-size:10px; opacity:0.8; font-weight:800; text-transform:uppercase; letter-spacing:1px;">Streak</div>
+        <div id="streakCount" style="font-weight:900; color:#fff; font-size:14px;">0 / 7 🔥</div>
+      </div>
+    </div>
+
+    <div class="streakGrid" id="streakGrid" aria-hidden="false"></div>
+
+    <div class="day7Wrap" id="day7Tile">
+      <div class="day7">
+        <div class="left">
+          <div class="bigEm">🎁</div>
+          <div style="min-width:0; z-index:2;">
+            <div class="desc">Legendary Harvest</div>
+            <div class="sub">Coins + Epic Seed + Multiplier</div>
+          </div>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px; z-index:2;">
+          <div id="day7Status">Locked</div>
+          <div id="day7Claim" class="claimBtn dim" style="display:none">Claim</div>
+        </div>
+        <div class="sparkles">
+          <div class="sparkle"></div><div class="sparkle"></div><div class="sparkle"></div><div class="sparkle"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="streakProgress">
+      <div id="streakFill" style="width: 0%;"></div>
+    </div>
+
+    <div style="display:flex; justify-content:center; margin-top: auto;">
+      <div class="buy" id="streakClose">Awesome</div>
+    </div>
+    
+  </div>
+</div>
+
+<script>
+(function(){
+  // Reward definitions for 7 days
+  const WEEK = [
+    // Toned-down weekly rewards to avoid destabilizing the economy.
+    { day:1, em:'🪙', title:'Coins', descr:'+50 Coins', action: s => gainCoins(50) },
+    { day:2, em:'🌱', title:'Seeds', descr:'3 Carrot Seeds', action: s => { S.seeds.carrot = (S.seeds.carrot||0)+3; refreshHotbar(); toast('You received 3 Carrot seeds!'); } },
+    { day:3, em:'⭐', title:'Bonus XP', descr:'+30 XP', action: s => gainXP(30) },
+    // Day 4: modest fertilizer or fallback coins
+    { day:4, em:'🔧', title:'Fertilizer Pack', descr:'+1 Fertilizer Level (or 30🪙)', action: s => {
+        const maxF = (UPGDEF && UPGDEF.fert) ? UPGDEF.fert.max : 5;
+        if(typeof S.upg.fert === 'number' && S.upg.fert < maxF){
+          S.upg.fert = (S.upg.fert||0) + 1;
+          toast('🌿 Fertilizer level increased!');
+        } else {
+          gainCoins(30);
+          toast('🌿 Fertilizer maxed — you received 30🪙 instead');
+        }
+      }
+    },
+    // Day 5: modest temporary sell multiplier for a shorter duration
+    { day:5, em:'🍀', title:'Sell Multiplier', descr:'+10% Sell Bonus (24h)', action: s => {
+        S._tempSellMult = { until: Date.now() + 24*3600*1000, mult: 1.10 };
+        toast('Sell price +10% for 24h');
+      }
+    },
+    { day:6, em:'🌈', title:'Rare Seed Pack', descr:'1 Rare Seed', action: s => {
+        // grant one higher-tier seed if available, prefer tomato/pepper, fallback to carrot
+        const preferred = ['tomato','pepper','eggplant','sunflower'];
+        let granted = 0;
+        for(const k of preferred){
+          if(CROPS[k]){
+            S.seeds[k] = (S.seeds[k]||0) + 1;
+            granted++;
+            break;
+          }
+        }
+        if(granted<1){
+          S.seeds.carrot = (S.seeds.carrot||0) + 1;
+        }
+        refreshHotbar();
+        toast('You received 1 Rare seed!');
+      }
+    },
+    // Day 7: meaningful but not game-breaking jackpot (no Bloombyte)
+    { day:7, em:'💠', title:'Grand Reward', descr:'+600 Coins + 120 XP', action: s => {
+        gainCoins(600);
+        gainXP(120);
+        refreshHotbar();
+        toast('🎉 Grand Reward! 600🪙 + 120 XP');
+      }
+    }
+  ];
+
+  // Utility & persistence
+  const KEY = 'farmup_streak_v1';
+  function now(){ return Date.now(); }
+  function load(){ try{ const j = localStorage.getItem(KEY); return j?JSON.parse(j):{lastClaim:0, streak:0, lastShownDay:0}; }catch(e){return {lastClaim:0,streak:0,lastShownDay:0}; } }
+  function save(state){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+
+  let state = load();
+
+  // Show modal once per day when Play is pressed; helper toggled in existing Play button handler
+  window._maybeShowStreak = function(openFromPlay){
+    // determine local "day id" (date string) to avoid timezone weirdness by using YYYY-MM-DD local
+    const d = new Date();
+    const dayId = d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+    if(state.lastShownDay === dayId) return; // already shown today
+    state.lastShownDay = dayId; save(state);
+    // only auto-open if called from Play (openFromPlay true)
+    if(openFromPlay) showModal();
+  };
+
+  // check whether player can claim (one claim per 24 hours)
+  function canClaim(){
+    const since = now() - (state.lastClaim || 0);
+    return since >= 24*3600*1000;
+  }
+
+  // compute current streak day (1..7)
+  function currentStreak(){
+    return Math.min(7, Math.max(0, state.streak || 0));
+  }
+
+  // advance streak (called on successful claim)
+  function advanceStreak(){
+    const next = Math.min(7, (state.streak||0) + 1);
+    state.streak = next;
+    state.lastClaim = now();
+    save(state);
+    return next;
+  }
+
+  // reset weekly streak if > 24h missed since last claim (and day boundary)
+  function maybeResetStreak(){
+    if(!state.lastClaim) return;
+    const since = now() - state.lastClaim;
+    if(since >= 48*3600*1000){ // missed long enough -> reset (two days)
+      state.streak = 0; save(state);
+    }
+  }
+
+  // Build UI tiles
+  const grid = document.getElementById('streakGrid'), panel = document.getElementById('streakModal');
+  function renderTiles(){
+    grid.innerHTML = '';
+    // days 1-3 row and 4-6 are auto handled by grid; we just push them in order
+    for(let i=0;i<6;i++){
+      const w = WEEK[i];
+      const tile = document.createElement('div');
+      tile.className = 'dayTile';
+      tile.dataset.day = w.day;
+      const claimed = (state.streak || 0) >= w.day && (state.lastClaim);
+      if(claimed) tile.classList.add('claimed');
+      const inner = `<div class="dayIdx">Day ${w.day}</div><div class="dayEm">${w.em}</div><div class="dayReward">${w.descr}</div>`;
+      tile.innerHTML = inner;
+      // Claim button for the next available day only
+      if(!claimed && currentStreak() + 1 === w.day && canClaim()){
+        const btn = document.createElement('div'); btn.className='claimBtn'; btn.textContent='Claim';
+        btn.onclick = ()=> claimDay(w.day);
+        tile.appendChild(btn);
+      } else if(!claimed && currentStreak() + 1 === w.day){
+        const btn = document.createElement('div'); btn.className='claimBtn dim'; btn.textContent='Locked';
+        tile.appendChild(btn);
+      }
+      grid.appendChild(tile);
+    }
+    // day 7 is handled separately
+    updateDay7();
+    updateProgress();
+    document.getElementById('streakCount').textContent = `${currentStreak()}/7`;
+  }
+
+  function updateProgress(){
+    const pct = Math.round((currentStreak()/7)*100);
+    document.getElementById('streakFill').style.width = pct + '%';
+  }
+
+  function updateDay7(){
+    const day7 = WEEK[6];
+    const claimed = (state.streak || 0) >= 7 && state.lastClaim;
+    const status = document.getElementById('day7Status');
+    const btn = document.getElementById('day7Claim');
+    if(claimed){
+      status.textContent = 'Claimed';
+      btn.classList.add('dim'); btn.textContent = 'Claimed';
+      if(!document.getElementById('day7Tile').querySelector('.checkBadge')){
+        const cb = document.createElement('div'); cb.className='checkBadge'; cb.textContent='✓ Claimed'; document.getElementById('day7Tile').appendChild(cb);
+      }
+    } else {
+      const eligible = currentStreak() + 1 === 7 && canClaim();
+      status.textContent = eligible ? 'Ready' : (currentStreak()>=7 ? 'Ready' : 'Locked');
+      btn.classList.toggle('dim', !eligible);
+      btn.textContent = eligible ? 'Claim' : 'Locked';
+      btn.onclick = ()=> { if(eligible) claimDay(7); };
+    }
+  }
+
+  // claim handler
+  function claimDay(day){
+    // guard
+    if(!canClaim()) { toast('⏳ You can claim once every 24 hours'); return; }
+    const entry = WEEK.find(w=>w.day===day); if(!entry) return;
+    // apply reward
+    try{
+      entry.action(S);
+    }catch(e){}
+    // advance streak and save
+    const got = advanceStreak();
+    // visual celebration
+    toast('🎉 Claimed Day '+day+' reward!');
+    sfx('upgrade');
+    // small particle burst effect using existing spawnParticle
+    const center = {x:0,y:1.8,z:0};
+    for(let i=0;i<18;i++){
+      spawnParticle(center.x, center.y, center.z, (Math.random()-0.5)*3, 2+Math.random()*3, (Math.random()-0.5)*3, '#ffd97a', 0.12, 0.7, -9);
+    }
+    // animate tile pop
+    const tileEl = (day===7) ? document.getElementById('day7Tile') : grid.querySelector('[data-day="'+day+'"]');
+    if(tileEl){ tileEl.classList.add('popAnim'); setTimeout(()=>{ tileEl.classList.remove('popAnim'); }, 520); }
+    renderTiles();
+    save(state);
+    // close automatically after claim with gentle delay
+    setTimeout(()=> hideModal(), 900);
+    // persist general game save as well
+    try{ saveGame(true); }catch(e){}
+  }
+
+  // show/hide modal
+  function showModal(){
+    maybeResetStreak();
+    renderTiles();
+    panel.classList.add('on');
+    document.getElementById('streakModal').classList.add('on');
+    document.getElementById('streakModal').setAttribute('aria-hidden','false');
+    // play gentle entrance
+    sfx('click');
+  }
+  function hideModal(){
+    // Trigger smooth closing animation, then fully hide after transition
+    const modalEl = document.getElementById('streakModal');
+    const panelEl = document.getElementById('streakPanel');
+
+    // start closing animation
+    modalEl.classList.add('closing');
+    panelEl.classList.add('closing');
+
+    // remove visible state immediately so layout/interaction is disabled
+    modalEl.classList.remove('on');
+    panel.classList.remove('on');
+    modalEl.setAttribute('aria-hidden','true');
+
+    // after animation completes, fully remove closing classes to reset state
+    setTimeout(()=>{
+      try{
+        modalEl.classList.remove('closing');
+        panelEl.classList.remove('closing');
+      }catch(e){}
+    }, 380); // matches CSS transition durations
+  }
+
+  document.getElementById('streakClose').onclick = hideModal;
+
+  // small canvas glow for day7 (simple radial gradient + animated shimmer)
+  const glowCanvas = document.getElementById('day7Glow');
+  if(glowCanvas && glowCanvas.getContext){
+    const gctx = glowCanvas.getContext('2d');
+    function renderGlow(t){
+      const w=glowCanvas.width, h=glowCanvas.height;
+      gctx.clearRect(0,0,w,h);
+      const grd = gctx.createLinearGradient(0,0,w,0);
+      grd.addColorStop(0,'rgba(255,200,80,0.12)');
+      grd.addColorStop(0.5,'rgba(255,150,50,0.16)');
+      grd.addColorStop(1,'rgba(255,200,80,0.08)');
+      gctx.fillStyle = grd;
+      gctx.fillRect(0,0,w,h);
+      // shimmer
+      const x = (Math.sin(t*0.9)+1)/2 * w;
+      const rg = gctx.createRadialGradient(x, h*0.4, 10, x, h*0.4, w*0.9);
+      rg.addColorStop(0,'rgba(255,235,170,0.18)');
+      rg.addColorStop(1,'rgba(255,235,170,0.0)');
+      gctx.fillStyle = rg; gctx.fillRect(0,0,w,h);
+      requestAnimationFrame(()=> renderGlow(performance.now()/1000));
+    }
+    requestAnimationFrame(()=> renderGlow(performance.now()/1000));
+  }
+
+  // Fire element for Day7: simple CSS animated faux flame via small canvas or rely on particles - here we keep it visual by adding subtle CSS animated dots
+  const day7 = document.getElementById('day7Tile');
+  if(day7){
+    const fire = document.createElement('div'); fire.className='fire';
+    // build small animated dots
+    for(let i=0;i<10;i++){
+      const d = document.createElement('div');
+      d.style.position='absolute'; d.style.width='8px'; d.style.height='12px'; d.style.borderRadius='8px';
+      d.style.right = (8 + Math.random()*92)+'px'; d.style.bottom = (6 + Math.random()*60)+'px';
+      d.style.background = `linear-gradient(180deg, rgba(255,220,120,${0.9+Math.random()*0.1}), rgba(255,120,20,${0.6+Math.random()*0.2}))`;
+      d.style.opacity = 0.9; d.style.transformOrigin='center bottom';
+      d.style.animation = `floatUp ${1.2 + Math.random()*1.2}s ease-in-out ${Math.random()*0.6}s infinite`;
+      fire.appendChild(d);
+    }
+    const style = document.createElement('style'); style.textContent = `
+      @keyframes floatUp { 0% { transform: translateY(0) scale(0.9); opacity:0.4 } 50% { transform: translateY(-18px) scale(1.0); opacity:1 } 100% { transform: translateY(-36px) scale(0.85); opacity:0 } }
+    `;
+    document.head.appendChild(style);
+    day7.appendChild(fire);
+  }
+
+  // Expose helper to show modal from Play button only once per day
+  // Existing mPlay handler calls this helper from earlier code; if not, we wire Play button here
+  const playBtn = document.getElementById('mPlay');
+  if(playBtn){
+    const orig = playBtn.onclick;
+    playBtn.onclick = function(ev){
+      try{ if(typeof orig==='function') orig(ev); }catch(e){}
+      // show modal once per day when pressing Play
+      window._maybeShowStreak(true);
+    };
+  }
+
+  // Also bind to the tutorial Play button variant if present
+  const tutBtn = document.getElementById('mPlayTut');
+  if(tutBtn){
+    const orig2 = tutBtn.onclick;
+    tutBtn.onclick = function(ev){
+      try{ if(typeof orig2==='function') orig2(ev); }catch(e){}
+      window._maybeShowStreak(true);
+    };
+  }
+
+  // On load, keep modal hidden; but set state persistence and ensure resets as needed
+  maybeResetStreak();
+  save(state);
+
+  // utility for tests / manual open
+  window.showStreakModal = showModal;
+  window.hideStreakModal = hideModal;
+
+})();
+</script>
+
+<style>
+  /* Weekly Rewards modal: keep same outer size but ensure all internal elements fit by enabling internal scroll
+     and reducing per-tile min-heights (with responsive fallbacks). These rules intentionally override earlier styles. */
+  #streakPanel{
+    /* keep current width but limit height to viewport and allow internal scrolling */
+    max-height: calc(78vh);
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Make grid rows adapt to content and allow the grid to compress when needed */
+  #streakGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: minmax(56px, auto); /* rows may shrink but grow as needed */
+    gap: 12px;
+  }
+
+  /* Reduce tile min-height to avoid overflow; keep good tap targets */
+  .dayTile {
+    min-height: 70px;
+    padding: 12px 8px;
+  }
+
+  /* Slightly smaller day7 block to keep layout stable on narrow viewports */
+  .day7Wrap { padding: 8px; }
+  .day7 { padding: 16px; }
+
+  /* Ensure the progress bar and footer buttons remain visible inside the scrollable panel */
+  #streakProgress, #streakClose { z-index: 12; position: sticky; bottom: 8px; background-clip: padding-box; }
+
+  /* On very small screens allow slightly smaller tiles and shrink paddings */
+  @media (max-width:420px){
+    #streakPanel{ max-height: calc(82vh); }
+    #streakGrid{ gap:8px; grid-auto-rows: minmax(48px, auto); }
+    .dayTile{ min-height:60px; padding:10px 6px; }
+    .dayEm{ font-size:22px !important; }
+    .day7 .bigEm{ font-size:34px !important; }
+    #streakProgress{ margin-bottom:10px; }
+    #streakClose{ padding:10px 20px !important; position: sticky; bottom: 8px; display:inline-block; width:100%; text-align:center; }
+  }
+
+  /* Make sure the internal scroll doesn't cause the backdrop or outer modal to overflow viewport */
+  #streakModal { overflow: hidden; }
+</style>
 </body></html>
